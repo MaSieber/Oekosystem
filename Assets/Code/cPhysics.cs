@@ -111,7 +111,6 @@ public class cPhysics : MonoBehaviour
 			float xDir = Mathf.Sign(deltaX);
 			if (transform.eulerAngles.y >= 180.0f)
 				xDir = -1.0f;
-            Debug.Log(xDir);
 
 			float x1 = p.x + centre.x - size.x/2 + size.x;
 			float x2 = p.x + centre.x - size.x/2;

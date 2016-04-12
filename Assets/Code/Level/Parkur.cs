@@ -25,23 +25,28 @@ public class Parkur : MonoBehaviour {
         switch (eventType)
         {
             case Events.EnergySuckOut:
-                Color col = this.gameObject.GetComponent<SpriteRenderer>().material.GetColor("Tint");
+                Color col = this.GetComponentInParent<SpriteRenderer>().color;
                 col.a -= deltaTime * fadeOutModifier;
 
-                if (col.a < 0.0f)
-                { 
+                if (col.a <= 0.01f)
+                {
                     col.a = 0.0f;
                     eventType = Events.None;
+                    this.gameObject.transform.parent.gameObject.GetComponent<BoxCollider2D>().enabled = false;
+                    
                 }
+                    
+                this.gameObject.GetComponentInParent<SpriteRenderer>().color = col;
 
                 break;
         }
 	}
 
-    void OnCollisionEnter(Collision collision)
+    void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.tag == "Player")
         {
+            this.gameObject.GetComponent<BoxCollider2D>().enabled = false;
             eventType = Events.EnergySuckOut;
         }
     }
