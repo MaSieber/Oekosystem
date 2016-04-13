@@ -42,14 +42,18 @@ public class Player : MonoBehaviour {
 
     void handleEnergySteal()
     {
-        currentEnergy += 3;
-
-
+        if (Input.GetButtonDown("StealEnergy"))
+            GetComponent<BoxCollider2D>().enabled = true;
+        else if (Input.GetButtonUp("StealEnergy"))
+            GetComponent<BoxCollider2D>().enabled = false;
     }
 
     void handleEnergyProvide()
     {
-
+        if (Input.GetButtonDown("ProvideEnergy"))
+            GetComponent<BoxCollider2D>().enabled = true;
+        else if (Input.GetButtonUp("ProvideEnergy"))
+            GetComponent<BoxCollider2D>().enabled = false;
     }
 
     void handleJump()
@@ -95,10 +99,8 @@ public class Player : MonoBehaviour {
 
         if (playerPhysics.grounded)
         {
-            if (Input.GetButton("StealEnergy"))
-                handleEnergySteal();
-            if (Input.GetButton("ProvideEnergy"))
-                handleEnergyProvide();
+            handleEnergySteal();
+            handleEnergyProvide(); 
         }
 
         movementDirection.y = 0.0f;
@@ -136,4 +138,11 @@ public class Player : MonoBehaviour {
         movementDirection.y = currentSpeed.y * deltaTime;
         //lastDirection = playerPhysics.Move(movementDirection);
     }
+
+    void msg_energySteal(int energy)
+    {
+        currentEnergy += energy;
+        currentEnergy = Mathf.Clamp(currentEnergy, 0, 10);
+    }
+
 }
