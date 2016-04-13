@@ -30,5 +30,6 @@ public class HoverPlatform : MonoBehaviour {
 
         transform.localPosition = new Vector3(0.0f,posY,0.0f);
     }
+
 }
 

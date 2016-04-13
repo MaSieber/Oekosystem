@@ -13,7 +13,10 @@ public class cPhysics : MonoBehaviour
 	public bool movementStopped;
 	[HideInInspector]
 	public float distanceToGround;
-	
+
+    [HideInInspector]
+    public bool bAttached;
+
 	private BoxCollider2D _collider;
 	private Vector3 size;
 	private Vector3 centre;
@@ -32,6 +35,8 @@ public class cPhysics : MonoBehaviour
 		
 		Vector3 vec3 = _collider.offset;
 		centre = vec3;
+
+        bAttached = false;
 	}
 	
 	public float GetDistanceToGround()
@@ -77,7 +82,7 @@ public class cPhysics : MonoBehaviour
 				break;
 			}
 		}
-		
+
 		/*
 		movementStopped = false;
 		if (deltaX == 0.0f)
@@ -171,7 +176,10 @@ public class cPhysics : MonoBehaviour
 				deltaY = 0;
 			}
 		}
-		
+
+        if (bAttached)
+            deltaY = 0;
+
 		Vector3 finalTransform = new Vector3(deltaX,deltaY,0.0f);
 		transform.Translate (finalTransform);
 		

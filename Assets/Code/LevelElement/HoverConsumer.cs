@@ -22,7 +22,16 @@ public class HoverConsumer : MonoBehaviour
     {
 	
 	}
-
+    void OnTriggerEnter2D(Collider2D collider)
+    {
+        if (collider.gameObject.name == "eventTrigger")
+        {
+            this.gameObject.GetComponent<BoxCollider2D>().enabled = false;
+            eventType = Events.EnergyConsume;
+            hoverPlatform.bIsActive = true;
+            collider.gameObject.transform.parent.SendMessage("msg_energyConsume", 3);
+        }
+    }
     void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.name == "Player")

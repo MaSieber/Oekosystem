@@ -60,6 +60,9 @@ public class Player : MonoBehaviour {
     {
         if (Input.GetButtonDown("Jump"))
         {
+            playerPhysics.bAttached = false;
+            transform.parent = null;
+
             if (playerPhysics.grounded)
                 iJumpCounter = 0;
 
@@ -142,12 +145,35 @@ public class Player : MonoBehaviour {
 
         movementDirection.y = currentSpeed.y * deltaTime;
         playerPhysics.Move(movementDirection);
+
+
+        Camera.main.transform.position = new Vector3(transform.position.x, transform.position.y, Camera.main.transform.position.z);
     }
 
     void msg_energySteal(int energy)
     {
         currentEnergy += energy;
         currentEnergy = Mathf.Clamp(currentEnergy, 0, maxEnergy);
+    }
+
+    void msg_energyConsume(int energy)
+    {
+        currentEnergy -= energy;
+        if (currentEnergy < 0)
+            currentEnergy = 0;
+    }
+    void msg_attach()
+    {
+
+    }
+
+    void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.tag == "Hover")
+        {
+            playerPhysics.bAttached = true;
+            transform.parent = collision.gameObject.transform;
+        }
     }
 
 }
