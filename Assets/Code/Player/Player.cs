@@ -8,9 +8,6 @@ public class Player : MonoBehaviour {
 
     //[HideInInspector]
     public PlayerPhysics playerPhysics;
-    private bool bCanJump = false;
-    private bool bJumping = false;
-    private bool bFalling = false;
     private int iJumpCounter = 0;
 
     public float jumpHeight = 8.0f;
@@ -19,9 +16,10 @@ public class Player : MonoBehaviour {
     protected Vector2 targetSpeed = Vector2.zero;
     protected Vector2 currentSpeed = Vector2.zero;
     public Vector2 acceleration = Vector2.zero;
-
-    private Vector3 lastDirection = Vector3.zero;
     private Vector2 movementDirection;
+
+    public int maxEnergy = 10;
+    private int currentEnergy = 0;
 
 	// Use this for initialization
 	void Start () {
@@ -42,6 +40,18 @@ public class Player : MonoBehaviour {
         }
     }
 
+    void handleEnergySteal()
+    {
+        currentEnergy += 3;
+
+
+    }
+
+    void handleEnergyProvide()
+    {
+
+    }
+
     void handleJump()
     {
         if (Input.GetButtonDown("Jump"))
@@ -52,7 +62,6 @@ public class Player : MonoBehaviour {
             iJumpCounter++;
             if (iJumpCounter <= 2)
             {
-                bJumping = true;
                 currentSpeed.y = jumpHeight / jumpTime;
             }
         }
@@ -84,39 +93,47 @@ public class Player : MonoBehaviour {
 
         handleJump();
 
+        if (playerPhysics.grounded)
+        {
+            if (Input.GetButton("StealEnergy"))
+                handleEnergySteal();
+            if (Input.GetButton("ProvideEnergy"))
+                handleEnergyProvide();
+        }
+
         movementDirection.y = 0.0f;
         //jumps & gravitation
         //we start with jumpVelocity, now we decrease it
         if (currentSpeed.y > 0.0f)
-            currentSpeed.y -= acceleration.y * Time.deltaTime;
+            currentSpeed.y -= acceleration.y * deltaTime;
         else
         {
             if (playerPhysics.grounded == false && playerPhysics.onSlope == false)
             {
                 //we are falling if we have negative speedY and we are not grounded
-                if (bCanJump)
+                /*if (bCanJump)
                 {
                     float distanceGround = playerPhysics.GetDistanceToGround();
                     if (distanceGround > 0.5f)
                         bFalling = true;
 
-                }
+                }*/
                 //we want to gain speed if we are falling
-                currentSpeed.y -= acceleration.y * Time.deltaTime;
+                currentSpeed.y -= acceleration.y * deltaTime;
             }
             else
             {
                 //movement is handled earlier, if we jump we need to know if we go to idle
-                bFalling = false;
+                //bFalling = false;
                 //reset to normal gravity 
-                currentSpeed.y = -acceleration.y * Time.deltaTime;
+                currentSpeed.y = -acceleration.y * deltaTime;
             }
-            bJumping = false;
+            //bJumping = false;
         }
 
         handleMovement(x);
 
-        movementDirection.y = currentSpeed.y * Time.deltaTime;
-        lastDirection = playerPhysics.Move(movementDirection);
+        movementDirection.y = currentSpeed.y * deltaTime;
+        //lastDirection = playerPhysics.Move(movementDirection);
     }
 }
