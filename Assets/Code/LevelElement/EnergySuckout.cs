@@ -41,6 +41,16 @@ public class EnergySuckout : MonoBehaviour {
         }
 	}
 
+    void OnTriggerEnter2D(Collider2D collider)
+    {
+        if (collider.gameObject.name == "Player")
+        {
+            this.gameObject.GetComponent<BoxCollider2D>().enabled = false;
+            eventType = Events.EnergySuckOut;
+            collider.gameObject.SendMessage("msg_energySteal", 4);
+        }
+    }
+
     void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.name == "Player")
