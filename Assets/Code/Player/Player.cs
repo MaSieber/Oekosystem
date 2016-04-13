@@ -43,17 +43,17 @@ public class Player : MonoBehaviour {
     void handleEnergySteal()
     {
         if (Input.GetButtonDown("StealEnergy"))
-            GetComponent<BoxCollider2D>().enabled = true;
+            transform.GetChild(2).gameObject.GetComponent<BoxCollider2D>().enabled = true;
         else if (Input.GetButtonUp("StealEnergy"))
-            GetComponent<BoxCollider2D>().enabled = false;
+            transform.GetChild(2).gameObject.GetComponent<BoxCollider2D>().enabled = false;
     }
 
     void handleEnergyProvide()
     {
         if (Input.GetButtonDown("ProvideEnergy"))
-            GetComponent<BoxCollider2D>().enabled = true;
+            transform.GetChild(2).gameObject.GetComponent<BoxCollider2D>().enabled = true;
         else if (Input.GetButtonUp("ProvideEnergy"))
-            GetComponent<BoxCollider2D>().enabled = false;
+            transform.GetChild(2).gameObject.GetComponent<BoxCollider2D>().enabled = false;
     }
 
     void handleJump()
@@ -88,6 +88,11 @@ public class Player : MonoBehaviour {
         movementDirection.y = 0.0f;
 
     } //end - handleMovement
+
+    void FixedUpdate()
+    {
+
+    }
 
 	// Update is called once per frame
 	void Update () {
@@ -136,13 +141,13 @@ public class Player : MonoBehaviour {
         handleMovement(x);
 
         movementDirection.y = currentSpeed.y * deltaTime;
-        //lastDirection = playerPhysics.Move(movementDirection);
+        playerPhysics.Move(movementDirection);
     }
 
     void msg_energySteal(int energy)
     {
         currentEnergy += energy;
-        currentEnergy = Mathf.Clamp(currentEnergy, 0, 10);
+        currentEnergy = Mathf.Clamp(currentEnergy, 0, maxEnergy);
     }
 
 }

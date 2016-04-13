@@ -24,14 +24,14 @@ public class EnergySuckout : MonoBehaviour {
         {
             case Events.EnergySuckOut:
 
-                int childCount = this.gameObject.transform.childCount;
+                int childCount = transform.childCount;
                 for (int i=0; i < childCount; i++)
                 {
                     GameObject child = transform.GetChild(i).gameObject;
                     EnergySuckoutBox suckoutBox = child.GetComponent<EnergySuckoutBox>();
 
                     float rndX = Random.Range(-1.0f, 1.0f);
-                    float rndY = Random.Range(0.0f, 1.0f);
+                    float rndY = Random.Range(2.0f, 5.0f);
                     suckoutBox.startDirection = new Vector3(rndX, rndY, 0.0f);
                     suckoutBox.bDestroying = true;
                 }
@@ -43,8 +43,9 @@ public class EnergySuckout : MonoBehaviour {
 
     void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.name == "PlayerEventTrigger")
+        if (collision.gameObject.name == "Player")
         {
+            this.gameObject.GetComponent<BoxCollider2D>().enabled = false;
             eventType = Events.EnergySuckOut;
             collision.gameObject.SendMessage("msg_energySteal", 4);
         }
