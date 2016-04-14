@@ -23,6 +23,9 @@ public class Player : MonoBehaviour {
     public int maxEnergy = 10;
     private int currentEnergy = 0;
 
+
+    //UI Stuff
+    public CanvasGroup doubleJump; 
     public Slider energySlider;
 
 	// Use this for initialization
@@ -139,6 +142,7 @@ public class Player : MonoBehaviour {
                     {
                         playerPhysics.bAttached = false;
                         transform.parent = null;
+                        doubleJump.alpha = 0;
                     }
 
                 //}
@@ -172,7 +176,10 @@ public class Player : MonoBehaviour {
         energySlider.value = currentEnergy;
 
         if (currentEnergy >= 100)
+        {
+            doubleJump.alpha = 1;
             maxJumps = 2;
+        }
         else
             maxJumps = 1;
     }
@@ -186,7 +193,10 @@ public class Player : MonoBehaviour {
         energySlider.value = currentEnergy;
 
         if (currentEnergy >= 100)
+        {
+            doubleJump.alpha = 1;
             maxJumps = 2;
+        }
         else
             maxJumps = 1;
     }

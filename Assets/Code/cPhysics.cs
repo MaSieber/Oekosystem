@@ -83,31 +83,6 @@ public class cPhysics : MonoBehaviour
 			}
 		}
 
-		/*
-		movementStopped = false;
-		if (deltaX == 0.0f)
-		{
-			for (int i = 0; i <3; i++)
-			{
-				float dir = Mathf.Sign(deltaX);
-				float x = p.x + centre.x + size.x/2 * dir;
-				float y = p.y + centre.y - size.y/2 + size.y/2 * i;
-				
-				ray = new Ray(new Vector2(x,y), new Vector2 (dir, 0));
-				//Debug.DrawRay(ray.origin,ray.direction);
-				if ((hit = Physics2D.Raycast (new Vector2(x,y), new Vector2 (dir, 0),Mathf.Abs (deltaX) + skin,collisionMask)))
-				{
-					float dst = Vector3.Distance (ray.origin,hit.point);
-					if (dst > skin)
-						deltaX = dst * dir - skin * dir;
-					else
-						deltaX = 0; // if we have large slope cancel x
-
-					movementStopped = true;
-					break;
-				}
-			}
-		}*/
 		//todo right detector
 		onSlope = false;
 		if (grounded)
@@ -163,8 +138,35 @@ public class cPhysics : MonoBehaviour
 			Debug.DrawRay(ray.origin,ray.direction*10.0f);
 			
 		}
-		
-		Vector3 playerDir = new Vector3 (deltaX, deltaY);
+       
+		movementStopped = false;
+		if (onSlope == false)
+		{
+			for (int i = 0; i <3; i++)
+			{
+				float dir = Mathf.Sign(deltaX);
+                if (transform.eulerAngles.y >= 180.0f)
+                    dir = -1.0f;
+                float x = p.x + centre.x + size.x/2 * dir;
+				float y = p.y + centre.y - size.y/2 + size.y/2 * i;
+				
+				ray = new Ray(new Vector2(x,y), new Vector2 (dir, 0));
+			    Debug.DrawRay(ray.origin,ray.direction);
+				if ((hit = Physics2D.Raycast (new Vector2(x,y), new Vector2 (dir, 0),Mathf.Abs (deltaX) + skin,collisionMask)))
+				{
+					float dst = Vector3.Distance (ray.origin,hit.point);
+					if (dst > skin)
+						deltaX = dst * dir - skin * dir;
+					else
+						deltaX = 0; // if we have large slope cancel x
+
+					movementStopped = true;
+					break;
+				}
+			}
+		}
+
+        Vector3 playerDir = new Vector3 (deltaX, deltaY);
 		if (!grounded && !movementStopped)
 		{
 			Vector3 o = new Vector3(p.x + centre.x + size.x/2 * Mathf.Sign(deltaX),p.y + centre.y + size.y/2 * Mathf.Sign(deltaY));
