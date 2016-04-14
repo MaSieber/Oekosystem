@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
 
 [RequireComponent(typeof(PlayerPhysics))]
 public class Player : MonoBehaviour {
@@ -8,25 +9,29 @@ public class Player : MonoBehaviour {
 
     //[HideInInspector]
     public PlayerPhysics playerPhysics;
-    private bool bCanJump = false;
-    private bool bJumping = false;
-    private bool bFalling = false;
     private int iJumpCounter = 0;
 
     public float jumpHeight = 8.0f;
     public float jumpTime = 2.0f;
+    public int maxJumps = 1;
 
     protected Vector2 targetSpeed = Vector2.zero;
     protected Vector2 currentSpeed = Vector2.zero;
     public Vector2 acceleration = Vector2.zero;
-
-    private Vector3 lastDirection = Vector3.zero;
     private Vector2 movementDirection;
+
+    public int maxEnergy = 10;
+    private int currentEnergy = 0;
+
+
+    //UI Stuff
+    public CanvasGroup doubleJump; 
+    public Slider energySlider;
 
 	// Use this for initialization
 	void Start () {
-	
-	}
+        energySlider.maxValue = maxEnergy;
+    }
 
     protected float IncrementTowards(float n, float target, float a)
     {
@@ -42,18 +47,44 @@ public class Player : MonoBehaviour {
         }
     }
 
+    void handleEnergySteal()
+    {
+        if (Input.GetButtonDown("StealEnergy"))
+            transform.GetChild(2).gameObject.GetComponent<BoxCollider2D>().enabled = true;
+        else if (Input.GetButtonUp("StealEnergy"))
+            transform.GetChild(2).gameObject.GetComponent<BoxCollider2D>().enabled = false;
+    }
+
+    void handleEnergyProvide()
+    {
+        if (Input.GetButtonDown("ProvideEnergy"))
+            transform.GetChild(2).gameObject.GetComponent<BoxCollider2D>().enabled = true;
+        else if (Input.GetButtonUp("ProvideEnergy"))
+            transform.GetChild(2).gameObject.GetComponent<BoxCollider2D>().enabled = false;
+    }
+
     void handleJump()
     {
         if (Input.GetButtonDown("Jump"))
         {
+            playerPhysics.bAttached = false;
+            transform.parent = null;
+
             if (playerPhysics.grounded)
                 iJumpCounter = 0;
 
             iJumpCounter++;
-            if (iJumpCounter <= 2)
+            if (iJumpCounter <= maxJumps)
             {
-                bJumping = true;
                 currentSpeed.y = jumpHeight / jumpTime;
+
+                if (iJumpCounter == 2)
+                {
+                    currentEnergy = 0;
+                    energySlider.value = currentEnergy;
+                    maxJumps = 1;
+                    doubleJump.alpha = 0;
+                }
             }
         }
     }
@@ -76,6 +107,11 @@ public class Player : MonoBehaviour {
 
     } //end - handleMovement
 
+    void FixedUpdate()
+    {
+
+    }
+
 	// Update is called once per frame
 	void Update () {
 
@@ -84,39 +120,112 @@ public class Player : MonoBehaviour {
 
         handleJump();
 
+        if (playerPhysics.grounded)
+        {
+            handleEnergySteal();
+            handleEnergyProvide(); 
+        }
+
         movementDirection.y = 0.0f;
         //jumps & gravitation
         //we start with jumpVelocity, now we decrease it
         if (currentSpeed.y > 0.0f)
-            currentSpeed.y -= acceleration.y * Time.deltaTime;
+            currentSpeed.y -= acceleration.y * deltaTime;
         else
         {
             if (playerPhysics.grounded == false && playerPhysics.onSlope == false)
             {
                 //we are falling if we have negative speedY and we are not grounded
-                if (bCanJump)
-                {
+                //if (bCanJump)
+                //{
                     float distanceGround = playerPhysics.GetDistanceToGround();
                     if (distanceGround > 0.5f)
-                        bFalling = true;
+                    {
+                        playerPhysics.bAttached = false;
+                        transform.parent = null;
+                    }
 
-                }
+                //}
                 //we want to gain speed if we are falling
-                currentSpeed.y -= acceleration.y * Time.deltaTime;
+                currentSpeed.y -= acceleration.y * deltaTime;
             }
             else
             {
                 //movement is handled earlier, if we jump we need to know if we go to idle
-                bFalling = false;
+                //bFalling = false;
                 //reset to normal gravity 
-                currentSpeed.y = -acceleration.y * Time.deltaTime;
+                currentSpeed.y = -acceleration.y * deltaTime;
             }
-            bJumping = false;
+            //bJumping = false;
         }
 
         handleMovement(x);
 
-        movementDirection.y = currentSpeed.y * Time.deltaTime;
-        lastDirection = playerPhysics.Move(movementDirection);
+        movementDirection.y = currentSpeed.y * deltaTime;
+        playerPhysics.Move(movementDirection);
+
+
+        Camera.main.transform.position = new Vector3(transform.position.x, transform.position.y, Camera.main.transform.position.z);
     }
+
+    void msg_energySteal(int energy)
+    {
+        currentEnergy += energy;
+        currentEnergy = Mathf.Clamp(currentEnergy, 0, maxEnergy);
+
+        energySlider.value = currentEnergy;
+
+        if (currentEnergy >= 100)
+        {
+            doubleJump.alpha = 1;
+            maxJumps = 2;
+        }
+        else
+        {
+            maxJumps = 1;
+            doubleJump.alpha = 0;
+        }
+            
+    }
+
+    void msg_energyConsume(int energy)
+    {
+        currentEnergy -= energy;
+        if (currentEnergy < 0)
+            currentEnergy = 0;
+
+        energySlider.value = currentEnergy;
+
+        if (currentEnergy >= 100)
+        {
+            doubleJump.alpha = 1;
+            maxJumps = 2;
+        }
+        else
+        {
+            maxJumps = 1;
+            doubleJump.alpha = 0;
+        }
+            
+    }
+    void msg_attach()
+    {
+
+    }
+
+    void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.tag == "Hover")
+        {
+            playerPhysics.bAttached = true;
+            transform.parent = collision.gameObject.transform;
+        }
+        else if (collision.gameObject.tag == "EnergyCollect")
+        {
+            int points = collision.gameObject.GetComponent<EnergyCollectible>().points;
+            msg_energySteal(points);
+            Destroy(collision.gameObject);
+        }
+    }
+
 }

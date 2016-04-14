@@ -51,5 +51,11 @@ public class Parkur : MonoBehaviour {
         }
     }
 
+    void msg_EnergySuckOut()
+    {
+        this.gameObject.GetComponent<BoxCollider2D>().enabled = false;
+        eventType = Events.EnergySuckOut;
+    }
+
 
 }

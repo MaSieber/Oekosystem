@@ -3,9 +3,14 @@ using System.Collections;
 
 public class LevelEnd : MonoBehaviour {
 
+    public Vector3 spawnPoint;
+
 	// Use this for initialization
-	void Start () {
-	
+	void Start ()
+    {
+        
+
+        spawnPoint = GameObject.FindGameObjectWithTag("Player").transform.position;
 	}
 	
 	// Update is called once per frame
@@ -15,6 +20,6 @@ public class LevelEnd : MonoBehaviour {
 
     void OnCollisionEnter2D(Collision2D collision)
     {
-        Destroy(collision.gameObject);
+        collision.gameObject.transform.position = spawnPoint;
     }
 }
