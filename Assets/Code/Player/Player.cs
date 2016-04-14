@@ -83,6 +83,7 @@ public class Player : MonoBehaviour {
                     currentEnergy = 0;
                     energySlider.value = currentEnergy;
                     maxJumps = 1;
+                    doubleJump.alpha = 0;
                 }
             }
         }
@@ -142,7 +143,6 @@ public class Player : MonoBehaviour {
                     {
                         playerPhysics.bAttached = false;
                         transform.parent = null;
-                        doubleJump.alpha = 0;
                     }
 
                 //}
@@ -181,7 +181,11 @@ public class Player : MonoBehaviour {
             maxJumps = 2;
         }
         else
+        {
             maxJumps = 1;
+            doubleJump.alpha = 0;
+        }
+            
     }
 
     void msg_energyConsume(int energy)
@@ -198,7 +202,11 @@ public class Player : MonoBehaviour {
             maxJumps = 2;
         }
         else
+        {
             maxJumps = 1;
+            doubleJump.alpha = 0;
+        }
+            
     }
     void msg_attach()
     {

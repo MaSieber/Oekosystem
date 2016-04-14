@@ -24,6 +24,7 @@ public class EnergySuckout : MonoBehaviour {
         {
             case Events.EnergySuckOut:
 
+                transform.parent.gameObject.GetComponent<BoxCollider2D>().enabled = false;
                 int childCount = transform.childCount;
                 for (int i=0; i < childCount; i++)
                 {

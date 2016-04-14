@@ -26,7 +26,9 @@ public class EnergySuckoutBox : MonoBehaviour {
             transform.Translate(startDirection * speedModifier * Time.deltaTime);
 
             if (despawnTime <= 0.0f)
-                Destroy(this.gameObject);
+            {
+                Destroy(transform.parent.parent.gameObject);
+            }
             else
                 despawnTime -= Time.deltaTime;
         }
