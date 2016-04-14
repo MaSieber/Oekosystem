@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
 
 [RequireComponent(typeof(PlayerPhysics))]
 public class Player : MonoBehaviour {
@@ -21,10 +22,12 @@ public class Player : MonoBehaviour {
     public int maxEnergy = 10;
     private int currentEnergy = 0;
 
+    public Slider energySlider;
+
 	// Use this for initialization
 	void Start () {
-	
-	}
+        energySlider.maxValue = maxEnergy;
+    }
 
     protected float IncrementTowards(float n, float target, float a)
     {
@@ -121,13 +124,16 @@ public class Player : MonoBehaviour {
             if (playerPhysics.grounded == false && playerPhysics.onSlope == false)
             {
                 //we are falling if we have negative speedY and we are not grounded
-                /*if (bCanJump)
-                {
+                //if (bCanJump)
+                //{
                     float distanceGround = playerPhysics.GetDistanceToGround();
                     if (distanceGround > 0.5f)
-                        bFalling = true;
+                    {
+                        playerPhysics.bAttached = false;
+                        transform.parent = null;
+                    }
 
-                }*/
+                //}
                 //we want to gain speed if we are falling
                 currentSpeed.y -= acceleration.y * deltaTime;
             }
@@ -154,6 +160,8 @@ public class Player : MonoBehaviour {
     {
         currentEnergy += energy;
         currentEnergy = Mathf.Clamp(currentEnergy, 0, maxEnergy);
+
+        energySlider.value = currentEnergy;
     }
 
     void msg_energyConsume(int energy)
@@ -161,6 +169,8 @@ public class Player : MonoBehaviour {
         currentEnergy -= energy;
         if (currentEnergy < 0)
             currentEnergy = 0;
+
+        energySlider.value = currentEnergy;
     }
     void msg_attach()
     {

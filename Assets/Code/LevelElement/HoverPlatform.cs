@@ -10,7 +10,7 @@ public class HoverPlatform : MonoBehaviour {
     private int direction = 1;
 	// Use this for initialization
 	void Start () {
-        currentRadiant = Mathf.PI / 2;
+        currentRadiant = 0.0f;
 	}
 	
 	// Update is called once per frame
@@ -27,7 +27,7 @@ public class HoverPlatform : MonoBehaviour {
         currentRadiant += Time.deltaTime * direction;
         float transitionY = Mathf.Sin(currentRadiant) * movementSpeed;
         float posY = Mathf.Lerp(-0.4f, 0.4f, transitionY);
-
+        
         transform.localPosition = new Vector3(0.0f,posY,0.0f);
     }
 
