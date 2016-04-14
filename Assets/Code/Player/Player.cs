@@ -13,6 +13,7 @@ public class Player : MonoBehaviour {
 
     public float jumpHeight = 8.0f;
     public float jumpTime = 2.0f;
+    public int maxJumps = 1;
 
     protected Vector2 targetSpeed = Vector2.zero;
     protected Vector2 currentSpeed = Vector2.zero;
@@ -70,9 +71,16 @@ public class Player : MonoBehaviour {
                 iJumpCounter = 0;
 
             iJumpCounter++;
-            if (iJumpCounter <= 2)
+            if (iJumpCounter <= maxJumps)
             {
                 currentSpeed.y = jumpHeight / jumpTime;
+
+                if (iJumpCounter == 2)
+                {
+                    currentEnergy = 0;
+                    energySlider.value = currentEnergy;
+                    maxJumps = 1;
+                }
             }
         }
     }
@@ -162,6 +170,11 @@ public class Player : MonoBehaviour {
         currentEnergy = Mathf.Clamp(currentEnergy, 0, maxEnergy);
 
         energySlider.value = currentEnergy;
+
+        if (currentEnergy >= 100)
+            maxJumps = 2;
+        else
+            maxJumps = 1;
     }
 
     void msg_energyConsume(int energy)
@@ -171,6 +184,11 @@ public class Player : MonoBehaviour {
             currentEnergy = 0;
 
         energySlider.value = currentEnergy;
+
+        if (currentEnergy >= 100)
+            maxJumps = 2;
+        else
+            maxJumps = 1;
     }
     void msg_attach()
     {
