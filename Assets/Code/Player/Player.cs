@@ -220,6 +220,12 @@ public class Player : MonoBehaviour {
             playerPhysics.bAttached = true;
             transform.parent = collision.gameObject.transform;
         }
+        else if (collision.gameObject.tag == "EnergyCollect")
+        {
+            int points = collision.gameObject.GetComponent<EnergyCollectible>().points;
+            msg_energySteal(points);
+            Destroy(collision.gameObject);
+        }
     }
 
 }
