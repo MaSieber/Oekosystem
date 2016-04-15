@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(PlayerPhysics))]
 public class Player : MonoBehaviour {
@@ -115,9 +116,17 @@ public class Player : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 
+        if (Input.GetKeyDown(KeyCode.F2))
+        {
+            SceneManager.LoadScene("prototype");
+        }
+        if (Input.GetKeyDown(KeyCode.F3))
+        {
+            SceneManager.LoadScene("prototype_vadim");
+        }
+
         float x = Input.GetAxis("Horizontal");
         float deltaTime = Time.deltaTime;
-
         handleJump();
 
         if (playerPhysics.grounded)
