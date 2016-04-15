@@ -11,6 +11,8 @@ public class EnergySuckout : MonoBehaviour {
     private Events eventType;
     private bool bIsStable;
 
+    public int energy = 25;
+
     // Use this for initialization
     void Start ()
     {
@@ -48,7 +50,7 @@ public class EnergySuckout : MonoBehaviour {
         {
             this.gameObject.GetComponent<BoxCollider2D>().enabled = false;
             eventType = Events.EnergySuckOut;
-            collider.gameObject.transform.parent.SendMessage("msg_energySteal", 100);
+            collider.gameObject.transform.parent.SendMessage("msg_energySteal", energy);
         }
     }
 
@@ -58,7 +60,7 @@ public class EnergySuckout : MonoBehaviour {
         {
             this.gameObject.GetComponent<BoxCollider2D>().enabled = false;
             eventType = Events.EnergySuckOut;
-            collision.gameObject.SendMessage("msg_energySteal", 100);
+            collision.gameObject.SendMessage("msg_energySteal", energy);
         }
     }
 }
