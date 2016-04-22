@@ -54,6 +54,7 @@ DerivedDataCache/*
 *.opensdf
 *.sdf
 *.sln
+*.db
 
 # Mac Artifacts
 .DS_Store
