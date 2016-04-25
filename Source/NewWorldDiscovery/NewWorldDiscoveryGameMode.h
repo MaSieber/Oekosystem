@@ -11,6 +11,15 @@ class ANewWorldDiscoveryGameMode : public AGameMode
 public:
 	ANewWorldDiscoveryGameMode();
 
+
+	UFUNCTION(BlueprintPure, Category = Player)
+	int32 GetEnergyLimit();
+
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Player)
+	int32 EnergyLimit;
+
+
 };
 
 
