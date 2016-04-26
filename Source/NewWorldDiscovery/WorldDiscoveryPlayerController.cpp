@@ -8,5 +8,9 @@ void AWorldDiscoveryPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
+
+	this->bShowMouseCursor = true;
+	this->bEnableClickEvents = true;
+	this->bEnableMouseOverEvents = true;
 }
 
