@@ -25,8 +25,18 @@ public:
 	void RemoveEnergy(int32 energy);
 
 
+	UFUNCTION(BlueprintPure, Category = Player)
+	int32 GetCurrentRessource();
+
+	UFUNCTION(BlueprintCallable, Category = Player)
+	void AddRessource(int32 ressource);
+
+	UFUNCTION(BlueprintCallable, Category = Player)
+	void RemoveRessource(int32 ressource);
+
 private:
 	int32 CurrentEnergy;
+	int32 CurrentRessource;
 
 	
 };
