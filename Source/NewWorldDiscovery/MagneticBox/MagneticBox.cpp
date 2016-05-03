@@ -4,6 +4,7 @@
 #include "MagneticBox.h"
 #include "NewWorldDiscoveryCharacter.h"
 #include "WorldDiscoveryPlayerController.h"
+#include "DrawDebugHelpers.h"
 
 
 // Sets default values
@@ -42,21 +43,23 @@ void AMagneticBox::Tick( float DeltaTime )
 
 	if (bPulling)
 	{
-		FVector newLocation;
-		newLocation = ForceAmount * ForceDirection;		
-		
-		MagneticMesh->AddTorque(ForceDirection);
-		MagneticMesh->AddForce(newLocation, NAME_None, true);
+		ANewWorldDiscoveryCharacter *playerChar = Cast<ANewWorldDiscoveryCharacter>(GetWorld()->GetFirstPlayerController()->GetCharacter());
+		TargetLocation = playerChar->GetActorLocation();
+		TargetLocation.Z += 200.0f;
 
-		//SetActorLocation(compLocation);
-		
-		
-		UE_LOG(LogTemp, Warning, TEXT("ForceAmount: %f "), ForceAmount);
+		FVector ActorPos = MagneticMesh->RelativeLocation;
 
-		ForceAmount += DeltaTime * 100.0f;		//v = Time * Acceleration
-		ForceAmount = FMath::Clamp(ForceAmount,0.0f,1000.0f);
-
+		float dist = FVector::Dist(TargetLocation, ActorPos);
+		if (dist > 50)
+		{ 
+			ForceDirection = (TargetLocation - ActorPos).GetSafeNormal();
+			FVector newLocation = ForceAmount * ForceDirection;
 		
+			DrawDebugLine(GetWorld(), ActorPos, TargetLocation,FColor(255,255,0,1));
+
+			MagneticMesh->AddTorque(ForceDirection);
+			MagneticMesh->AddForce(newLocation, NAME_None, true);		
+		}
 	}
 
 }
@@ -68,6 +71,7 @@ void AMagneticBox::triggerMagnetic(FVector direction, float force)
 	ForceDirection = direction.GetSafeNormal();
 	ForceAmount = force;
 	CurrentForceSeconds = ForceSeconds;
+	
 }
 
 void AMagneticBox::TriggerMagneticStop()
@@ -83,12 +87,11 @@ void AMagneticBox::OnOverlapBegin(class AActor* OtherActor, class UPrimitiveComp
 	if (playerChar)
 	{
 		FVector playerPos = playerChar->GetActorLocation();
-		playerPos.Y += 150.0f;
-		FVector direction = playerPos - GetActorLocation();
-		
+		playerPos.Z += 200.0f;
 
 
-		triggerMagnetic(direction, 800);	
+		FVector direction = playerPos - MagneticMesh->RelativeLocation;
+		triggerMagnetic(direction, 1500);
 	}
 }
 

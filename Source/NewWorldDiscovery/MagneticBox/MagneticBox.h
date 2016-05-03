@@ -47,4 +47,5 @@ private:
 	float ForceSeconds;
 	float CurrentForceSeconds;
 	
+	FVector TargetLocation;
 };
