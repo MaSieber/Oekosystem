@@ -2,6 +2,7 @@
 
 #include "NewWorldDiscovery.h"
 #include "MagneticBox.h"
+#include "NewWorldDiscoveryCharacter.h"
 #include "WorldDiscoveryPlayerController.h"
 
 
@@ -16,6 +17,10 @@ AMagneticBox::AMagneticBox()
 
 	MagneticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BatteryMesh"));
 	MagneticMesh->AttachTo(BaseComponent);
+	MagneticMesh->bGenerateOverlapEvents = true;
+	MagneticMesh->SetCollisionProfileName("MagneticBox");
+	MagneticMesh->OnComponentBeginOverlap.AddDynamic(this, &AMagneticBox::OnOverlapBegin);
+	MagneticMesh->OnComponentEndOverlap.AddDynamic(this, &AMagneticBox::OnOverlapEnd);
 	MagneticMesh->SetSimulatePhysics(true);
 	
 	bPulling = false;
@@ -37,47 +42,30 @@ void AMagneticBox::Tick( float DeltaTime )
 
 	if (bPulling)
 	{
-		AWorldDiscoveryPlayerController* playerController =  Cast<AWorldDiscoveryPlayerController>(GetWorld()->GetFirstPlayerController());
-		if (playerController)
-		{
-			float MouseX = 0.0f;
-			float MouseY = 0.0f;
-			FVector mouseLocation, mouseDirection;
-			//bool bMouse = playerController->GetMousePosition(MouseX,MouseY);
-			bool bMouse = playerController->DeprojectMousePositionToWorld(mouseLocation, mouseDirection);
+		FVector newLocation;
+		newLocation = ForceAmount * ForceDirection;		
+		
+		MagneticMesh->AddTorque(ForceDirection);
+		MagneticMesh->AddForce(newLocation, NAME_None, true);
 
-			
+		//SetActorLocation(compLocation);
+		
+		
+		UE_LOG(LogTemp, Warning, TEXT("ForceAmount: %f "), ForceAmount);
 
-			if (bMouse)
-			{
-				FVector newLocation;
-				newLocation.X = GetActorLocation().X;
-				newLocation.Y = mouseLocation.Y + (mouseDirection.Y * 500);
-				newLocation.Z = mouseLocation.Z + (mouseDirection.Z * 500);
+		ForceAmount += DeltaTime * 100.0f;		//v = Time * Acceleration
+		ForceAmount = FMath::Clamp(ForceAmount,0.0f,1000.0f);
 
-				UE_LOG(LogTemp, Warning, TEXT("actor: %f %f %f"), GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z);
-				UE_LOG(LogTemp, Warning, TEXT("mouse: %f %f %f"), mouseLocation.X, mouseLocation.Y,mouseLocation.Z);
-				UE_LOG(LogTemp, Warning, TEXT("mouse direction: %f %f %f"), mouseDirection.X, mouseDirection.Y, mouseDirection.Z);
-				SetActorLocation(newLocation);
-			}
-		}
-		//if (CurrentForceSeconds > 0.0f)
-		//	CurrentForceSeconds -= DeltaTime;
-		//else
-		//	bPulling = false;
-
-		//MagneticMesh->AddTorque(ForceDirection);
-		//MagneticMesh->AddForce(ForceDirection * ForceAmount, NAME_None, true);
-		//MagneticMesh->AddImpulse(ForceDirection * ForceAmount, NAME_None, true);
+		
 	}
 
 }
 
 void AMagneticBox::triggerMagnetic(FVector direction, float force)
 {
-	MagneticMesh->SetSimulatePhysics(false);
+	//MagneticMesh->SetSimulatePhysics(false);
 	bPulling = true;
-	ForceDirection = direction;
+	ForceDirection = direction.GetSafeNormal();
 	ForceAmount = force;
 	CurrentForceSeconds = ForceSeconds;
 }
@@ -85,7 +73,27 @@ void AMagneticBox::triggerMagnetic(FVector direction, float force)
 void AMagneticBox::TriggerMagneticStop()
 {
 	bPulling = false;
-	MagneticMesh->SetSimulatePhysics(true);
+}
 
-	
+void AMagneticBox::OnOverlapBegin(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	UE_LOG(LogTemp,Warning,TEXT("Overlap Begin"));
+
+	ANewWorldDiscoveryCharacter *playerChar = Cast<ANewWorldDiscoveryCharacter>(OtherActor);
+	if (playerChar)
+	{
+		FVector playerPos = playerChar->GetActorLocation();
+		playerPos.Y += 150.0f;
+		FVector direction = playerPos - GetActorLocation();
+		
+
+
+		triggerMagnetic(direction, 800);	
+	}
+}
+
+void AMagneticBox::OnOverlapEnd(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Overlap End"));
+	TriggerMagneticStop();
 }

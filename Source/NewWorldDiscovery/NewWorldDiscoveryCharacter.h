@@ -16,6 +16,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent* CameraBoom;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = MagneticCollider)
+	USphereComponent* magneticTrigger;
+
 protected:
 
 	/** Called for side to side input */
@@ -35,8 +38,12 @@ protected:
 public:
 	ANewWorldDiscoveryCharacter();
 
+	// Called every frame
+	virtual void Tick(float DeltaSeconds) override;
+
 	/** Returns SideViewCameraComponent subobject **/
 	FORCEINLINE class UCameraComponent* GetSideViewCameraComponent() const { return SideViewCameraComponent; }
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
+
 };

@@ -37,6 +37,12 @@ ANewWorldDiscoveryCharacter::ANewWorldDiscoveryCharacter()
 	GetCharacterMovement()->MaxWalkSpeed = 600.f;
 	GetCharacterMovement()->MaxFlySpeed = 600.f;
 
+	magneticTrigger = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComponent"));	
+	magneticTrigger->bGenerateOverlapEvents = false;
+	magneticTrigger->SetSimulatePhysics(false);
+	magneticTrigger->AttachTo(RootComponent);
+	
+
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
 }
@@ -72,3 +78,8 @@ void ANewWorldDiscoveryCharacter::TouchStopped(const ETouchIndex::Type FingerInd
 	StopJumping();
 }
 
+void ANewWorldDiscoveryCharacter::Tick(float DeltaTime)
+{
+	float rad = magneticTrigger->GetUnscaledSphereRadius();
+	magneticTrigger->SetSphereRadius(rad + FMath::Sin(DeltaTime)/10.0f);
+}
