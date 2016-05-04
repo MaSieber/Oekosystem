@@ -11,10 +11,6 @@ class NEWWORLDDISCOVERY_API AMagneticBox : public AActor
 	GENERATED_BODY()
 	
 public:	
-
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = MagneticBox)
-	USceneComponent* BaseComponent;
-
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = MagneticBox)
 	UStaticMeshComponent* MagneticMesh;
 
@@ -39,8 +35,26 @@ public:
 	UFUNCTION()
 	void OnOverlapEnd(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MagneticBox)
+	float Acceleration;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MagneticBox)
+	float Velocity;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MagneticBox)
+	float RotationVelocity;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MagneticBox)
+	float RotationAmplitude;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MagneticBox)
+	float RotationFrequency;
+
 private:
-	bool bPulling;
+	void Accelerate(float DeltaTime);
+
+	float CurrentVelocity;
+
 	float ForceAmount;
 	FVector ForceDirection;
 
@@ -48,4 +62,12 @@ private:
 	float CurrentForceSeconds;
 	
 	FVector TargetLocation;
+
+	enum ePulling
+	{
+		NONE = 0,
+		PULLING,
+		FOLLOWING
+	};
+	int PullingType;
 };
