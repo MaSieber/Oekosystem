@@ -19,6 +19,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = MagneticCollider)
 	USphereComponent* magneticTrigger;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MagneticBox)
+	AActor* PulledObject;
+
 protected:
 
 	/** Called for side to side input */
@@ -45,5 +48,8 @@ public:
 	FORCEINLINE class UCameraComponent* GetSideViewCameraComponent() const { return SideViewCameraComponent; }
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
+
+	UFUNCTION(BlueprintCallable, Category = MagneticBox)
+	AActor* GetPulledObject();
 
 };

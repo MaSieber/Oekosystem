@@ -35,6 +35,8 @@ AMagneticBox::AMagneticBox()
 
 	RotationAmplitude = 1.0f;
 	RotationFrequency = 0.02f;
+
+	PushAmount = 5000.0f;
 }
 
 // Called when the game starts or when spawned
@@ -96,6 +98,8 @@ void AMagneticBox::Tick( float DeltaTime )
 			ANewWorldDiscoveryCharacter *playerChar = Cast<ANewWorldDiscoveryCharacter>(playerController->GetCharacter());
 			FVector ActorPos = GetActorLocation();
 
+			playerChar->PulledObject = this;
+
 			TargetLocation = playerChar->GetActorLocation();
 			TargetLocation.Z += 200.0f;
 			
@@ -119,7 +123,6 @@ void AMagneticBox::Tick( float DeltaTime )
 				if (bMouse)
 				{
 					MouseY = (mouseDirection.Y * 360);
-					UE_LOG(LogTemp, Warning, TEXT("mouseLocationY - %f, mouseDirectionY - %f"), mouseLocation.Y,mouseDirection.Y);
 				}
 
 				float s = RotationAmplitude * FMath::Sin(RotationFrequency * MouseY);
@@ -131,29 +134,45 @@ void AMagneticBox::Tick( float DeltaTime )
 				float newY = player.Y + (c * (box.Y - player.Y) - s * (box.Z - player.Z));
 				float newZ = player.Z + (s * (box.Y - player.Y) + c * (box.Z - player.Z));
 				
-				UE_LOG(LogTemp, Warning, TEXT(" old %f, %f,%f"), box.X, box.Y, box.Z);
 				FVector newLocation = FVector(box.X, newY, newZ);
 				SetActorLocation(newLocation);
-				UE_LOG(LogTemp, Warning, TEXT(" new %f, %f,%f"), GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z);
-				
 				
 			}
 			break;
 
+		}
+		case ePulling::PUSHING:
+		{
+			AWorldDiscoveryPlayerController* playerController = Cast<AWorldDiscoveryPlayerController>(GetWorld()->GetFirstPlayerController());
+			ANewWorldDiscoveryCharacter *playerChar = Cast<ANewWorldDiscoveryCharacter>(playerController->GetCharacter());
+			FVector ActorPos = GetActorLocation();
+			FVector PlayerPos = playerChar->GetActorLocation();
+
+			FVector PushDirection = -1.0f * (PlayerPos - ActorPos).GetSafeNormal();
+
+			MagneticMesh->AddImpulseAtLocation(PushDirection * PushAmount, GetActorLocation());
+
+			//PullingType = ePulling::NONE;
+
+			break;
 		}
 	}
 }
 
 void AMagneticBox::triggerMagnetic(FVector direction, float force)
 {
-	ForceDirection = direction.GetSafeNormal();
-	ForceAmount = force;
-	CurrentForceSeconds = ForceSeconds;
-	MagneticMesh->SetEnableGravity(false);
-	MagneticMesh->SetSimulatePhysics(false);
-	PullingType = ePulling::PULLING;
+	if (PullingType == ePulling::NONE)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Trigger"));
 
-	CurrentVelocity = 0;
+		ForceDirection = direction.GetSafeNormal();
+		ForceAmount = force;
+		CurrentForceSeconds = ForceSeconds;
+		MagneticMesh->SetEnableGravity(false);
+		MagneticMesh->SetSimulatePhysics(false);
+		PullingType = ePulling::PULLING;
+		CurrentVelocity = 0;
+	}
 }
 
 void AMagneticBox::TriggerMagneticStop()
@@ -161,6 +180,18 @@ void AMagneticBox::TriggerMagneticStop()
 	PullingType = ePulling::NONE;
 	MagneticMesh->SetEnableGravity(true);
 	MagneticMesh->SetSimulatePhysics(true);
+}
+
+void AMagneticBox::TriggerMagneticPush()
+{
+	if (PullingType == ePulling::FOLLOWING)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Push"));
+
+		PullingType = ePulling::PUSHING;
+		MagneticMesh->SetEnableGravity(true);
+		MagneticMesh->SetSimulatePhysics(true);
+	}
 }
 
 void AMagneticBox::OnOverlapBegin(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)

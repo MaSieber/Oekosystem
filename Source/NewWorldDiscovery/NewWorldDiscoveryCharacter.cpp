@@ -80,6 +80,12 @@ void ANewWorldDiscoveryCharacter::TouchStopped(const ETouchIndex::Type FingerInd
 
 void ANewWorldDiscoveryCharacter::Tick(float DeltaTime)
 {
+	//To Trigger the Collision Event, if we stay still
 	float rad = magneticTrigger->GetUnscaledSphereRadius();
 	magneticTrigger->SetSphereRadius(rad + FMath::Sin(DeltaTime)/10.0f);
+}
+
+AActor* ANewWorldDiscoveryCharacter::GetPulledObject()
+{
+	return this->PulledObject;
 }

@@ -29,6 +29,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = MagneticBox)
 	void TriggerMagneticStop();
 
+	UFUNCTION(BlueprintCallable, Category = MagneticBox)
+	void TriggerMagneticPush();
+
 	UFUNCTION()
 	void OnOverlapBegin(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
@@ -50,6 +53,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MagneticBox)
 	float RotationFrequency;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MagneticBox)
+	float PushAmount;
+
 private:
 	void Accelerate(float DeltaTime);
 
@@ -67,7 +73,8 @@ private:
 	{
 		NONE = 0,
 		PULLING,
-		FOLLOWING
+		FOLLOWING,
+		PUSHING
 	};
 	int PullingType;
 };
