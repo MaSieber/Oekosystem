@@ -121,8 +121,6 @@ void AMovingPlatform::Tick( float DeltaTime )
 
 void AMovingPlatform::DirectionSwitch(float current,float start, float end)
 {
-	UE_LOG(LogTemp,Warning,TEXT("%f %f %f"),current,start,end);
-
 	float oldDirection = MoveDirection;
 	if (current >= start)
 		MoveDirection = -1.0f;

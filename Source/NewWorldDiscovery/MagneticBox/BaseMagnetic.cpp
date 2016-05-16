@@ -165,6 +165,9 @@ void ABaseMagnetic::triggerMagnetic(FVector direction, float force)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Trigger"));
 
+		MagneticMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1, ECollisionResponse::ECR_Ignore);
+		MagneticMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
+
 		ForceDirection = direction.GetSafeNormal();
 		ForceAmount = force;
 		CurrentForceSeconds = ForceSeconds;
@@ -173,9 +176,6 @@ void ABaseMagnetic::triggerMagnetic(FVector direction, float force)
 
 		PullingType = ePulling::PULLING;
 		CurrentVelocity = 0;
-
-		MagneticMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1, ECollisionResponse::ECR_Ignore);
-		MagneticMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
 	}
 }
 
