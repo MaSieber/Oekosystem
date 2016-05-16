@@ -170,14 +170,19 @@ void ABaseMagnetic::triggerMagnetic(FVector direction, float force)
 		CurrentForceSeconds = ForceSeconds;
 		MagneticMesh->SetEnableGravity(false);
 		MagneticMesh->SetSimulatePhysics(false);
+
 		PullingType = ePulling::PULLING;
 		CurrentVelocity = 0;
+
+		MagneticMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1, ECollisionResponse::ECR_Ignore);
+		MagneticMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
 	}
 }
 
 void ABaseMagnetic::TriggerMagneticStop()
 {
 	PullingType = ePulling::NONE;
+	MagneticMesh->SetCollisionProfileName("MagneticBox");
 	MagneticMesh->SetEnableGravity(true);
 	MagneticMesh->SetSimulatePhysics(true);
 }
@@ -189,6 +194,7 @@ void ABaseMagnetic::TriggerMagneticPush()
 		UE_LOG(LogTemp, Warning, TEXT("Push"));
 
 		PullingType = ePulling::PUSHING;
+		MagneticMesh->SetCollisionProfileName("MagneticBox");
 		MagneticMesh->SetEnableGravity(true);
 		MagneticMesh->SetSimulatePhysics(true);
 	}
@@ -196,8 +202,6 @@ void ABaseMagnetic::TriggerMagneticPush()
 
 void ABaseMagnetic::OnOverlapBegin(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Overlap Begin"));
-
 	ANewWorldDiscoveryCharacter *playerChar = Cast<ANewWorldDiscoveryCharacter>(OtherActor);
 	if (playerChar)
 	{
@@ -214,6 +218,5 @@ void ABaseMagnetic::OnOverlapBegin(class AActor* OtherActor, class UPrimitiveCom
 
 void ABaseMagnetic::OnOverlapEnd(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Overlap End"));
 	TriggerMagneticStop();
 }
