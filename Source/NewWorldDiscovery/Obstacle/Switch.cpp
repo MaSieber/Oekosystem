@@ -17,6 +17,11 @@ ASwitch::ASwitch()
 	SwitchMesh->bGenerateOverlapEvents = true;
 	SwitchMesh->AttachTo(BaseComponent);
 
+	BoxCollisionTrigger = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxCollisionTrigger"));
+	BoxCollisionTrigger->bGenerateOverlapEvents = true;
+	BoxCollisionTrigger->SetCollisionProfileName("PlatformTrigger");
+	BoxCollisionTrigger->AttachTo(SwitchMesh);
+
 	SwitchSocketMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("SwitchSocketMesh"));
 	SwitchSocketMesh->bGenerateOverlapEvents = false;
 	SwitchSocketMesh->AttachTo(BaseComponent);

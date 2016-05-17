@@ -31,7 +31,10 @@ public:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = Switch)
 	UStaticMeshComponent* SwitchSocketMesh;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Doors)
-	TArray<ADoor*> ListDoors;
-	
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = Switch)
+	UBoxComponent* BoxCollisionTrigger;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Switch)
+	TArray<ADoor*> Doors;
+
 };

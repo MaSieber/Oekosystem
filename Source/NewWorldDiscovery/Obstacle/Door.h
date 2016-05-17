@@ -29,4 +29,36 @@ public:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = Door)
 	UStaticMeshComponent* DoorSocketMesh;
 	
+	UENUM(BlueprintType)
+	enum class eState : uint8
+	{
+		OPEN = 0,
+		CLOSED
+	};
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Door)
+	eState DoorState;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Door)
+	float MaxDoorVelocity;
+
+	UFUNCTION()
+	void TriggerDoorMove(bool bMove);
+
+	UFUNCTION(BlueprintCallable, Category = Door)
+	void OverlapBegin(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION(BlueprintCallable, Category = Door)
+	void OverlapEnd(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+private:
+	bool bMoveDoor;
+
+	FVector min;
+	FVector max;
+	FVector Start;
+	FVector End;
+
+	FTransform LineTransform;
+	
 };
