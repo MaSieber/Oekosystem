@@ -55,7 +55,19 @@ void AMovingPlatform::BeginPlay()
 		MoveDirection = -1.0f;
 	else
 		MoveDirection = 1.0f;
+
+	RelOriginPosition = PlatformMesh->RelativeLocation;
+	OriginDirection = InitialDirection;
+	bOriginActive = bActive;
 	
+}
+
+void AMovingPlatform::ResetPlatform()
+{
+	CurrentVelocity = 0.0f;
+	PlatformMesh->SetRelativeLocation(RelOriginPosition);
+	InitialDirection = OriginDirection;
+	bActive = bOriginActive;
 }
 
 //ToDo: Write generell Acceleration/Movement-Helper Class
@@ -142,8 +154,6 @@ void AMovingPlatform::SetStoringEnergy(uint32 energy)
 
 void AMovingPlatform::OverlapBegin(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Overlap Begin - Platform"));
-
 	AMagneticEnergyProvider *energyProvider = Cast<AMagneticEnergyProvider>(OtherActor);
 	if (energyProvider)
 	{
@@ -157,8 +167,6 @@ void AMovingPlatform::OverlapEnd(class AActor* OtherActor, class UPrimitiveCompo
 	AMagneticEnergyProvider *energyProvider = Cast<AMagneticEnergyProvider>(OtherActor);
 	if (energyProvider)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Overlap End - Platform"));
-
 		SetStoringEnergy(0);
 		TriggerPlatform(false);
 	}
