@@ -50,10 +50,8 @@ AMovingPlatform::AMovingPlatform()
 void AMovingPlatform::BeginPlay()
 {
 	Super::BeginPlay();
-
-
-
-	if (InitialDirection == eInitialDirection::END)
+	
+	if ((Type == eTypeDirection::HORIZONTAL && InitialDirection == eInitialDirection::END) || (Type == eTypeDirection::VERTICAL && InitialDirection == eInitialDirection::START))
 		MoveDirection = -1.0f;
 	else
 		MoveDirection = 1.0f;
@@ -122,6 +120,7 @@ void AMovingPlatform::Tick( float DeltaTime )
 void AMovingPlatform::DirectionSwitch(float current,float start, float end)
 {
 	float oldDirection = MoveDirection;
+
 	if (current >= start)
 		MoveDirection = -1.0f;
 	else if (current <= end)
