@@ -40,10 +40,13 @@ public:
 	void OnOverlapEnd(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = BaseMagnetic)
-	float Acceleration;
+	float PullAcceleration;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = BaseMagnetic)
-	float Velocity;
+	float PullVelocity;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = BaseMagnetic)
+	float RotationAroundVelocity;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = BaseMagnetic)
 	float RotationVelocity;
@@ -56,6 +59,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = BaseMagnetic)
 	float PushAmount;
+
+	UFUNCTION()
+	void SetRotationRate(float Val);
 
 protected:
 	void Accelerate(float DeltaTime);
@@ -78,5 +84,8 @@ protected:
 		PUSHING
 	};
 	int PullingType;
+
+	float RotationCurrent;
+	float RotationRate;
 	
 };

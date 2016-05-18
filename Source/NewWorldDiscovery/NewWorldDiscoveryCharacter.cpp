@@ -3,6 +3,8 @@
 #include "NewWorldDiscovery.h"
 #include "NewWorldDiscoveryCharacter.h"
 
+#include "MagneticBox/BaseMagnetic.h"
+
 ANewWorldDiscoveryCharacter::ANewWorldDiscoveryCharacter()
 {
 	// Set size for collision capsule
@@ -42,7 +44,7 @@ ANewWorldDiscoveryCharacter::ANewWorldDiscoveryCharacter()
 	magneticTrigger->SetSimulatePhysics(false);
 	magneticTrigger->AttachTo(RootComponent);
 	
-
+	PulledObject = nullptr;
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
 }
@@ -56,9 +58,25 @@ void ANewWorldDiscoveryCharacter::SetupPlayerInputComponent(class UInputComponen
 	InputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	InputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 	InputComponent->BindAxis("MoveRight", this, &ANewWorldDiscoveryCharacter::MoveRight);
+	InputComponent->BindAxis("RotateAround", this, &ANewWorldDiscoveryCharacter::RotateAround);
+
 
 	InputComponent->BindTouch(IE_Pressed, this, &ANewWorldDiscoveryCharacter::TouchStarted);
 	InputComponent->BindTouch(IE_Released, this, &ANewWorldDiscoveryCharacter::TouchStopped);
+}
+
+void ANewWorldDiscoveryCharacter::RotateAround(float Value)
+{
+	UE_LOG(LogTemp,Warning,TEXT("%f"),Value);
+
+	if (PulledObject != nullptr)
+	{
+		ABaseMagnetic* BaseMagnetic = Cast<ABaseMagnetic>(PulledObject);
+		if (BaseMagnetic)
+		{
+			BaseMagnetic->SetRotationRate(Value);
+		}
+	}
 }
 
 void ANewWorldDiscoveryCharacter::MoveRight(float Value)

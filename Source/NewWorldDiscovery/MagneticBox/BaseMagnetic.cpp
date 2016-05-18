@@ -28,13 +28,14 @@ ABaseMagnetic::ABaseMagnetic()
 	PullingType = ePulling::NONE;
 
 	CurrentVelocity = 0;
-	Velocity = 100;
-	Acceleration = 20;
+	PullVelocity = 100;
+	PullAcceleration = 20;
 
 	RotationVelocity = 100.0f;
-
 	RotationAmplitude = 1.0f;
 	RotationFrequency = 0.02f;
+
+	RotationAroundVelocity = 0.010f;
 
 	PushAmount = 5000.0f;
 
@@ -45,10 +46,17 @@ void ABaseMagnetic::BeginPlay()
 	Super::BeginPlay();
 }
 
+void ABaseMagnetic::SetRotationRate(float Value)
+{
+	RotationRate = Value;
+	RotationCurrent += RotationRate * RotationAroundVelocity;
+	FMath::Clamp(RotationCurrent,-1.0f,1.0f);
+}
+
 void ABaseMagnetic::Accelerate(float DeltaTime)
 {
-	CurrentVelocity += DeltaTime * Acceleration * Velocity;
-	FMath::Clamp(CurrentVelocity, 0.0f, Velocity);
+	CurrentVelocity += DeltaTime * PullAcceleration * PullVelocity;
+	FMath::Clamp(CurrentVelocity, 0.0f, PullVelocity);
 }
 
 // Called every frame
@@ -116,14 +124,9 @@ void ABaseMagnetic::Tick(float DeltaTime)
 		SetActorRotation(rot);
 
 		{
-			//Rotate AroundMouse
-			float MouseY = 0.0f;
-			FVector mouseLocation, mouseDirection;
-			bool bMouse = playerController->DeprojectMousePositionToWorld(mouseLocation, mouseDirection);
-			if (bMouse)
-			{
-				MouseY = (mouseDirection.Y * 360);
-			}
+			//Rotate Around
+			float MouseY = (RotationCurrent * 360);
+			
 
 			float s = RotationAmplitude * FMath::Sin(RotationFrequency * MouseY);
 			float c = RotationAmplitude * FMath::Cos(RotationFrequency * MouseY);
