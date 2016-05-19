@@ -67,8 +67,6 @@ void ANewWorldDiscoveryCharacter::SetupPlayerInputComponent(class UInputComponen
 
 void ANewWorldDiscoveryCharacter::RotateAround(float Value)
 {
-	UE_LOG(LogTemp,Warning,TEXT("%f"),Value);
-
 	if (PulledObject != nullptr)
 	{
 		ABaseMagnetic* BaseMagnetic = Cast<ABaseMagnetic>(PulledObject);

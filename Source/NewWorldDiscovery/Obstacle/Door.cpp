@@ -24,9 +24,12 @@ ADoor::ADoor()
 	DoorSocketMesh->bGenerateOverlapEvents = false;
 	DoorSocketMesh->AttachTo(BaseComponent);
 
+	bRepeat = true;
 	bMoveDoor = false;
 	MaxDoorVelocity = 20.0f;
 	DoorState = eState::CLOSED;
+
+	RepeatCount = 1;
 }
 
 // Called when the game starts or when spawned
@@ -54,10 +57,9 @@ void ADoor::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
 
-	if (bMoveDoor)
+	if (bMoveDoor && (RepeatCount > 0 || bRepeat))
 	{ 
 		FVector RelLocation = DoorMesh->RelativeLocation;
-		
 		switch (DoorState)
 		{
 			case eState::CLOSED:
@@ -67,6 +69,7 @@ void ADoor::Tick( float DeltaTime )
 				{
 					bMoveDoor = false;
 					DoorState = eState::OPEN;
+					RepeatCount -= 1;
 				}
 				break;
 			}
@@ -77,11 +80,11 @@ void ADoor::Tick( float DeltaTime )
 				{
 					bMoveDoor = false;
 					DoorState = eState::CLOSED;
+					RepeatCount -= 1;
 				}
 				break;
 			}
 		}
-		
 		DoorMesh->SetRelativeLocation(RelLocation);
 	}
 }
