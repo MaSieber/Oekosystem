@@ -174,14 +174,17 @@ void ABaseMagnetic::triggerMagnetic(FVector direction, float force)
 {
 	if (PullingType == ePulling::NONE)
 	{
-		//MagneticMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1, ECollisionResponse::ECR_Ignore);
-		//MagneticMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
+		MagneticMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1, ECollisionResponse::ECR_Ignore);
+		MagneticMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
 
 		ForceDirection = direction.GetSafeNormal();
 		ForceAmount = force;
 		CurrentForceSeconds = ForceSeconds;
 		MagneticMesh->SetEnableGravity(false);
 		MagneticMesh->SetSimulatePhysics(true);
+
+		MagneticMesh->bGenerateOverlapEvents = false;
+		MagneticMesh->bMultiBodyOverlap = false;
 
 		PullingType = ePulling::PULLING;
 		CurrentVelocity = 0;
@@ -194,6 +197,8 @@ void ABaseMagnetic::TriggerMagneticStop()
 	MagneticMesh->SetCollisionProfileName("MagneticBox");
 	MagneticMesh->SetEnableGravity(true);
 	MagneticMesh->SetSimulatePhysics(true);
+	MagneticMesh->bGenerateOverlapEvents = true;
+	MagneticMesh->bMultiBodyOverlap = true;
 }
 
 void ABaseMagnetic::TriggerMagneticPush()
@@ -206,6 +211,8 @@ void ABaseMagnetic::TriggerMagneticPush()
 		MagneticMesh->SetCollisionProfileName("MagneticBox");
 		MagneticMesh->SetEnableGravity(true);
 		MagneticMesh->SetSimulatePhysics(true);
+		MagneticMesh->bGenerateOverlapEvents = true;
+		MagneticMesh->bMultiBodyOverlap = true;
 	}
 }
 
@@ -226,5 +233,12 @@ void ABaseMagnetic::OnOverlapBegin(class AActor* OtherActor, class UPrimitiveCom
 
 void ABaseMagnetic::OnOverlapEnd(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	TriggerMagneticStop();
+	
+	if (MagneticMesh->bGenerateOverlapEvents)
+	{
+		;
+		//UE_LOG(LogTemp, Warning, TEXT("BaseMagnetic - OverlapEnd"));
+		//TriggerMagneticStop();
+	}
+		
 }
