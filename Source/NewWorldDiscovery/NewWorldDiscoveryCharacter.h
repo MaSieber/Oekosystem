@@ -37,6 +37,8 @@ protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
 	// End of APawn interface
 
+	void RotateAround(float Val);
+
 
 public:
 	ANewWorldDiscoveryCharacter();

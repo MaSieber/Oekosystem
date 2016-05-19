@@ -39,7 +39,14 @@ void ADoor::BeginPlay()
 	DoorMesh->GetLocalBounds(min, max);
 	End = RelLocation;
 	Start = FVector::ZeroVector;
-	Start.Z = End.Z - ((max.Z - min.Z) * LineTransform.GetScale3D().Z);
+	if (DoorState == eState::CLOSED)
+		Start.Z = End.Z - ((max.Z - min.Z) * LineTransform.GetScale3D().Z);
+	else if (DoorState == eState::OPEN)
+	{
+		Start.Z = End.Z + ((max.Z - min.Z) * LineTransform.GetScale3D().Z);
+		End.Z = Start.Z;
+		Start = RelLocation;
+	}	
 }
 
 // Called every frame
@@ -50,16 +57,31 @@ void ADoor::Tick( float DeltaTime )
 	if (bMoveDoor)
 	{ 
 		FVector RelLocation = DoorMesh->RelativeLocation;
-		RelLocation.Z -= MaxDoorVelocity * DeltaTime;
-
-		UE_LOG(LogTemp,Warning,TEXT("%f %f"),RelLocation.Z,Start.Z);
-		if (RelLocation.Z <= Start.Z)
+		
+		switch (DoorState)
 		{
-			bMoveDoor = false;
-			DoorState = eState::OPEN;
+			case eState::CLOSED:
+			{
+				RelLocation.Z -= MaxDoorVelocity * DeltaTime;
+				if (RelLocation.Z <= Start.Z)
+				{
+					bMoveDoor = false;
+					DoorState = eState::OPEN;
+				}
+				break;
+			}
+			case eState::OPEN:
+			{
+				RelLocation.Z += MaxDoorVelocity * DeltaTime;
+				if (RelLocation.Z >= End.Z)
+				{
+					bMoveDoor = false;
+					DoorState = eState::CLOSED;
+				}
+				break;
+			}
 		}
-			
-
+		
 		DoorMesh->SetRelativeLocation(RelLocation);
 	}
 }
@@ -72,7 +94,7 @@ void ADoor::TriggerDoorMove(bool bMove)
 void ADoor::OverlapBegin(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	AMagneticBox *magneticBox = Cast<AMagneticBox>(OtherActor);
-	if (magneticBox && DoorState == eState::CLOSED)	//For now only closed ones
+	if (magneticBox)
 	{
 		TriggerDoorMove(true);
 	}

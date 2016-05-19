@@ -75,6 +75,10 @@ public:
 	UFUNCTION()
 	void SetStoringEnergy(uint32 energy);
 
+	UFUNCTION(BlueprintCallable, Category = MovingPlatform)
+	void ResetPlatform();
+
+
 private:
 	uint32 StoringEnergy;
 	float CurrentVelocity;
@@ -84,5 +88,9 @@ private:
 	float MoveDirection;
 
 	void DirectionSwitch(float current, float start, float end);
+
+	FVector RelOriginPosition;
+	eInitialDirection OriginDirection;
+	bool bOriginActive;
 	
 };
