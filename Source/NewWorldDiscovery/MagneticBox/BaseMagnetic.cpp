@@ -15,6 +15,7 @@ ABaseMagnetic::ABaseMagnetic()
 
 	MagneticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MagneticMesh"));
 	MagneticMesh->bGenerateOverlapEvents = true;
+	MagneticMesh->bMultiBodyOverlap = true;
 	MagneticMesh->SetCollisionProfileName("MagneticBox");
 	MagneticMesh->OnComponentBeginOverlap.AddDynamic(this, &ABaseMagnetic::OnOverlapBegin);
 	MagneticMesh->OnComponentEndOverlap.AddDynamic(this, &ABaseMagnetic::OnOverlapEnd);
@@ -34,23 +35,25 @@ ABaseMagnetic::ABaseMagnetic()
 	RotationVelocity = 100.0f;
 	RotationAmplitude = 1.0f;
 	RotationFrequency = 0.02f;
-
 	RotationAroundVelocity = 0.010f;
-
 	PushAmount = 5000.0f;
-
 	Radius = 150.0f;
+
+	
 }
 
 void ABaseMagnetic::BeginPlay()
 {
 	Super::BeginPlay();
+
+	StaticXPos = GetActorLocation().X;
 }
 
 void ABaseMagnetic::SetRotationRate(float Value)
 {
 	RotationRate = Value;
-	RotationCurrent += RotationRate * RotationAroundVelocity;
+
+	RotationCurrent = RotationRate * RotationAroundVelocity;
 	FMath::Clamp(RotationCurrent,-1.0f,1.0f);
 }
 
@@ -90,9 +93,9 @@ void ABaseMagnetic::Tick(float DeltaTime)
 			DrawDebugLine(GetWorld(), ActorPos, TargetLocation, FColor(255, 255, 0, 1));
 			SetActorLocation(newLocation);
 
-			FRotator rot = GetActorRotation();
-			rot.Roll += xDir * 80.0f * FMath::Sin(DeltaTime);
-			SetActorRotation(rot);
+			//FRotator rot = GetActorRotation();
+			//rot.Roll += xDir * 80.0f * FMath::Sin(DeltaTime);
+			//SetActorRotation(rot);
 
 		}
 		else
@@ -114,21 +117,24 @@ void ABaseMagnetic::Tick(float DeltaTime)
 		TargetLocation = playerChar->GetActorLocation();
 		ForceDirection = (TargetLocation - ActorPos).GetSafeNormal();
 		TargetLocation += -ForceDirection * Radius;
+		
+		MagneticMesh->SetPhysicsLinearVelocity(FVector::ZeroVector);
+		FVector phyVel = MagneticMesh->GetPhysicsLinearVelocity();
+		//UE_LOG(LogTemp, Warning, TEXT("phyVel - %f %f %f"), phyVel.X, phyVel.Y, phyVel.Z);
 
 		//Set Location to Player Location
 		FVector newLocation = TargetLocation;
 		SetActorLocation(TargetLocation);
-
+		
 		//Rotate
 		FRotator rot = GetActorRotation();
 		rot.Roll += xDir * RotationVelocity * FMath::Sin(DeltaTime);
 		SetActorRotation(rot);
 
+		if (RotationRate != 0.0f)
 		{
 			//Rotate Around
-			float MouseY = (RotationCurrent * 360);
-			
-
+			float MouseY = (RotationCurrent * 360);		//percent base x percent of 360
 			float s = RotationAmplitude * FMath::Sin(RotationFrequency * MouseY);
 			float c = RotationAmplitude * FMath::Cos(RotationFrequency * MouseY);
 
@@ -138,7 +144,8 @@ void ABaseMagnetic::Tick(float DeltaTime)
 			float newY = player.Y + (c * (box.Y - player.Y) - s * (box.Z - player.Z));
 			float newZ = player.Z + (s * (box.Y - player.Y) + c * (box.Z - player.Z));
 
-			FVector newLocation = FVector(box.X, newY, newZ);
+			FVector newLocation = FVector(StaticXPos, newY, newZ);
+			//UE_LOG(LogTemp, Warning, TEXT("NewLocation - %f %f %f"), newLocation.X,newLocation.Y,newLocation.Z);
 			SetActorLocation(newLocation);
 
 		}
@@ -176,6 +183,9 @@ void ABaseMagnetic::triggerMagnetic(FVector direction, float force)
 		MagneticMesh->SetEnableGravity(false);
 		MagneticMesh->SetSimulatePhysics(true);
 
+		MagneticMesh->bGenerateOverlapEvents = false;
+		MagneticMesh->bMultiBodyOverlap = false;
+
 		PullingType = ePulling::PULLING;
 		CurrentVelocity = 0;
 	}
@@ -187,6 +197,8 @@ void ABaseMagnetic::TriggerMagneticStop()
 	MagneticMesh->SetCollisionProfileName("MagneticBox");
 	MagneticMesh->SetEnableGravity(true);
 	MagneticMesh->SetSimulatePhysics(true);
+	MagneticMesh->bGenerateOverlapEvents = true;
+	MagneticMesh->bMultiBodyOverlap = true;
 }
 
 void ABaseMagnetic::TriggerMagneticPush()
@@ -199,6 +211,8 @@ void ABaseMagnetic::TriggerMagneticPush()
 		MagneticMesh->SetCollisionProfileName("MagneticBox");
 		MagneticMesh->SetEnableGravity(true);
 		MagneticMesh->SetSimulatePhysics(true);
+		MagneticMesh->bGenerateOverlapEvents = true;
+		MagneticMesh->bMultiBodyOverlap = true;
 	}
 }
 
@@ -219,5 +233,12 @@ void ABaseMagnetic::OnOverlapBegin(class AActor* OtherActor, class UPrimitiveCom
 
 void ABaseMagnetic::OnOverlapEnd(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	TriggerMagneticStop();
+	
+	if (MagneticMesh->bGenerateOverlapEvents)
+	{
+		;
+		//UE_LOG(LogTemp, Warning, TEXT("BaseMagnetic - OverlapEnd"));
+		//TriggerMagneticStop();
+	}
+		
 }
