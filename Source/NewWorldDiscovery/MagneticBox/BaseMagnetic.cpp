@@ -209,7 +209,6 @@ void ABaseMagnetic::OnOverlapBegin(class AActor* OtherActor, class UPrimitiveCom
 	{
 		USphereComponent* sphereComponent = Cast<USphereComponent>(OtherComp);
 		FString name = sphereComponent->GetReadableName();
-		UE_LOG(LogTemp, Warning, TEXT("%s"), *name);
 		FVector playerPos = playerChar->GetActorLocation();
 		playerPos.Z += 200.0f;
 
