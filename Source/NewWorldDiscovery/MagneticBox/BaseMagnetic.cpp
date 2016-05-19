@@ -15,6 +15,7 @@ ABaseMagnetic::ABaseMagnetic()
 
 	MagneticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MagneticMesh"));
 	MagneticMesh->bGenerateOverlapEvents = true;
+	MagneticMesh->bMultiBodyOverlap = true;
 	MagneticMesh->SetCollisionProfileName("MagneticBox");
 	MagneticMesh->OnComponentBeginOverlap.AddDynamic(this, &ABaseMagnetic::OnOverlapBegin);
 	MagneticMesh->OnComponentEndOverlap.AddDynamic(this, &ABaseMagnetic::OnOverlapEnd);
@@ -34,12 +35,11 @@ ABaseMagnetic::ABaseMagnetic()
 	RotationVelocity = 100.0f;
 	RotationAmplitude = 1.0f;
 	RotationFrequency = 0.02f;
-
 	RotationAroundVelocity = 0.010f;
-
 	PushAmount = 5000.0f;
-
 	Radius = 150.0f;
+
+	
 }
 
 void ABaseMagnetic::BeginPlay()
@@ -51,11 +51,9 @@ void ABaseMagnetic::BeginPlay()
 
 void ABaseMagnetic::SetRotationRate(float Value)
 {
-	RotationRate = Value * 0.1f;
+	RotationRate = Value;
 
-	UE_LOG(LogTemp, Warning, TEXT("RotationRate - %f"), RotationRate);
-
-	RotationCurrent += RotationRate * RotationAroundVelocity;
+	RotationCurrent = RotationRate * RotationAroundVelocity;
 	FMath::Clamp(RotationCurrent,-1.0f,1.0f);
 }
 
@@ -136,7 +134,7 @@ void ABaseMagnetic::Tick(float DeltaTime)
 		if (RotationRate != 0.0f)
 		{
 			//Rotate Around
-			float MouseY = (RotationCurrent * 360);
+			float MouseY = (RotationCurrent * 360);		//percent base x percent of 360
 			float s = RotationAmplitude * FMath::Sin(RotationFrequency * MouseY);
 			float c = RotationAmplitude * FMath::Cos(RotationFrequency * MouseY);
 
@@ -176,8 +174,8 @@ void ABaseMagnetic::triggerMagnetic(FVector direction, float force)
 {
 	if (PullingType == ePulling::NONE)
 	{
-		MagneticMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1, ECollisionResponse::ECR_Ignore);
-		MagneticMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
+		//MagneticMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1, ECollisionResponse::ECR_Ignore);
+		//MagneticMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
 
 		ForceDirection = direction.GetSafeNormal();
 		ForceAmount = force;
