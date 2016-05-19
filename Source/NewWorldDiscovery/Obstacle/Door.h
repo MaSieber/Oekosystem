@@ -42,6 +42,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Door)
 	float MaxDoorVelocity;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Door)
+	bool bRepeat;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Door)
+	int32 RepeatCount;
+
 	UFUNCTION()
 	void TriggerDoorMove(bool bMove);
 

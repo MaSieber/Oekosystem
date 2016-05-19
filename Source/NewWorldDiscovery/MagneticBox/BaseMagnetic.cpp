@@ -39,6 +39,7 @@ ABaseMagnetic::ABaseMagnetic()
 
 	PushAmount = 5000.0f;
 
+	Radius = 150.0f;
 }
 
 void ABaseMagnetic::BeginPlay()
@@ -72,25 +73,24 @@ void ABaseMagnetic::Tick(float DeltaTime)
 	{
 		ANewWorldDiscoveryCharacter *playerChar = Cast<ANewWorldDiscoveryCharacter>(GetWorld()->GetFirstPlayerController()->GetCharacter());
 		FVector ActorPos = GetActorLocation();
+		float xDir = 1.0f;
+		FVector forward = playerChar->GetActorForwardVector();
+		xDir = forward.Y <= 0 ? -1.0f : 1.0f;
 
 		TargetLocation = playerChar->GetActorLocation();
-		TargetLocation.Z += 200.0f;
-		float dist = FVector::Dist(TargetLocation, ActorPos);
+		ForceDirection = (TargetLocation - ActorPos).GetSafeNormal();
+		TargetLocation += -ForceDirection * Radius;
 
+		float dist = FVector::Dist(TargetLocation, ActorPos);
 		if (dist > 10)
 		{
 			ForceDirection = (TargetLocation - ActorPos).GetSafeNormal();
 			Accelerate(DeltaTime);
 			FVector newLocation = ActorPos + CurrentVelocity * ForceDirection * DeltaTime;
-
 			DrawDebugLine(GetWorld(), ActorPos, TargetLocation, FColor(255, 255, 0, 1));
-
 			SetActorLocation(newLocation);
 
 			FRotator rot = GetActorRotation();
-			float xDir = 1.0f;
-			FVector forward = playerChar->GetActorForwardVector();
-			xDir = forward.Y <= 0 ? -1.0f : 1.0f;
 			rot.Roll += xDir * 80.0f * FMath::Sin(DeltaTime);
 			SetActorRotation(rot);
 
@@ -105,20 +105,21 @@ void ABaseMagnetic::Tick(float DeltaTime)
 		AWorldDiscoveryPlayerController* playerController = Cast<AWorldDiscoveryPlayerController>(GetWorld()->GetFirstPlayerController());
 		ANewWorldDiscoveryCharacter *playerChar = Cast<ANewWorldDiscoveryCharacter>(playerController->GetCharacter());
 		FVector ActorPos = GetActorLocation();
+		float xDir = 1.0f;
+		FVector forward = playerChar->GetActorForwardVector();
+		xDir = forward.Y <= 0 ? -1.0f : 1.0f;
 
 		playerChar->PulledObject = this;
 
 		TargetLocation = playerChar->GetActorLocation();
-		TargetLocation.Z += 200.0f;
+		ForceDirection = (TargetLocation - ActorPos).GetSafeNormal();
+		TargetLocation += -ForceDirection * Radius;
 
 		//Set Location to Player Location
 		FVector newLocation = TargetLocation;
 		SetActorLocation(TargetLocation);
 
 		//Rotate
-		float xDir = 1.0f;
-		FVector forward = playerChar->GetActorForwardVector();
-		xDir = forward.Y <= 0 ? -1.0f : 1.0f;
 		FRotator rot = GetActorRotation();
 		rot.Roll += xDir * RotationVelocity * FMath::Sin(DeltaTime);
 		SetActorRotation(rot);
@@ -166,8 +167,6 @@ void ABaseMagnetic::triggerMagnetic(FVector direction, float force)
 {
 	if (PullingType == ePulling::NONE)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Trigger"));
-
 		MagneticMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1, ECollisionResponse::ECR_Ignore);
 		MagneticMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
 
@@ -175,7 +174,7 @@ void ABaseMagnetic::triggerMagnetic(FVector direction, float force)
 		ForceAmount = force;
 		CurrentForceSeconds = ForceSeconds;
 		MagneticMesh->SetEnableGravity(false);
-		MagneticMesh->SetSimulatePhysics(false);
+		MagneticMesh->SetSimulatePhysics(true);
 
 		PullingType = ePulling::PULLING;
 		CurrentVelocity = 0;
