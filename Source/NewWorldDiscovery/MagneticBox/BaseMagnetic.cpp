@@ -45,11 +45,16 @@ ABaseMagnetic::ABaseMagnetic()
 void ABaseMagnetic::BeginPlay()
 {
 	Super::BeginPlay();
+
+	StaticXPos = GetActorLocation().X;
 }
 
 void ABaseMagnetic::SetRotationRate(float Value)
 {
-	RotationRate = Value;
+	RotationRate = Value * 0.1f;
+
+	UE_LOG(LogTemp, Warning, TEXT("RotationRate - %f"), RotationRate);
+
 	RotationCurrent += RotationRate * RotationAroundVelocity;
 	FMath::Clamp(RotationCurrent,-1.0f,1.0f);
 }
@@ -90,9 +95,9 @@ void ABaseMagnetic::Tick(float DeltaTime)
 			DrawDebugLine(GetWorld(), ActorPos, TargetLocation, FColor(255, 255, 0, 1));
 			SetActorLocation(newLocation);
 
-			FRotator rot = GetActorRotation();
-			rot.Roll += xDir * 80.0f * FMath::Sin(DeltaTime);
-			SetActorRotation(rot);
+			//FRotator rot = GetActorRotation();
+			//rot.Roll += xDir * 80.0f * FMath::Sin(DeltaTime);
+			//SetActorRotation(rot);
 
 		}
 		else
@@ -114,21 +119,24 @@ void ABaseMagnetic::Tick(float DeltaTime)
 		TargetLocation = playerChar->GetActorLocation();
 		ForceDirection = (TargetLocation - ActorPos).GetSafeNormal();
 		TargetLocation += -ForceDirection * Radius;
+		
+		MagneticMesh->SetPhysicsLinearVelocity(FVector::ZeroVector);
+		FVector phyVel = MagneticMesh->GetPhysicsLinearVelocity();
+		//UE_LOG(LogTemp, Warning, TEXT("phyVel - %f %f %f"), phyVel.X, phyVel.Y, phyVel.Z);
 
 		//Set Location to Player Location
 		FVector newLocation = TargetLocation;
 		SetActorLocation(TargetLocation);
-
+		
 		//Rotate
 		FRotator rot = GetActorRotation();
 		rot.Roll += xDir * RotationVelocity * FMath::Sin(DeltaTime);
 		SetActorRotation(rot);
 
+		if (RotationRate != 0.0f)
 		{
 			//Rotate Around
 			float MouseY = (RotationCurrent * 360);
-			
-
 			float s = RotationAmplitude * FMath::Sin(RotationFrequency * MouseY);
 			float c = RotationAmplitude * FMath::Cos(RotationFrequency * MouseY);
 
@@ -138,7 +146,8 @@ void ABaseMagnetic::Tick(float DeltaTime)
 			float newY = player.Y + (c * (box.Y - player.Y) - s * (box.Z - player.Z));
 			float newZ = player.Z + (s * (box.Y - player.Y) + c * (box.Z - player.Z));
 
-			FVector newLocation = FVector(box.X, newY, newZ);
+			FVector newLocation = FVector(StaticXPos, newY, newZ);
+			//UE_LOG(LogTemp, Warning, TEXT("NewLocation - %f %f %f"), newLocation.X,newLocation.Y,newLocation.Z);
 			SetActorLocation(newLocation);
 
 		}

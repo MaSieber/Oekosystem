@@ -90,5 +90,7 @@ protected:
 
 	float RotationCurrent;
 	float RotationRate;
+
+	float StaticXPos;
 	
 };
