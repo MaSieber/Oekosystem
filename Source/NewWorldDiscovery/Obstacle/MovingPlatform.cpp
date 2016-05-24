@@ -24,12 +24,15 @@ AMovingPlatform::AMovingPlatform()
 	BoxCollisionTrigger->bGenerateOverlapEvents = true;
 	BoxCollisionTrigger->SetCollisionProfileName("PlatformTrigger");
 
+	PlatformEnergySocketMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PlatformEnergySocketMesh"));
+	PlatformEnergySocketMesh->bGenerateOverlapEvents = false;
+	PlatformEnergySocketMesh->AttachTo(PlatformMesh);
 
 	//doenst work because, 2 blueprints ref to 1 c++ class ?
 	//BoxCollisionTrigger->OnComponentBeginOverlap.AddDynamic(this, &AMovingPlatform::OnOverlapBegin);
 	//BoxCollisionTrigger->OnComponentEndOverlap.AddDynamic(this, &AMovingPlatform::OnOverlapEnd);
 
-	BoxCollisionTrigger->AttachTo(PlatformMesh);
+	BoxCollisionTrigger->AttachTo(PlatformEnergySocketMesh);
 
 	PlatformLineMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PlatformLineMesh"));
 	PlatformLineMesh->bGenerateOverlapEvents = false;
@@ -59,6 +62,9 @@ void AMovingPlatform::BeginPlay()
 	RelOriginPosition = PlatformMesh->RelativeLocation;
 	OriginDirection = InitialDirection;
 	bOriginActive = bActive;
+
+	//PlatformEnergySocketMesh->DetachFromParent(true);
+	//PlatformEnergySocketMesh->AttachTo(PlatformMesh);
 	
 }
 
@@ -74,7 +80,7 @@ void AMovingPlatform::ResetPlatform()
 void AMovingPlatform::Accelerate(float DeltaTime)
 {
 	CurrentVelocity += DeltaTime * Acceleration * MaxPlatformVelocity;
-	FMath::Clamp(CurrentVelocity, 0.0f, MaxPlatformVelocity);
+	CurrentVelocity = FMath::Clamp(CurrentVelocity, 0.0f, MaxPlatformVelocity);
 }
 
 // Called every frame

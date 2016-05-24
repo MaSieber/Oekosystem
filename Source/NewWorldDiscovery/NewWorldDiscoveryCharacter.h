@@ -22,6 +22,31 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MagneticBox)
 	AActor* PulledObject;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = MagneticBox)
+	TArray<AActor*> CreatedBoxes;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = MagneticBox)
+	TArray<AActor*> CreatedBalls;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = MagneticBox)
+	TArray<AActor*> CreatedPyramides;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MagneticBox)
+	int32 MaxBoxes;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MagneticBox)
+	int32 MaxBalls;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MagneticBox)
+	int32 MaxPyramides;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MagneticBox)
+	AActor* MagneticBox;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MagneticBox)
+	AActor* MagneticBall;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MagneticBox)
+	AActor* MagneticPyramide;
+
 protected:
 
 	/** Called for side to side input */
@@ -38,6 +63,10 @@ protected:
 	// End of APawn interface
 
 	void RotateAround(float Val);
+
+	void CreateMagneticBox();
+	void CreateMagneticBall();
+	void CreateMagneticPyramide();
 
 
 public:

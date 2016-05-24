@@ -4,6 +4,9 @@
 #include "NewWorldDiscoveryCharacter.h"
 
 #include "MagneticBox/BaseMagnetic.h"
+#include "MagneticBox/MagneticBox.h"
+#include "MagneticBox/MagneticEnergyProvider.h"
+#include "MagneticBox/MagneticEnergyTransfer.h"
 
 ANewWorldDiscoveryCharacter::ANewWorldDiscoveryCharacter()
 {
@@ -45,6 +48,10 @@ ANewWorldDiscoveryCharacter::ANewWorldDiscoveryCharacter()
 	magneticTrigger->AttachTo(RootComponent);
 	
 	PulledObject = nullptr;
+	MaxBalls = 1;
+	MaxBoxes = 1;
+	MaxPyramides = 1;
+
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
 }
@@ -61,8 +68,44 @@ void ANewWorldDiscoveryCharacter::SetupPlayerInputComponent(class UInputComponen
 	InputComponent->BindAxis("RotateAround", this, &ANewWorldDiscoveryCharacter::RotateAround);
 
 
+	InputComponent->BindAction("CreateBox", IE_Pressed, this, &ANewWorldDiscoveryCharacter::CreateMagneticBox);
+	InputComponent->BindAction("CreatePyramide", IE_Pressed, this, &ANewWorldDiscoveryCharacter::CreateMagneticPyramide);
+	InputComponent->BindAction("CreateBall", IE_Pressed, this, &ANewWorldDiscoveryCharacter::CreateMagneticBall);
+
+
 	InputComponent->BindTouch(IE_Pressed, this, &ANewWorldDiscoveryCharacter::TouchStarted);
 	InputComponent->BindTouch(IE_Released, this, &ANewWorldDiscoveryCharacter::TouchStopped);
+}
+
+void ANewWorldDiscoveryCharacter::CreateMagneticBox()
+{
+	if (CreatedBoxes.Num() >= MaxBoxes)
+	{
+		Cast<AMagneticBox>(CreatedBoxes[0])->TriggerDestroy(true);
+		CreatedBoxes.RemoveAt(0);
+	}
+
+	float xDir = 1.0f;
+	FVector forward = GetActorForwardVector();
+	xDir = forward.Y <= 0 ? -1.0f : 1.0f;
+
+	FVector direction = FVector(0.0f,xDir,0.7f);
+
+	FVector SpawnLocation = GetActorLocation() + direction * 100.0f;
+	FActorSpawnParameters SpawnParameters = FActorSpawnParameters();
+	SpawnParameters.bNoFail = true;
+	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
+	FRotator Rotation = FRotator(0.0f,0.0f,0.0f);
+	AActor *box = GetWorld()->SpawnActor<AMagneticBox>(SpawnLocation,Rotation,SpawnParameters);
+	CreatedBoxes.Add(box);
+}
+void ANewWorldDiscoveryCharacter::CreateMagneticBall()
+{
+
+}
+void ANewWorldDiscoveryCharacter::CreateMagneticPyramide()
+{
+
 }
 
 void ANewWorldDiscoveryCharacter::RotateAround(float Value)

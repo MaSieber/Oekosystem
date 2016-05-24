@@ -39,7 +39,7 @@ ABaseMagnetic::ABaseMagnetic()
 	PushAmount = 5000.0f;
 	Radius = 150.0f;
 
-	
+	bDestroying = false;
 }
 
 void ABaseMagnetic::BeginPlay()
@@ -60,13 +60,16 @@ void ABaseMagnetic::SetRotationRate(float Value)
 void ABaseMagnetic::Accelerate(float DeltaTime)
 {
 	CurrentVelocity += DeltaTime * PullAcceleration * PullVelocity;
-	FMath::Clamp(CurrentVelocity, 0.0f, PullVelocity);
+	CurrentVelocity = FMath::Clamp(CurrentVelocity, 0.0f, PullVelocity);
 }
 
 // Called every frame
 void ABaseMagnetic::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (bDestroying)
+		return;
 
 	switch (PullingType)
 	{
@@ -213,6 +216,17 @@ void ABaseMagnetic::TriggerMagneticPush()
 		MagneticMesh->SetSimulatePhysics(true);
 		MagneticMesh->bGenerateOverlapEvents = true;
 		MagneticMesh->bMultiBodyOverlap = true;
+	}
+}
+
+void ABaseMagnetic::TriggerDestroy(bool bInstant)
+{
+	if (bInstant)
+		this->K2_DestroyActor();
+	else
+	{
+		//trigger some blueprint event
+		bDestroying = true;
 	}
 }
 

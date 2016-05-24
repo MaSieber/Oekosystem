@@ -66,6 +66,9 @@ public:
 	UFUNCTION()
 	void SetRotationRate(float Val);
 
+	UFUNCTION()
+	void TriggerDestroy(bool bInstant);
+
 protected:
 	void Accelerate(float DeltaTime);
 
@@ -93,4 +96,5 @@ protected:
 
 	float StaticXPos;
 	
+	bool bDestroying;
 };
