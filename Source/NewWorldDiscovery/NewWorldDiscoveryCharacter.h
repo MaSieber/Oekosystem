@@ -1,5 +1,7 @@
 // Copyright 1998-2016 Epic Games, Inc. All Rights Reserved.
 #pragma once
+
+#include "MagneticBox/BaseMagnetic.h"
 #include "GameFramework/Character.h"
 #include "NewWorldDiscoveryCharacter.generated.h"
 
@@ -23,13 +25,13 @@ public:
 	AActor* PulledObject;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = MagneticBox)
-	TArray<AActor*> CreatedBoxes;
+	TArray<ABaseMagnetic*> CreatedBoxes;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = MagneticBox)
-	TArray<AActor*> CreatedBalls;
+	TArray<ABaseMagnetic*> CreatedBalls;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = MagneticBox)
-	TArray<AActor*> CreatedPyramides;
+	TArray<ABaseMagnetic*> CreatedPyramides;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MagneticBox)
 	int32 MaxBoxes;
@@ -41,11 +43,13 @@ public:
 	int32 MaxPyramides;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MagneticBox)
-	AActor* MagneticBox;
+	TSubclassOf<class ABaseMagnetic> MagneticBox;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MagneticBox)
-	AActor* MagneticBall;
+	TSubclassOf<class ABaseMagnetic> MagneticBall;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MagneticBox)
-	AActor* MagneticPyramide;
+	TSubclassOf<class ABaseMagnetic> MagneticPyramide;
 
 protected:
 

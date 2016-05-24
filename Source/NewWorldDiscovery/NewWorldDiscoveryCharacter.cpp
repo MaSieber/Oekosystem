@@ -3,7 +3,6 @@
 #include "NewWorldDiscovery.h"
 #include "NewWorldDiscoveryCharacter.h"
 
-#include "MagneticBox/BaseMagnetic.h"
 #include "MagneticBox/MagneticBox.h"
 #include "MagneticBox/MagneticEnergyProvider.h"
 #include "MagneticBox/MagneticEnergyTransfer.h"
@@ -77,6 +76,9 @@ void ANewWorldDiscoveryCharacter::SetupPlayerInputComponent(class UInputComponen
 	InputComponent->BindTouch(IE_Released, this, &ANewWorldDiscoveryCharacter::TouchStopped);
 }
 
+/*
+ ToDo: More Generic ... More Abstract ... pretty much the same
+*/
 void ANewWorldDiscoveryCharacter::CreateMagneticBox()
 {
 	if (CreatedBoxes.Num() >= MaxBoxes)
@@ -89,23 +91,59 @@ void ANewWorldDiscoveryCharacter::CreateMagneticBox()
 	FVector forward = GetActorForwardVector();
 	xDir = forward.Y <= 0 ? -1.0f : 1.0f;
 
-	FVector direction = FVector(0.0f,xDir,0.7f);
-
+	FVector direction = FVector(0.0f,-xDir,0.7f);
 	FVector SpawnLocation = GetActorLocation() + direction * 100.0f;
 	FActorSpawnParameters SpawnParameters = FActorSpawnParameters();
 	SpawnParameters.bNoFail = true;
 	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
 	FRotator Rotation = FRotator(0.0f,0.0f,0.0f);
-	AActor *box = GetWorld()->SpawnActor<AMagneticBox>(SpawnLocation,Rotation,SpawnParameters);
-	CreatedBoxes.Add(box);
+	ABaseMagnetic *box = GetWorld()->SpawnActor<ABaseMagnetic>(MagneticBox,SpawnLocation, Rotation, SpawnParameters);
+	if (box)
+		CreatedBoxes.Add(box);
 }
 void ANewWorldDiscoveryCharacter::CreateMagneticBall()
 {
+	if (CreatedBalls.Num() >= MaxBalls)
+	{
+		Cast<AMagneticEnergyTransfer>(CreatedBalls[0])->TriggerDestroy(true);
+		CreatedBalls.RemoveAt(0);
+	}
 
+	float xDir = 1.0f;
+	FVector forward = GetActorForwardVector();
+	xDir = forward.Y <= 0 ? -1.0f : 1.0f;
+
+	FVector direction = FVector(0.0f, -xDir, 0.7f);
+	FVector SpawnLocation = GetActorLocation() + direction * 100.0f;
+	FActorSpawnParameters SpawnParameters = FActorSpawnParameters();
+	SpawnParameters.bNoFail = true;
+	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
+	FRotator Rotation = FRotator(0.0f, 0.0f, 0.0f);
+	ABaseMagnetic *ball = GetWorld()->SpawnActor<ABaseMagnetic>(MagneticBall, SpawnLocation, Rotation, SpawnParameters);
+	if (ball)
+		CreatedBalls.Add(ball);
 }
 void ANewWorldDiscoveryCharacter::CreateMagneticPyramide()
 {
+	if (CreatedPyramides.Num() >= MaxPyramides)
+	{
+		Cast<AMagneticEnergyProvider>(CreatedPyramides[0])->TriggerDestroy(true);
+		CreatedPyramides.RemoveAt(0);
+	}
 
+	float xDir = 1.0f;
+	FVector forward = GetActorForwardVector();
+	xDir = forward.Y <= 0 ? -1.0f : 1.0f;
+
+	FVector direction = FVector(0.0f, -xDir, 0.7f);
+	FVector SpawnLocation = GetActorLocation() + direction * 100.0f;
+	FActorSpawnParameters SpawnParameters = FActorSpawnParameters();
+	SpawnParameters.bNoFail = true;
+	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
+	FRotator Rotation = FRotator(0.0f, 0.0f, 0.0f);
+	ABaseMagnetic *pyramide = GetWorld()->SpawnActor<ABaseMagnetic>(MagneticPyramide, SpawnLocation, Rotation, SpawnParameters);
+	if (pyramide)
+		CreatedPyramides.Add(pyramide);
 }
 
 void ANewWorldDiscoveryCharacter::RotateAround(float Value)
