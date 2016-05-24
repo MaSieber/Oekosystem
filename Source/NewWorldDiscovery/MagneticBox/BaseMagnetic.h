@@ -33,6 +33,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = BaseMagnetic)
 	void TriggerMagneticPush();
 
+	UFUNCTION(BlueprintImplementableEvent, Category = BaseMagneticEvent)
+	void OnCreate();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = BaseMagneticEvent)
+	void OnDestroying();
+
 	UFUNCTION()
 	void OnOverlapBegin(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
@@ -97,4 +103,5 @@ protected:
 	float StaticXPos;
 	
 	bool bDestroying;
+	bool bIsDestroyed;
 };

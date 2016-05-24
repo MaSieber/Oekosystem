@@ -68,8 +68,13 @@ void ABaseMagnetic::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (bDestroying)
+	if (bDestroying && !bIsDestroyed)
+	{
+		bIsDestroyed = true;
+		OnDestroying();
 		return;
+	}
+		
 
 	switch (PullingType)
 	{

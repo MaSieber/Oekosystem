@@ -99,7 +99,11 @@ void ANewWorldDiscoveryCharacter::CreateMagneticBox()
 	FRotator Rotation = FRotator(0.0f,0.0f,0.0f);
 	ABaseMagnetic *box = GetWorld()->SpawnActor<ABaseMagnetic>(MagneticBox,SpawnLocation, Rotation, SpawnParameters);
 	if (box)
+	{ 
+		box->MagneticMesh->SetSimulatePhysics(false);
 		CreatedBoxes.Add(box);
+		box->OnCreate();
+	}
 }
 void ANewWorldDiscoveryCharacter::CreateMagneticBall()
 {
@@ -121,7 +125,12 @@ void ANewWorldDiscoveryCharacter::CreateMagneticBall()
 	FRotator Rotation = FRotator(0.0f, 0.0f, 0.0f);
 	ABaseMagnetic *ball = GetWorld()->SpawnActor<ABaseMagnetic>(MagneticBall, SpawnLocation, Rotation, SpawnParameters);
 	if (ball)
+	{
+		ball->MagneticMesh->SetSimulatePhysics(false);
 		CreatedBalls.Add(ball);
+		ball->OnCreate();
+	}
+		
 }
 void ANewWorldDiscoveryCharacter::CreateMagneticPyramide()
 {
@@ -143,7 +152,11 @@ void ANewWorldDiscoveryCharacter::CreateMagneticPyramide()
 	FRotator Rotation = FRotator(0.0f, 0.0f, 0.0f);
 	ABaseMagnetic *pyramide = GetWorld()->SpawnActor<ABaseMagnetic>(MagneticPyramide, SpawnLocation, Rotation, SpawnParameters);
 	if (pyramide)
+	{
+		pyramide->MagneticMesh->SetSimulatePhysics(false);
 		CreatedPyramides.Add(pyramide);
+		pyramide->OnCreate();
+	}
 }
 
 void ANewWorldDiscoveryCharacter::RotateAround(float Value)
