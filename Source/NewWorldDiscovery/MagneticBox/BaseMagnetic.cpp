@@ -39,7 +39,7 @@ ABaseMagnetic::ABaseMagnetic()
 	PushAmount = 5000.0f;
 	Radius = 150.0f;
 
-	
+	bDestroying = false;
 }
 
 void ABaseMagnetic::BeginPlay()
@@ -60,13 +60,21 @@ void ABaseMagnetic::SetRotationRate(float Value)
 void ABaseMagnetic::Accelerate(float DeltaTime)
 {
 	CurrentVelocity += DeltaTime * PullAcceleration * PullVelocity;
-	FMath::Clamp(CurrentVelocity, 0.0f, PullVelocity);
+	CurrentVelocity = FMath::Clamp(CurrentVelocity, 0.0f, PullVelocity);
 }
 
 // Called every frame
 void ABaseMagnetic::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (bDestroying && !bIsDestroyed)
+	{
+		bIsDestroyed = true;
+		OnDestroying();
+		return;
+	}
+		
 
 	switch (PullingType)
 	{
@@ -99,8 +107,10 @@ void ABaseMagnetic::Tick(float DeltaTime)
 
 		}
 		else
+		{
 			PullingType = ePulling::FOLLOWING;
-
+			playerChar->AddPulledObject(this);
+		}
 		break;
 	}
 	case ePulling::FOLLOWING:
@@ -111,8 +121,6 @@ void ABaseMagnetic::Tick(float DeltaTime)
 		float xDir = 1.0f;
 		FVector forward = playerChar->GetActorForwardVector();
 		xDir = forward.Y <= 0 ? -1.0f : 1.0f;
-
-		playerChar->PulledObject = this;
 
 		TargetLocation = playerChar->GetActorLocation();
 		ForceDirection = (TargetLocation - ActorPos).GetSafeNormal();
@@ -183,8 +191,8 @@ void ABaseMagnetic::triggerMagnetic(FVector direction, float force)
 		MagneticMesh->SetEnableGravity(false);
 		MagneticMesh->SetSimulatePhysics(true);
 
-		MagneticMesh->bGenerateOverlapEvents = false;
-		MagneticMesh->bMultiBodyOverlap = false;
+		MagneticMesh->bGenerateOverlapEvents = true;
+		MagneticMesh->bMultiBodyOverlap = true;
 
 		PullingType = ePulling::PULLING;
 		CurrentVelocity = 0;
@@ -199,6 +207,7 @@ void ABaseMagnetic::TriggerMagneticStop()
 	MagneticMesh->SetSimulatePhysics(true);
 	MagneticMesh->bGenerateOverlapEvents = true;
 	MagneticMesh->bMultiBodyOverlap = true;
+
 }
 
 void ABaseMagnetic::TriggerMagneticPush()
@@ -213,16 +222,44 @@ void ABaseMagnetic::TriggerMagneticPush()
 		MagneticMesh->SetSimulatePhysics(true);
 		MagneticMesh->bGenerateOverlapEvents = true;
 		MagneticMesh->bMultiBodyOverlap = true;
+
+		AWorldDiscoveryPlayerController* playerController = Cast<AWorldDiscoveryPlayerController>(GetWorld()->GetFirstPlayerController());
+		if (playerController)
+		{
+			ANewWorldDiscoveryCharacter *playerChar = Cast<ANewWorldDiscoveryCharacter>(playerController->GetCharacter());
+			if (playerChar)
+			{
+				playerChar->RemovePulledObject(this);
+			}
+		}
+	}
+}
+
+void ABaseMagnetic::TriggerDestroy(bool bInstant)
+{
+	if (bInstant)
+		this->K2_DestroyActor();
+	else
+	{
+		//trigger some blueprint event
+		bDestroying = true;
 	}
 }
 
 void ABaseMagnetic::OnOverlapBegin(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	ANewWorldDiscoveryCharacter *playerChar = Cast<ANewWorldDiscoveryCharacter>(OtherActor);
+	UE_LOG(LogTemp, Warning, TEXT("ABaseMagnetic - OnOverlapBegin"));
+
+	OnOverlap(OtherActor);
+}
+
+void ABaseMagnetic::OnOverlap(class AActor* actor)
+{
+	UE_LOG(LogTemp, Warning, TEXT("ABaseMagnetic - OnOverlap"));
+
+	ANewWorldDiscoveryCharacter *playerChar = Cast<ANewWorldDiscoveryCharacter>(actor);
 	if (playerChar)
 	{
-		USphereComponent* sphereComponent = Cast<USphereComponent>(OtherComp);
-		FString name = sphereComponent->GetReadableName();
 		FVector playerPos = playerChar->GetActorLocation();
 		playerPos.Z += 200.0f;
 
@@ -233,12 +270,11 @@ void ABaseMagnetic::OnOverlapBegin(class AActor* OtherActor, class UPrimitiveCom
 
 void ABaseMagnetic::OnOverlapEnd(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	
-	if (MagneticMesh->bGenerateOverlapEvents)
+	ANewWorldDiscoveryCharacter *playerChar = Cast<ANewWorldDiscoveryCharacter>(OtherActor);
+	if (playerChar)
 	{
-		;
-		//UE_LOG(LogTemp, Warning, TEXT("BaseMagnetic - OverlapEnd"));
-		//TriggerMagneticStop();
+		UE_LOG(LogTemp, Warning, TEXT("ABaseMagnetic - OnOverlap End"));
+		//PullingType = ePulling::NONE;
 	}
-		
 }
+

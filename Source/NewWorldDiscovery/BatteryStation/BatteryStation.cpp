@@ -64,6 +64,13 @@ void ABatteryStation::OnOverlapBegin(class AActor* OtherActor, class UPrimitiveC
 	ANewWorldDiscoveryCharacter *playerChar = Cast<ANewWorldDiscoveryCharacter>(OtherActor);
 	if (playerChar)
 	{
+		if (bCheckpoint)
+		{
+			//Reset Player
+			playerChar->SetLastCheckpoint(this);
+			//Reset Platforms
+		}
+
 		AWorldDiscoveryPlayerState * playerState = (AWorldDiscoveryPlayerState*)playerChar->PlayerState;
 		if (playerState != nullptr)
 		{

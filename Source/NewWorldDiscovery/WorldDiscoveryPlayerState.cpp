@@ -34,7 +34,6 @@ void AWorldDiscoveryPlayerState::AddEnergy(int32 energy)
 void AWorldDiscoveryPlayerState::RemoveEnergy(int32 energy)
 {
 	ANewWorldDiscoveryGameMode* gameMode = Cast<ANewWorldDiscoveryGameMode>(GetWorld()->GetAuthGameMode());
-
 	if (gameMode)
 	{
 		int32 limit = gameMode->GetEnergyLimit();

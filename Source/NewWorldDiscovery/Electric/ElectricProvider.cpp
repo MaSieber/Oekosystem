@@ -55,7 +55,7 @@ void AElectricProvider::OnOverlapBegin(class AActor* OtherActor, class UPrimitiv
 	AMagneticEnergyTransfer *energyTransfer = Cast<AMagneticEnergyTransfer>(OtherActor);
 	if (energyTransfer)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("OnOverlapBegin"));
+		UE_LOG(LogTemp, Warning, TEXT("AElectricProvider - OnOverlapBegin"));
 	}
 }
 
@@ -64,6 +64,6 @@ void AElectricProvider::OnOverlapEnd(class AActor* OtherActor, class UPrimitiveC
 	AMagneticEnergyTransfer *energyTransfer = Cast<AMagneticEnergyTransfer>(OtherActor);
 	if (energyTransfer)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("OnOverlapEnd"));
+		UE_LOG(LogTemp, Warning, TEXT("AElectricProvider - OnOverlapEnd"));
 	}
 }

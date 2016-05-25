@@ -57,5 +57,6 @@ private:
 	int32 CurrentEnergy;
 	bool bEnergyRefuel;
 	float CurrentEnergyRefuelTime;
+
 	
 };

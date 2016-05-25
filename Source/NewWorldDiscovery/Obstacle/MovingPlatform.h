@@ -67,6 +67,9 @@ public:
 	UStaticMeshComponent* PlatformLineMesh;
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = MovingPlatform)
+	UStaticMeshComponent* PlatformEnergySocketMesh;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = MovingPlatform)
 	UBoxComponent* BoxCollisionTrigger;
 
 	UFUNCTION(BlueprintCallable, Category = MovingPlatform)

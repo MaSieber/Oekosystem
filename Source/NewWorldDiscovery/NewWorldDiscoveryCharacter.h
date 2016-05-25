@@ -1,5 +1,7 @@
 // Copyright 1998-2016 Epic Games, Inc. All Rights Reserved.
 #pragma once
+
+#include "MagneticBox/BaseMagnetic.h"
 #include "GameFramework/Character.h"
 #include "NewWorldDiscoveryCharacter.generated.h"
 
@@ -19,8 +21,38 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = MagneticCollider)
 	USphereComponent* magneticTrigger;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = MagneticBox)
+	TArray<ABaseMagnetic*> HoldingObjects;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = MagneticBox)
+	TArray<ABaseMagnetic*> CreatedBoxes;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = MagneticBox)
+	TArray<ABaseMagnetic*> CreatedBalls;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = MagneticBox)
+	TArray<ABaseMagnetic*> CreatedPyramides;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MagneticBox)
-	AActor* PulledObject;
+	TArray<int32> EnergyCosts;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MagneticBox)
+	int32 MaxBoxes;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MagneticBox)
+	int32 MaxBalls;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MagneticBox)
+	int32 MaxPyramides;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MagneticBox)
+	TSubclassOf<class ABaseMagnetic> MagneticBox;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MagneticBox)
+	TSubclassOf<class ABaseMagnetic> MagneticBall;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MagneticBox)
+	TSubclassOf<class ABaseMagnetic> MagneticPyramide;
 
 protected:
 
@@ -39,6 +71,17 @@ protected:
 
 	void RotateAround(float Val);
 
+	void CreateMagneticBox();
+	void CreateMagneticBall();
+	void CreateMagneticPyramide();
+
+	void Reset();
+
+private:
+	AActor* LastCheckpoint;
+	bool RemoveEnergy();
+
+	int32 currentEnergyIndex;
 
 public:
 	ANewWorldDiscoveryCharacter();
@@ -52,6 +95,18 @@ public:
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 
 	UFUNCTION(BlueprintCallable, Category = MagneticBox)
-	AActor* GetPulledObject();
+	ABaseMagnetic* GetActiveObject();
+
+	UFUNCTION(BlueprintCallable, Category = Checkpoint)
+	void SetLastCheckpoint(AActor* Checkpoint);
+
+	UFUNCTION(BlueprintCallable, Category = Checkpoint)
+	void AddPulledObject(ABaseMagnetic* baseMagnetic);
+
+	UFUNCTION(BlueprintCallable, Category = Checkpoint)
+	void RemovePulledObject(ABaseMagnetic* baseMagnetic);
+
+	UFUNCTION(BlueprintCallable, Category = Checkpoint)
+	void EmptyHoldingObjects();
 
 };
