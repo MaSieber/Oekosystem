@@ -25,9 +25,15 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = BaseMagneticEvent)
 	void OnPoweringUp();
 
+	UFUNCTION(BlueprintImplementableEvent, Category = BaseMagneticEvent)
+	void OnPoweringDown();
+
 	UFUNCTION()
 	virtual void OnOverlap(class AActor* actor) override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MagneticTransfer)
 	float MaxEnergy;
+
+	UFUNCTION()
+	void triggerPoweringDown();
 };

@@ -191,8 +191,8 @@ void ABaseMagnetic::triggerMagnetic(FVector direction, float force)
 		MagneticMesh->SetEnableGravity(false);
 		MagneticMesh->SetSimulatePhysics(true);
 
-		MagneticMesh->bGenerateOverlapEvents = false;
-		MagneticMesh->bMultiBodyOverlap = false;
+		MagneticMesh->bGenerateOverlapEvents = true;
+		MagneticMesh->bMultiBodyOverlap = true;
 
 		PullingType = ePulling::PULLING;
 		CurrentVelocity = 0;

@@ -38,3 +38,8 @@ void AMagneticEnergyTransfer::OnOverlap(class AActor* actor)
 		OnPoweringUp();
 }
 
+void AMagneticEnergyTransfer::triggerPoweringDown()
+{
+	OnPoweringDown();
+}
+
