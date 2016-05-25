@@ -22,6 +22,12 @@ public:
 	// Called every frame
 	virtual void Tick( float DeltaSeconds ) override;
 
+	UFUNCTION(BlueprintImplementableEvent, Category = BaseMagneticEvent)
+	void OnPoweringUp();
+
+	UFUNCTION()
+	virtual void OnOverlap(class AActor* actor) override;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MagneticTransfer)
 	float MaxEnergy;
 };

@@ -3,6 +3,7 @@
 #include "NewWorldDiscovery.h"
 #include "MagneticEnergyTransfer.h"
 
+#include "../Electric/ElectricProvider.h"
 
 // Sets default values
 AMagneticEnergyTransfer::AMagneticEnergyTransfer()
@@ -24,5 +25,16 @@ void AMagneticEnergyTransfer::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
 
+}
+
+void AMagneticEnergyTransfer::OnOverlap(class AActor* actor)
+{
+	Super::OnOverlap(actor);
+
+	UE_LOG(LogTemp,Warning,TEXT("AMagneticEnergyTransfer - OnOverlap"));
+
+	AElectricProvider *provider = Cast<AElectricProvider>(actor);
+	if (provider)
+		OnPoweringUp();
 }
 

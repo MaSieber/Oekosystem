@@ -3,6 +3,8 @@
 #include "NewWorldDiscovery.h"
 #include "NewWorldDiscoveryCharacter.h"
 
+#include "WorldDiscoveryPlayerState.h"
+
 #include "MagneticBox/MagneticBox.h"
 #include "MagneticBox/MagneticEnergyProvider.h"
 #include "MagneticBox/MagneticEnergyTransfer.h"
@@ -46,10 +48,12 @@ ANewWorldDiscoveryCharacter::ANewWorldDiscoveryCharacter()
 	magneticTrigger->SetSimulatePhysics(false);
 	magneticTrigger->AttachTo(RootComponent);
 	
-	PulledObject = nullptr;
+	LastCheckpoint = nullptr;
 	MaxBalls = 1;
 	MaxBoxes = 1;
 	MaxPyramides = 1;
+
+	currentEnergyIndex = 0;
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
@@ -66,14 +70,66 @@ void ANewWorldDiscoveryCharacter::SetupPlayerInputComponent(class UInputComponen
 	InputComponent->BindAxis("MoveRight", this, &ANewWorldDiscoveryCharacter::MoveRight);
 	InputComponent->BindAxis("RotateAround", this, &ANewWorldDiscoveryCharacter::RotateAround);
 
-
 	InputComponent->BindAction("CreateBox", IE_Pressed, this, &ANewWorldDiscoveryCharacter::CreateMagneticBox);
 	InputComponent->BindAction("CreatePyramide", IE_Pressed, this, &ANewWorldDiscoveryCharacter::CreateMagneticPyramide);
 	InputComponent->BindAction("CreateBall", IE_Pressed, this, &ANewWorldDiscoveryCharacter::CreateMagneticBall);
 
+	InputComponent->BindAction("Reset", IE_Pressed, this, &ANewWorldDiscoveryCharacter::Reset);
 
 	InputComponent->BindTouch(IE_Pressed, this, &ANewWorldDiscoveryCharacter::TouchStarted);
 	InputComponent->BindTouch(IE_Released, this, &ANewWorldDiscoveryCharacter::TouchStopped);
+}
+
+void ANewWorldDiscoveryCharacter::Reset()
+{
+	if (LastCheckpoint != nullptr)
+	{ 
+		for (int i = 0; i < CreatedBoxes.Num(); i++)
+		{
+			Cast<AMagneticBox>(CreatedBoxes[i])->TriggerDestroy(true);
+		}
+		CreatedBoxes.Empty();
+		for (int i = 0; i < CreatedPyramides.Num(); i++)
+		{
+			Cast<AMagneticEnergyProvider>(CreatedPyramides[i])->TriggerDestroy(true);
+		}
+		CreatedPyramides.Empty();
+		for (int i = 0; i < CreatedBalls.Num(); i++)
+		{
+			Cast<AMagneticEnergyTransfer>(CreatedBalls[i])->TriggerDestroy(true);
+		}
+		CreatedBalls.Empty();
+
+		FVector ResetLocation = LastCheckpoint->GetActorLocation();
+		ResetLocation.Z += 150.0f;
+
+		SetActorLocation(ResetLocation);
+	}
+}
+
+bool ANewWorldDiscoveryCharacter::RemoveEnergy()
+{
+	if (currentEnergyIndex == EnergyCosts.Num())
+	{
+		currentEnergyIndex = 0;
+	}
+	
+	AWorldDiscoveryPlayerState * playerState = (AWorldDiscoveryPlayerState*)this->PlayerState;
+	if (playerState != nullptr)
+	{
+		int32 currentEnergy = playerState->GetCurrentEnergy();
+		int32 energyCosts = EnergyCosts[currentEnergyIndex];
+		currentEnergyIndex++;
+
+		if (currentEnergy >= energyCosts)
+		{
+			playerState->RemoveEnergy(energyCosts);
+			return true;
+		}
+		else
+			return false;
+	}
+	return false;
 }
 
 /*
@@ -81,6 +137,10 @@ void ANewWorldDiscoveryCharacter::SetupPlayerInputComponent(class UInputComponen
 */
 void ANewWorldDiscoveryCharacter::CreateMagneticBox()
 {
+	//We have no energy .. so we cant create more objects
+	if (!RemoveEnergy())
+		return;
+
 	if (CreatedBoxes.Num() >= MaxBoxes)
 	{
 		Cast<AMagneticBox>(CreatedBoxes[0])->TriggerDestroy(true);
@@ -107,6 +167,10 @@ void ANewWorldDiscoveryCharacter::CreateMagneticBox()
 }
 void ANewWorldDiscoveryCharacter::CreateMagneticBall()
 {
+	//We have no energy .. so we cant create more objects
+	if (!RemoveEnergy())
+		return;
+
 	if (CreatedBalls.Num() >= MaxBalls)
 	{
 		Cast<AMagneticEnergyTransfer>(CreatedBalls[0])->TriggerDestroy(true);
@@ -134,6 +198,10 @@ void ANewWorldDiscoveryCharacter::CreateMagneticBall()
 }
 void ANewWorldDiscoveryCharacter::CreateMagneticPyramide()
 {
+	//We have no energy .. so we cant create more objects
+	if (!RemoveEnergy())
+		return;
+
 	if (CreatedPyramides.Num() >= MaxPyramides)
 	{
 		Cast<AMagneticEnergyProvider>(CreatedPyramides[0])->TriggerDestroy(true);
@@ -161,9 +229,9 @@ void ANewWorldDiscoveryCharacter::CreateMagneticPyramide()
 
 void ANewWorldDiscoveryCharacter::RotateAround(float Value)
 {
-	if (PulledObject != nullptr)
+	for (int i = 0; i < HoldingObjects.Num(); i++)
 	{
-		ABaseMagnetic* BaseMagnetic = Cast<ABaseMagnetic>(PulledObject);
+		ABaseMagnetic* BaseMagnetic = Cast<ABaseMagnetic>(HoldingObjects[i]);
 		if (BaseMagnetic)
 		{
 			BaseMagnetic->SetRotationRate(Value);
@@ -201,7 +269,39 @@ void ANewWorldDiscoveryCharacter::Tick(float DeltaTime)
 	magneticTrigger->SetSphereRadius(rad + FMath::Sin(DeltaTime)/10.0f);
 }
 
-AActor* ANewWorldDiscoveryCharacter::GetPulledObject()
+ABaseMagnetic* ANewWorldDiscoveryCharacter::GetActiveObject()
 {
-	return this->PulledObject;
+	UE_LOG(LogTemp,Warning,TEXT("%d"), HoldingObjects.Num());
+
+	if (HoldingObjects.Num() > 0)
+	{
+		return HoldingObjects[0];
+	}
+
+	return nullptr;
+}
+
+void ANewWorldDiscoveryCharacter::SetLastCheckpoint(AActor* Checkpoint)
+{
+	this->LastCheckpoint = Checkpoint;
+}
+
+void ANewWorldDiscoveryCharacter::AddPulledObject(ABaseMagnetic* baseMagnetic)
+{
+	if (baseMagnetic != nullptr)
+	{
+		HoldingObjects.Add(baseMagnetic);
+	}
+}
+void ANewWorldDiscoveryCharacter::RemovePulledObject(ABaseMagnetic* baseMagnetic)
+{
+	if (baseMagnetic != nullptr)
+	{
+		HoldingObjects.Remove(baseMagnetic);
+	}
+}
+
+void ANewWorldDiscoveryCharacter::EmptyHoldingObjects()
+{
+	HoldingObjects.Empty();
 }

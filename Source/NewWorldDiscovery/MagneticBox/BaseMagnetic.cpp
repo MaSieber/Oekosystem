@@ -107,8 +107,10 @@ void ABaseMagnetic::Tick(float DeltaTime)
 
 		}
 		else
+		{
 			PullingType = ePulling::FOLLOWING;
-
+			playerChar->AddPulledObject(this);
+		}
 		break;
 	}
 	case ePulling::FOLLOWING:
@@ -119,8 +121,6 @@ void ABaseMagnetic::Tick(float DeltaTime)
 		float xDir = 1.0f;
 		FVector forward = playerChar->GetActorForwardVector();
 		xDir = forward.Y <= 0 ? -1.0f : 1.0f;
-
-		playerChar->PulledObject = this;
 
 		TargetLocation = playerChar->GetActorLocation();
 		ForceDirection = (TargetLocation - ActorPos).GetSafeNormal();
@@ -207,6 +207,7 @@ void ABaseMagnetic::TriggerMagneticStop()
 	MagneticMesh->SetSimulatePhysics(true);
 	MagneticMesh->bGenerateOverlapEvents = true;
 	MagneticMesh->bMultiBodyOverlap = true;
+
 }
 
 void ABaseMagnetic::TriggerMagneticPush()
@@ -221,6 +222,16 @@ void ABaseMagnetic::TriggerMagneticPush()
 		MagneticMesh->SetSimulatePhysics(true);
 		MagneticMesh->bGenerateOverlapEvents = true;
 		MagneticMesh->bMultiBodyOverlap = true;
+
+		AWorldDiscoveryPlayerController* playerController = Cast<AWorldDiscoveryPlayerController>(GetWorld()->GetFirstPlayerController());
+		if (playerController)
+		{
+			ANewWorldDiscoveryCharacter *playerChar = Cast<ANewWorldDiscoveryCharacter>(playerController->GetCharacter());
+			if (playerChar)
+			{
+				playerChar->RemovePulledObject(this);
+			}
+		}
 	}
 }
 
@@ -237,11 +248,18 @@ void ABaseMagnetic::TriggerDestroy(bool bInstant)
 
 void ABaseMagnetic::OnOverlapBegin(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	ANewWorldDiscoveryCharacter *playerChar = Cast<ANewWorldDiscoveryCharacter>(OtherActor);
+	UE_LOG(LogTemp, Warning, TEXT("ABaseMagnetic - OnOverlapBegin"));
+
+	OnOverlap(OtherActor);
+}
+
+void ABaseMagnetic::OnOverlap(class AActor* actor)
+{
+	UE_LOG(LogTemp, Warning, TEXT("ABaseMagnetic - OnOverlap"));
+
+	ANewWorldDiscoveryCharacter *playerChar = Cast<ANewWorldDiscoveryCharacter>(actor);
 	if (playerChar)
 	{
-		USphereComponent* sphereComponent = Cast<USphereComponent>(OtherComp);
-		FString name = sphereComponent->GetReadableName();
 		FVector playerPos = playerChar->GetActorLocation();
 		playerPos.Z += 200.0f;
 
@@ -252,12 +270,11 @@ void ABaseMagnetic::OnOverlapBegin(class AActor* OtherActor, class UPrimitiveCom
 
 void ABaseMagnetic::OnOverlapEnd(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	
-	if (MagneticMesh->bGenerateOverlapEvents)
+	ANewWorldDiscoveryCharacter *playerChar = Cast<ANewWorldDiscoveryCharacter>(OtherActor);
+	if (playerChar)
 	{
-		;
-		//UE_LOG(LogTemp, Warning, TEXT("BaseMagnetic - OverlapEnd"));
-		//TriggerMagneticStop();
+		UE_LOG(LogTemp, Warning, TEXT("ABaseMagnetic - OnOverlap End"));
+		//PullingType = ePulling::NONE;
 	}
-		
 }
+
