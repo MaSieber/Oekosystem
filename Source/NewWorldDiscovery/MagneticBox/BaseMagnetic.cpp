@@ -171,7 +171,7 @@ void ABaseMagnetic::Tick(float DeltaTime)
 
 		MagneticMesh->AddImpulseAtLocation(PushDirection * PushAmount, GetActorLocation());
 
-		//PullingType = ePulling::NONE;
+		PullingType = ePulling::NONE;
 
 		break;
 	}
@@ -207,6 +207,8 @@ void ABaseMagnetic::TriggerMagneticStop()
 	MagneticMesh->SetSimulatePhysics(true);
 	MagneticMesh->bGenerateOverlapEvents = true;
 	MagneticMesh->bMultiBodyOverlap = true;
+
+	//Clearing of Pulled Objects with Blueprint
 
 }
 
