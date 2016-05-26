@@ -280,3 +280,8 @@ void ABaseMagnetic::OnOverlapEnd(class AActor* OtherActor, class UPrimitiveCompo
 	}
 }
 
+bool ABaseMagnetic::IsInteractible()
+{
+	return (PullingType == ePulling::NONE);
+}
+

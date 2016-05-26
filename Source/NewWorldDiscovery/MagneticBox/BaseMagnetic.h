@@ -78,6 +78,9 @@ public:
 	UFUNCTION()
 	void TriggerDestroy(bool bInstant);
 
+	UFUNCTION()
+	bool IsInteractible();
+
 protected:
 	void Accelerate(float DeltaTime);
 
