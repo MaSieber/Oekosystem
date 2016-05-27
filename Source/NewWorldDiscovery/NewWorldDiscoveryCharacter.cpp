@@ -33,6 +33,9 @@ ANewWorldDiscoveryCharacter::ANewWorldDiscoveryCharacter()
 	SideViewCameraComponent->AttachTo(CameraBoom, USpringArmComponent::SocketName);
 	SideViewCameraComponent->bUsePawnControlRotation = false; // We don't want the controller rotating the camera
 
+	SpawnPoint = CreateDefaultSubobject<USceneComponent>(TEXT("SpawnPoint"));
+	SpawnPoint->AttachTo(GetCapsuleComponent());
+
 	// Configure character movement
 	GetCharacterMovement()->bOrientRotationToMovement = true; // Face in the direction we are moving..
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 720.0f, 0.0f); // ...at this rotation rate
@@ -150,9 +153,11 @@ void ANewWorldDiscoveryCharacter::CreateMagneticBox()
 	float xDir = 1.0f;
 	FVector forward = GetActorForwardVector();
 	xDir = forward.Y <= 0 ? -1.0f : 1.0f;
+	FVector direction = FVector(0.0f, xDir, 1.0f);
+	FVector SpawnLocation = SpawnPoint->RelativeLocation;
+	SpawnLocation.Y = SpawnLocation.X;
+	SpawnLocation = (SpawnLocation * direction) + GetActorLocation();
 
-	FVector direction = FVector(0.0f,-xDir,0.7f);
-	FVector SpawnLocation = GetActorLocation() + direction * 100.0f;
 	FActorSpawnParameters SpawnParameters = FActorSpawnParameters();
 	SpawnParameters.bNoFail = true;
 	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
@@ -180,9 +185,11 @@ void ANewWorldDiscoveryCharacter::CreateMagneticBall()
 	float xDir = 1.0f;
 	FVector forward = GetActorForwardVector();
 	xDir = forward.Y <= 0 ? -1.0f : 1.0f;
+	FVector direction = FVector(0.0f, xDir, 1.0f);
+	FVector SpawnLocation = SpawnPoint->RelativeLocation;
+	SpawnLocation.Y = SpawnLocation.X;
+	SpawnLocation = (SpawnLocation * direction) + GetActorLocation();
 
-	FVector direction = FVector(0.0f, -xDir, 0.7f);
-	FVector SpawnLocation = GetActorLocation() + direction * 100.0f;
 	FActorSpawnParameters SpawnParameters = FActorSpawnParameters();
 	SpawnParameters.bNoFail = true;
 	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
@@ -211,9 +218,11 @@ void ANewWorldDiscoveryCharacter::CreateMagneticPyramide()
 	float xDir = 1.0f;
 	FVector forward = GetActorForwardVector();
 	xDir = forward.Y <= 0 ? -1.0f : 1.0f;
+	FVector direction = FVector(0.0f, xDir, 1.0f);
+	FVector SpawnLocation = SpawnPoint->RelativeLocation;
+	SpawnLocation.Y = SpawnLocation.X;
+	SpawnLocation = (SpawnLocation * direction) + GetActorLocation();
 
-	FVector direction = FVector(0.0f, -xDir, 0.7f);
-	FVector SpawnLocation = GetActorLocation() + direction * 100.0f;
 	FActorSpawnParameters SpawnParameters = FActorSpawnParameters();
 	SpawnParameters.bNoFail = true;
 	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;

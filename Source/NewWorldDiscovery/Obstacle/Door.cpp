@@ -65,7 +65,6 @@ void ADoor::Tick( float DeltaTime )
 			case eState::CLOSED:
 			{
 				RelLocation.Z -= MaxDoorVelocity * DeltaTime;
-				UE_LOG(LogTemp, Warning, TEXT("closed RelLocation.z - %f"), (float)RelLocation.Z);
 				if (RelLocation.Z <= Start.Z)
 				{
 					bMoveDoor = false;
@@ -77,7 +76,6 @@ void ADoor::Tick( float DeltaTime )
 			case eState::OPEN:
 			{
 				RelLocation.Z += MaxDoorVelocity * DeltaTime;
-				UE_LOG(LogTemp, Warning, TEXT("open RelLocation.z - %f"), (float)RelLocation.Z);
 				if (RelLocation.Z >= End.Z)
 				{
 					bMoveDoor = false;

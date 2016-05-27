@@ -21,6 +21,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = MagneticCollider)
 	USphereComponent* magneticTrigger;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = SpawnPoint)
+	USceneComponent* SpawnPoint;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = MagneticBox)
 	TArray<ABaseMagnetic*> HoldingObjects;
 
