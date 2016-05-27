@@ -24,6 +24,7 @@ ADoor::ADoor()
 	DoorSocketMesh->bGenerateOverlapEvents = false;
 	DoorSocketMesh->AttachTo(BaseComponent);
 
+	bBackToOrigin = false;
 	bRepeat = true;
 	bMoveDoor = false;
 	MaxDoorVelocity = 20.0f;
@@ -56,7 +57,6 @@ void ADoor::BeginPlay()
 void ADoor::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
-
 	if (bMoveDoor && (RepeatCount > 0 || bRepeat))
 	{ 
 		FVector RelLocation = DoorMesh->RelativeLocation;
@@ -91,7 +91,17 @@ void ADoor::Tick( float DeltaTime )
 
 void ADoor::TriggerDoorMove(bool bMove)
 {
-	bMoveDoor = bMove;
+	UE_LOG(LogTemp, Warning, TEXT("trigger door move1"));
+	if (bBackToOrigin && !bMove)
+	{
+		UE_LOG(LogTemp,Warning,TEXT("trigger door move2"));
+		if (DoorState == eState::CLOSED)
+			DoorState = eState::OPEN;
+		else if (DoorState == eState::OPEN)
+			DoorState = eState::CLOSED;
+	}
+	else
+		bMoveDoor = bMove;
 }
 
 void ADoor::OverlapBegin(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)

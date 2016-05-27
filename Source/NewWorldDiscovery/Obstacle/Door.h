@@ -46,6 +46,9 @@ public:
 	bool bRepeat;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Door)
+	bool bBackToOrigin;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Door)
 	int32 RepeatCount;
 
 	UFUNCTION()
