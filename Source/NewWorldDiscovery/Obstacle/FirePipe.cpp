@@ -25,6 +25,7 @@ AFirePipe::AFirePipe()
 	fireParticle = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("FireParticle"));
 	fireParticle->bGenerateOverlapEvents = false;
 	fireParticle->bAutoActivate = true;
+	fireParticle->AttachTo(FireMesh);
 
 }
 
