@@ -27,9 +27,9 @@ void AMagneticEnergyTransfer::Tick( float DeltaTime )
 
 }
 
-void AMagneticEnergyTransfer::OnOverlap(class AActor* actor)
+void AMagneticEnergyTransfer::OnOverlap(class AActor* actor, bool bState)
 {
-	Super::OnOverlap(actor);
+	Super::OnOverlap(actor,bState);
 
 	UE_LOG(LogTemp,Warning,TEXT("AMagneticEnergyTransfer - OnOverlap"));
 

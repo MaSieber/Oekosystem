@@ -78,7 +78,7 @@ protected:
 	void CreateMagneticBall();
 	void CreateMagneticPyramide();
 
-	void Reset();
+	
 
 private:
 	AActor* LastCheckpoint;
@@ -111,5 +111,8 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = Checkpoint)
 	void EmptyHoldingObjects();
+
+	UFUNCTION()
+	void Reset();
 
 };

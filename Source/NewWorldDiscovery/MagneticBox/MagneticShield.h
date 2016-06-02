@@ -22,6 +22,8 @@ public:
 	// Called every frame
 	virtual void Tick( float DeltaSeconds ) override;
 
+	UFUNCTION()
+	virtual void OnOverlap(class AActor* actor, bool bState) override;
 	
 	
 };

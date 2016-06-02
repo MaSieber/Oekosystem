@@ -32,4 +32,12 @@ public:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = FirePipe)
 	UParticleSystemComponent *fireParticle;
 	
+	UFUNCTION()
+	void SetCanDoDamage(bool bDamage);
+
+	UFUNCTION()
+	void OnOverlapBegin(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+private:
+	bool bCanDoDamage;
 };

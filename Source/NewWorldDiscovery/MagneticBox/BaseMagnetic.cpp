@@ -252,32 +252,40 @@ void ABaseMagnetic::OnOverlapBegin(class AActor* OtherActor, class UPrimitiveCom
 {
 	UE_LOG(LogTemp, Warning, TEXT("ABaseMagnetic - OnOverlapBegin"));
 
-	OnOverlap(OtherActor);
+	OnOverlap(OtherActor,true);
 }
 
-void ABaseMagnetic::OnOverlap(class AActor* actor)
+void ABaseMagnetic::OnOverlap(class AActor* actor,bool bState)
 {
-	UE_LOG(LogTemp, Warning, TEXT("ABaseMagnetic - OnOverlap"));
-
-	ANewWorldDiscoveryCharacter *playerChar = Cast<ANewWorldDiscoveryCharacter>(actor);
-	if (playerChar)
+	if (bState)
 	{
-		FVector playerPos = playerChar->GetActorLocation();
-		playerPos.Z += 200.0f;
+		UE_LOG(LogTemp, Warning, TEXT("ABaseMagnetic - OnOverlap"));
+		ANewWorldDiscoveryCharacter *playerChar = Cast<ANewWorldDiscoveryCharacter>(actor);
+		if (playerChar)
+		{
+			FVector playerPos = playerChar->GetActorLocation();
+			playerPos.Z += 200.0f;
 
-		FVector direction = playerPos - MagneticMesh->RelativeLocation;
-		triggerMagnetic(direction, 1500);
+			FVector direction = playerPos - MagneticMesh->RelativeLocation;
+			triggerMagnetic(direction, 1500);
+		}
 	}
+	else
+	{
+		ANewWorldDiscoveryCharacter *playerChar = Cast<ANewWorldDiscoveryCharacter>(actor);
+		if (playerChar)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("ABaseMagnetic - OnOverlap End"));
+			//PullingType = ePulling::NONE;
+		}
+	}
+	
+
 }
 
 void ABaseMagnetic::OnOverlapEnd(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	ANewWorldDiscoveryCharacter *playerChar = Cast<ANewWorldDiscoveryCharacter>(OtherActor);
-	if (playerChar)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("ABaseMagnetic - OnOverlap End"));
-		//PullingType = ePulling::NONE;
-	}
+	OnOverlap(OtherActor, false);
 }
 
 bool ABaseMagnetic::IsInteractible()

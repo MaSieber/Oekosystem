@@ -29,7 +29,7 @@ public:
 	void OnPoweringDown();
 
 	UFUNCTION()
-	virtual void OnOverlap(class AActor* actor) override;
+	virtual void OnOverlap(class AActor* actor, bool bState) override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MagneticTransfer)
 	float MaxEnergy;

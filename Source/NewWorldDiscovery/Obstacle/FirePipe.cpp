@@ -3,6 +3,7 @@
 #include "NewWorldDiscovery.h"
 #include "FirePipe.h"
 
+#include "../NewWorldDiscoveryCharacter.h"
 
 // Sets default values
 AFirePipe::AFirePipe()
@@ -20,6 +21,7 @@ AFirePipe::AFirePipe()
 	CollisionTrigger = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CollisionTrigger"));
 	CollisionTrigger->bGenerateOverlapEvents = true;
 	CollisionTrigger->SetCollisionProfileName("PlatformTrigger");
+	CollisionTrigger->OnComponentBeginOverlap.AddDynamic(this, &AFirePipe::OnOverlapBegin);
 	CollisionTrigger->AttachTo(FireMesh);
 
 	fireParticle = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("FireParticle"));
@@ -27,6 +29,7 @@ AFirePipe::AFirePipe()
 	fireParticle->bAutoActivate = true;
 	fireParticle->AttachTo(FireMesh);
 
+	bCanBeDamaged = true;
 }
 
 // Called when the game starts or when spawned
@@ -43,3 +46,20 @@ void AFirePipe::Tick( float DeltaTime )
 
 }
 
+void AFirePipe::SetCanDoDamage(bool bDamage)
+{
+	this->bCanBeDamaged = bDamage;
+}
+
+void AFirePipe::OnOverlapBegin(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (bCanBeDamaged)
+	{
+		ANewWorldDiscoveryCharacter* playerCharacter = Cast<ANewWorldDiscoveryCharacter>(OtherActor);
+		if (playerCharacter)
+		{
+			playerCharacter->Reset();
+			UE_LOG(LogTemp,Warning,TEXT("Overlap FirePipe PlayerCharacter"))
+		}
+	}
+}
