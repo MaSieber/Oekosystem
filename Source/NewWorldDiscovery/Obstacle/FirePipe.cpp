@@ -33,6 +33,8 @@ AFirePipe::AFirePipe()
 	fireParticle->AttachTo(FireMesh);
 
 	bCanBeDamaged = true;
+
+	character = nullptr;
 }
 
 // Called when the game starts or when spawned
@@ -48,8 +50,18 @@ void AFirePipe::Tick( float DeltaTime )
 	Super::Tick( DeltaTime );
 
 	float rad = CollisionTrigger->GetUnscaledCapsuleRadius();
-	UE_LOG(LogTemp, Warning, TEXT("Radius %f"),rad)
 	CollisionTrigger->SetCapsuleRadius(rad + FMath::Sin(DeltaTime) / 10.0f);
+
+	if (bCanBeDamaged)
+	{
+		ANewWorldDiscoveryCharacter* playerCharacter = Cast<ANewWorldDiscoveryCharacter>(character);
+		if (playerCharacter)
+		{
+			playerCharacter->Reset();
+			character = nullptr;
+		}
+		
+	}
 
 }
 
@@ -60,32 +72,28 @@ void AFirePipe::SetCanDoDamage(bool bDamage)
 
 void AFirePipe::OnOverlapBegin(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Overlap FirePipe"))
 	ABaseMagnetic* baseMagnetic = Cast<ABaseMagnetic>(OtherActor);
 	if (baseMagnetic)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Overlap FirePipe BaseMagnetic"))
 		SetCanDoDamage(false);
 		AMagneticShield* magneticShield = Cast<AMagneticShield>(baseMagnetic);
 		if (!magneticShield)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Overlap FirePipe Magnetic Shield"))
 			baseMagnetic->TriggerDestroy(false);
 		}
 	}
-
-	if (bCanBeDamaged)
+	ANewWorldDiscoveryCharacter* playerCharacter = Cast<ANewWorldDiscoveryCharacter>(OtherActor);
+	if (playerCharacter)
 	{
-		ANewWorldDiscoveryCharacter* playerCharacter = Cast<ANewWorldDiscoveryCharacter>(OtherActor);
-		if (playerCharacter)
-		{
-			playerCharacter->Reset();
-			UE_LOG(LogTemp,Warning,TEXT("Overlap FirePipe PlayerCharacter"))
-		}
+		character = playerCharacter;
 	}
 }
 
 void AFirePipe::OnOverlapEnd(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	SetCanDoDamage(true);
+	AMagneticShield* magneticShield = Cast<AMagneticShield>(OtherActor);
+	if (magneticShield)
+	{
+		SetCanDoDamage(true);
+	}
 }

@@ -71,6 +71,13 @@ void ABaseMagnetic::Tick(float DeltaTime)
 	if (bDestroying && !bIsDestroyed)
 	{
 		bIsDestroyed = true;
+
+		if (parentCharacter)
+		{
+			ANewWorldDiscoveryCharacter *playerChar = Cast<ANewWorldDiscoveryCharacter>(parentCharacter);
+			playerChar->RemovePulledObject(this);
+		}
+
 		OnDestroying();
 		return;
 	}
@@ -196,6 +203,16 @@ void ABaseMagnetic::triggerMagnetic(FVector direction, float force)
 
 		PullingType = ePulling::PULLING;
 		CurrentVelocity = 0;
+
+		AWorldDiscoveryPlayerController* playerController = Cast<AWorldDiscoveryPlayerController>(GetWorld()->GetFirstPlayerController());
+		if (playerController)
+		{
+			ANewWorldDiscoveryCharacter *playerChar = Cast<ANewWorldDiscoveryCharacter>(playerController->GetCharacter());
+			if (playerChar)
+			{
+				parentCharacter = playerChar;
+			}
+		}
 	}
 }
 
@@ -208,6 +225,7 @@ void ABaseMagnetic::TriggerMagneticStop()
 	MagneticMesh->bGenerateOverlapEvents = true;
 	MagneticMesh->bMultiBodyOverlap = true;
 
+	parentCharacter = nullptr;
 	//Clearing of Pulled Objects with Blueprint
 
 }
@@ -232,6 +250,7 @@ void ABaseMagnetic::TriggerMagneticPush()
 			if (playerChar)
 			{
 				playerChar->RemovePulledObject(this);
+				parentCharacter = nullptr;
 			}
 		}
 	}

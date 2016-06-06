@@ -49,6 +49,9 @@ public:
 	void OnOverlapEnd(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = BaseMagnetic)
+	ACharacter* parentCharacter;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = BaseMagnetic)
 	float Radius;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = BaseMagnetic)

@@ -43,4 +43,6 @@ public:
 
 private:
 	bool bCanDoDamage;
+
+	ACharacter* character;
 };
