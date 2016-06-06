@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "Door.h"
+#include "BaseDoor.h"
 
 #include "GameFramework/Actor.h"
 #include "Switch.generated.h"
@@ -35,6 +35,6 @@ public:
 	UBoxComponent* BoxCollisionTrigger;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Switch)
-	TArray<ADoor*> Doors;
+	TArray<ABaseDoor*> Doors;
 
 };
