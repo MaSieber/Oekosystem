@@ -4,6 +4,8 @@
 #include "FirePipe.h"
 
 #include "../NewWorldDiscoveryCharacter.h"
+#include "../MagneticBox/BaseMagnetic.h"
+#include "../MagneticBox/MagneticShield.h"
 
 // Sets default values
 AFirePipe::AFirePipe()
@@ -22,6 +24,7 @@ AFirePipe::AFirePipe()
 	CollisionTrigger->bGenerateOverlapEvents = true;
 	CollisionTrigger->SetCollisionProfileName("PlatformTrigger");
 	CollisionTrigger->OnComponentBeginOverlap.AddDynamic(this, &AFirePipe::OnOverlapBegin);
+	CollisionTrigger->OnComponentEndOverlap.AddDynamic(this, &AFirePipe::OnOverlapEnd);
 	CollisionTrigger->AttachTo(FireMesh);
 
 	fireParticle = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("FireParticle"));
@@ -44,6 +47,10 @@ void AFirePipe::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
 
+	float rad = CollisionTrigger->GetUnscaledCapsuleRadius();
+	UE_LOG(LogTemp, Warning, TEXT("Radius %f"),rad)
+	CollisionTrigger->SetCapsuleRadius(rad + FMath::Sin(DeltaTime) / 10.0f);
+
 }
 
 void AFirePipe::SetCanDoDamage(bool bDamage)
@@ -53,6 +60,20 @@ void AFirePipe::SetCanDoDamage(bool bDamage)
 
 void AFirePipe::OnOverlapBegin(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	UE_LOG(LogTemp, Warning, TEXT("Overlap FirePipe"))
+	ABaseMagnetic* baseMagnetic = Cast<ABaseMagnetic>(OtherActor);
+	if (baseMagnetic)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Overlap FirePipe BaseMagnetic"))
+		SetCanDoDamage(false);
+		AMagneticShield* magneticShield = Cast<AMagneticShield>(baseMagnetic);
+		if (!magneticShield)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Overlap FirePipe Magnetic Shield"))
+			baseMagnetic->TriggerDestroy(false);
+		}
+	}
+
 	if (bCanBeDamaged)
 	{
 		ANewWorldDiscoveryCharacter* playerCharacter = Cast<ANewWorldDiscoveryCharacter>(OtherActor);
@@ -62,4 +83,9 @@ void AFirePipe::OnOverlapBegin(class AActor* OtherActor, class UPrimitiveCompone
 			UE_LOG(LogTemp,Warning,TEXT("Overlap FirePipe PlayerCharacter"))
 		}
 	}
+}
+
+void AFirePipe::OnOverlapEnd(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	SetCanDoDamage(true);
 }
