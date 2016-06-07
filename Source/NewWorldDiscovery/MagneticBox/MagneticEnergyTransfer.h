@@ -36,4 +36,10 @@ public:
 
 	UFUNCTION()
 	void triggerPoweringDown();
+
+	UFUNCTION()
+	bool GetChargeState();
+
+private:
+	bool bCharged;
 };
