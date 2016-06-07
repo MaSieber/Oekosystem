@@ -95,5 +95,7 @@ private:
 	FVector RelOriginPosition;
 	eInitialDirection OriginDirection;
 	bool bOriginActive;
+
+	AActor *actor;
 	
 };

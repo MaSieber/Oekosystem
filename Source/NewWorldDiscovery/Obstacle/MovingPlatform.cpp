@@ -47,6 +47,8 @@ AMovingPlatform::AMovingPlatform()
 	InitialDirection = eInitialDirection::END;
 
 	MoveDirection = 1.0f;
+
+	actor = nullptr;
 }
 
 // Called when the game starts or when spawned
@@ -62,9 +64,6 @@ void AMovingPlatform::BeginPlay()
 	RelOriginPosition = PlatformMesh->RelativeLocation;
 	OriginDirection = InitialDirection;
 	bOriginActive = bActive;
-
-	//PlatformEnergySocketMesh->DetachFromParent(true);
-	//PlatformEnergySocketMesh->AttachTo(PlatformMesh);
 	
 }
 
@@ -126,7 +125,17 @@ void AMovingPlatform::Tick( float DeltaTime )
 			}
 
 			PlatformMesh->SetRelativeLocation(PlatformLocationVector);
-				
+		
+			if (actor != nullptr)
+			{
+				FVector RelLoc = PlatformEnergySocketMesh->RelativeLocation;
+				FVector ActorLocation = GetActorLocation() + PlatformLocationVector;
+
+				ActorLocation.Y -= RelLoc.X;
+				ActorLocation.Z += RelLoc.Z;
+				actor->SetActorLocation(ActorLocation);
+				UE_LOG(LogTemp, Warning, TEXT("AcLoc %f %f %f"), ActorLocation.X, ActorLocation.Y, ActorLocation.Z);
+			}			
 		}
 		else
 		{
@@ -164,6 +173,14 @@ void AMovingPlatform::OverlapBegin(class AActor* OtherActor, class UPrimitiveCom
 	if (energyProvider)
 	{
 		SetStoringEnergy(energyProvider->MaxEnergy);
+
+		//energyProvider->MagneticMesh->SetEnableGravity(false);
+		//energyProvider->MagneticMesh->bIgnoreRadialForce = true;
+		//energyProvider->MagneticMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		energyProvider->bIgnoreMagnetic = true;
+		//energyProvider->MagneticMesh->SetSimulatePhysics(true);
+
+		//actor = energyProvider;
 		TriggerPlatform(true);
 	}
 }
@@ -175,6 +192,9 @@ void AMovingPlatform::OverlapEnd(class AActor* OtherActor, class UPrimitiveCompo
 	{
 		SetStoringEnergy(0);
 		TriggerPlatform(false);
+		energyProvider->bIgnoreMagnetic = false;
+		//energyProvider->MagneticMesh->SetEnableGravity(true);
+		actor = nullptr;
 	}
 }
 
