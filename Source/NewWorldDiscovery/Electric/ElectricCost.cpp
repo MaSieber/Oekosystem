@@ -55,7 +55,7 @@ void AElectricCost::Tick( float DeltaTime )
 void AElectricCost::OnOverlapBegin(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	AMagneticEnergyTransfer *energyTransfer = Cast<AMagneticEnergyTransfer>(OtherActor);
-	if (energyTransfer)
+	if (energyTransfer && energyTransfer->GetChargeState())
 	{
 		UE_LOG(LogTemp, Warning, TEXT("AElectricCost - OnOverlapBegin"));
 
