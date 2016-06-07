@@ -8,3 +8,13 @@ ANewWorldDiscoveryGameMode::ANewWorldDiscoveryGameMode()
 {
 	DefaultPawnClass = ANewWorldDiscoveryCharacter::StaticClass();
 }
+
+int32 ANewWorldDiscoveryGameMode::GetEnergyLimit()
+{
+	return this->EnergyLimit;
+}
+
+int32 ANewWorldDiscoveryGameMode::GetRessourceLimit()
+{
+	return this->RessourceLimit;
+}
