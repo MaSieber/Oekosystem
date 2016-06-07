@@ -4,6 +4,8 @@
 #include "FirePipe.h"
 
 #include "../NewWorldDiscoveryCharacter.h"
+#include "../MagneticBox/BaseMagnetic.h"
+#include "../MagneticBox/MagneticShield.h"
 
 // Sets default values
 AFirePipe::AFirePipe()
@@ -22,6 +24,7 @@ AFirePipe::AFirePipe()
 	CollisionTrigger->bGenerateOverlapEvents = true;
 	CollisionTrigger->SetCollisionProfileName("PlatformTrigger");
 	CollisionTrigger->OnComponentBeginOverlap.AddDynamic(this, &AFirePipe::OnOverlapBegin);
+	CollisionTrigger->OnComponentEndOverlap.AddDynamic(this, &AFirePipe::OnOverlapEnd);
 	CollisionTrigger->AttachTo(FireMesh);
 
 	fireParticle = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("FireParticle"));
@@ -30,6 +33,8 @@ AFirePipe::AFirePipe()
 	fireParticle->AttachTo(FireMesh);
 
 	bCanBeDamaged = true;
+
+	character = nullptr;
 }
 
 // Called when the game starts or when spawned
@@ -44,6 +49,20 @@ void AFirePipe::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
 
+	float rad = CollisionTrigger->GetUnscaledCapsuleRadius();
+	CollisionTrigger->SetCapsuleRadius(rad + FMath::Sin(DeltaTime) / 10.0f);
+
+	if (bCanBeDamaged)
+	{
+		ANewWorldDiscoveryCharacter* playerCharacter = Cast<ANewWorldDiscoveryCharacter>(character);
+		if (playerCharacter)
+		{
+			playerCharacter->Reset();
+			character = nullptr;
+		}
+		
+	}
+
 }
 
 void AFirePipe::SetCanDoDamage(bool bDamage)
@@ -53,13 +72,28 @@ void AFirePipe::SetCanDoDamage(bool bDamage)
 
 void AFirePipe::OnOverlapBegin(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (bCanBeDamaged)
+	ABaseMagnetic* baseMagnetic = Cast<ABaseMagnetic>(OtherActor);
+	if (baseMagnetic)
 	{
-		ANewWorldDiscoveryCharacter* playerCharacter = Cast<ANewWorldDiscoveryCharacter>(OtherActor);
-		if (playerCharacter)
+		SetCanDoDamage(false);
+		AMagneticShield* magneticShield = Cast<AMagneticShield>(baseMagnetic);
+		if (!magneticShield)
 		{
-			playerCharacter->Reset();
-			UE_LOG(LogTemp,Warning,TEXT("Overlap FirePipe PlayerCharacter"))
+			baseMagnetic->TriggerDestroy(false);
 		}
+	}
+	ANewWorldDiscoveryCharacter* playerCharacter = Cast<ANewWorldDiscoveryCharacter>(OtherActor);
+	if (playerCharacter)
+	{
+		character = playerCharacter;
+	}
+}
+
+void AFirePipe::OnOverlapEnd(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	AMagneticShield* magneticShield = Cast<AMagneticShield>(OtherActor);
+	if (magneticShield)
+	{
+		SetCanDoDamage(true);
 	}
 }

@@ -40,6 +40,8 @@ ABaseMagnetic::ABaseMagnetic()
 	Radius = 150.0f;
 
 	bDestroying = false;
+
+	ForceDirection = FVector::ZeroVector;
 }
 
 void ABaseMagnetic::BeginPlay()
@@ -71,6 +73,13 @@ void ABaseMagnetic::Tick(float DeltaTime)
 	if (bDestroying && !bIsDestroyed)
 	{
 		bIsDestroyed = true;
+
+		if (parentCharacter)
+		{
+			ANewWorldDiscoveryCharacter *playerChar = Cast<ANewWorldDiscoveryCharacter>(parentCharacter);
+			playerChar->RemovePulledObject(this);
+		}
+
 		OnDestroying();
 		return;
 	}
@@ -123,17 +132,16 @@ void ABaseMagnetic::Tick(float DeltaTime)
 		xDir = forward.Y <= 0 ? -1.0f : 1.0f;
 
 		TargetLocation = playerChar->GetActorLocation();
-		ForceDirection = (TargetLocation - ActorPos).GetSafeNormal();
+		if (ForceDirection == FVector::ZeroVector)
+			ForceDirection = (TargetLocation - ActorPos).GetSafeNormal();
+
 		TargetLocation += -ForceDirection * Radius;
-		
 		MagneticMesh->SetPhysicsLinearVelocity(FVector::ZeroVector);
-		FVector phyVel = MagneticMesh->GetPhysicsLinearVelocity();
-		//UE_LOG(LogTemp, Warning, TEXT("phyVel - %f %f %f"), phyVel.X, phyVel.Y, phyVel.Z);
 
 		//Set Location to Player Location
 		FVector newLocation = TargetLocation;
 		SetActorLocation(TargetLocation);
-		
+
 		//Rotate
 		FRotator rot = GetActorRotation();
 		rot.Roll += xDir * RotationVelocity * FMath::Sin(DeltaTime);
@@ -153,8 +161,8 @@ void ABaseMagnetic::Tick(float DeltaTime)
 			float newZ = player.Z + (s * (box.Y - player.Y) + c * (box.Z - player.Z));
 
 			FVector newLocation = FVector(StaticXPos, newY, newZ);
-			//UE_LOG(LogTemp, Warning, TEXT("NewLocation - %f %f %f"), newLocation.X,newLocation.Y,newLocation.Z);
 			SetActorLocation(newLocation);
+			ForceDirection = (player - newLocation).GetSafeNormal();
 
 		}
 		break;
@@ -196,6 +204,16 @@ void ABaseMagnetic::triggerMagnetic(FVector direction, float force)
 
 		PullingType = ePulling::PULLING;
 		CurrentVelocity = 0;
+
+		AWorldDiscoveryPlayerController* playerController = Cast<AWorldDiscoveryPlayerController>(GetWorld()->GetFirstPlayerController());
+		if (playerController)
+		{
+			ANewWorldDiscoveryCharacter *playerChar = Cast<ANewWorldDiscoveryCharacter>(playerController->GetCharacter());
+			if (playerChar)
+			{
+				parentCharacter = playerChar;
+			}
+		}
 	}
 }
 
@@ -208,6 +226,7 @@ void ABaseMagnetic::TriggerMagneticStop()
 	MagneticMesh->bGenerateOverlapEvents = true;
 	MagneticMesh->bMultiBodyOverlap = true;
 
+	parentCharacter = nullptr;
 	//Clearing of Pulled Objects with Blueprint
 
 }
@@ -232,6 +251,7 @@ void ABaseMagnetic::TriggerMagneticPush()
 			if (playerChar)
 			{
 				playerChar->RemovePulledObject(this);
+				parentCharacter = nullptr;
 			}
 		}
 	}
@@ -279,8 +299,6 @@ void ABaseMagnetic::OnOverlap(class AActor* actor,bool bState)
 			//PullingType = ePulling::NONE;
 		}
 	}
-	
-
 }
 
 void ABaseMagnetic::OnOverlapEnd(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)

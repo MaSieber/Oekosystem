@@ -3,8 +3,6 @@
 #include "NewWorldDiscovery.h"
 #include "MagneticShield.h"
 
-#include "../Obstacle/FirePipe.h"
-
 // Sets default values
 AMagneticShield::AMagneticShield()
 {
@@ -30,21 +28,5 @@ void AMagneticShield::Tick( float DeltaTime )
 void AMagneticShield::OnOverlap(class AActor* actor, bool bState)
 {
 	Super::OnOverlap(actor,bState);
-
-	AFirePipe *firePipe = Cast<AFirePipe>(actor);
-	if (firePipe)
-	{
-		if (bState)
-		{
-			//no damage
-			UE_LOG(LogTemp, Warning, TEXT("MagneticShield FirePipe Begin Overlap"));
-			firePipe->SetCanDoDamage(false);
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("MagneticShield FirePipe End Overlap"));
-			firePipe->SetCanDoDamage(true);
-		}
-	}
 
 }
