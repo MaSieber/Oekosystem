@@ -11,13 +11,15 @@ AMagneticEnergyTransfer::AMagneticEnergyTransfer()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	bCharged = false;
+
 }
 
 // Called when the game starts or when spawned
 void AMagneticEnergyTransfer::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 }
 
 // Called every frame
@@ -35,11 +37,21 @@ void AMagneticEnergyTransfer::OnOverlap(class AActor* actor, bool bState)
 
 	AElectricProvider *provider = Cast<AElectricProvider>(actor);
 	if (provider)
+	{
+		bCharged = true;
 		OnPoweringUp();
+	}
+		
 }
 
 void AMagneticEnergyTransfer::triggerPoweringDown()
 {
 	OnPoweringDown();
+	bCharged = false;
+}
+
+bool AMagneticEnergyTransfer::GetChargeState()
+{
+	return bCharged;
 }
 

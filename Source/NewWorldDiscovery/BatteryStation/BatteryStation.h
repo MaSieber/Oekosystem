@@ -33,6 +33,9 @@ public:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = BatteryStation)
 	UBoxComponent* BatteryEventCollider;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Checkpoint)
+	TArray<AActor*> ObjectsToReset;
+
 	// Sets default values for this actor's properties
 	ABatteryStation();
 
@@ -52,6 +55,8 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = BatteryStationEvent)
 	void OnEnergyFall();
 
+	UFUNCTION()
+	void Reset();
 
 private:
 	int32 CurrentEnergy;

@@ -5,6 +5,8 @@
 #include "WorldDiscoveryPlayerState.h"
 #include "NewWorldDiscoveryCharacter.h"
 
+#include "../MagneticBox/BaseMagnetic.h"
+#include "../Obstacle/MovingPlatform.h"
 
 // Sets default values
 ABatteryStation::ABatteryStation()
@@ -87,4 +89,24 @@ void ABatteryStation::OnOverlapBegin(class AActor* OtherActor, class UPrimitiveC
 		}
 	}
 
+}
+
+void ABatteryStation::Reset()
+{
+	if (bCheckpoint)
+	{
+		for (int i = 0; i < ObjectsToReset.Num(); i++)
+		{
+			AActor* actor = ObjectsToReset[i];
+
+			if (AMovingPlatform* platform = Cast<AMovingPlatform>(actor))
+			{
+				platform->ResetPlatform();
+			}
+			else if (ABaseMagnetic* magnetic = Cast<ABaseMagnetic>(actor))
+			{
+				magnetic->Reset();
+			}
+		}
+	}
 }

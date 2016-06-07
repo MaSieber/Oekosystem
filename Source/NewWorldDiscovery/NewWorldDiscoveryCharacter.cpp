@@ -5,9 +5,11 @@
 
 #include "WorldDiscoveryPlayerState.h"
 
+#include "MagneticBox/BaseMagnetic.h"
 #include "MagneticBox/MagneticBox.h"
 #include "MagneticBox/MagneticEnergyProvider.h"
 #include "MagneticBox/MagneticEnergyTransfer.h"
+#include "MagneticBox/MagneticShield.h"
 
 ANewWorldDiscoveryCharacter::ANewWorldDiscoveryCharacter()
 {
@@ -102,6 +104,19 @@ void ANewWorldDiscoveryCharacter::Reset()
 			Cast<AMagneticEnergyTransfer>(CreatedBalls[i])->TriggerDestroy(true);
 		}
 		CreatedBalls.Empty();
+
+		for (int i = 0; i < HoldingObjects.Num(); i++)
+		{
+			ABaseMagnetic* baseMagnetic = HoldingObjects[i];
+			if (baseMagnetic)
+			{
+				if (!Cast<AMagneticShield>(baseMagnetic))
+					baseMagnetic->TriggerDestroy(true);
+			}
+		}
+		HoldingObjects.Empty();
+		LastCheckpoint->Reset();
+		OnReset();
 
 		FVector ResetLocation = LastCheckpoint->GetActorLocation();
 		ResetLocation.Z += 150.0f;

@@ -2,11 +2,13 @@
 
 #pragma once
 
+#include "BaseDoor.h"
+
 #include "GameFramework/Actor.h"
 #include "Door.generated.h"
 
 UCLASS()
-class NEWWORLDDISCOVERY_API ADoor : public AActor
+class NEWWORLDDISCOVERY_API ADoor : public ABaseDoor
 {
 	GENERATED_BODY()
 	
@@ -19,55 +21,5 @@ public:
 	
 	// Called every frame
 	virtual void Tick( float DeltaSeconds ) override;
-
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = Door)
-	USceneComponent* BaseComponent;
-
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = Door)
-	UStaticMeshComponent* DoorMesh;
-
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = Door)
-	UStaticMeshComponent* DoorSocketMesh;
-	
-	UENUM(BlueprintType)
-	enum class eState : uint8
-	{
-		OPEN = 0,
-		CLOSED
-	};
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Door)
-	eState DoorState;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Door)
-	float MaxDoorVelocity;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Door)
-	bool bRepeat;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Door)
-	bool bBackToOrigin;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Door)
-	int32 RepeatCount;
-
-	UFUNCTION()
-	void TriggerDoorMove(bool bMove);
-
-	UFUNCTION(BlueprintCallable, Category = Door)
-	void OverlapBegin(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-
-	UFUNCTION(BlueprintCallable, Category = Door)
-	void OverlapEnd(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
-
-private:
-	bool bMoveDoor;
-
-	FVector min;
-	FVector max;
-	FVector Start;
-	FVector End;
-
-	FTransform LineTransform;
 	
 };
