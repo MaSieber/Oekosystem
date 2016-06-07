@@ -60,9 +60,7 @@ void AFirePipe::Tick( float DeltaTime )
 			playerCharacter->Reset();
 			character = nullptr;
 		}
-		
 	}
-
 }
 
 void AFirePipe::SetCanDoDamage(bool bDamage)
@@ -94,6 +92,7 @@ void AFirePipe::OnOverlapEnd(class AActor* OtherActor, class UPrimitiveComponent
 	AMagneticShield* magneticShield = Cast<AMagneticShield>(OtherActor);
 	if (magneticShield)
 	{
+		character = nullptr;
 		SetCanDoDamage(true);
 	}
 }
