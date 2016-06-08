@@ -77,3 +77,13 @@ void AWorldDiscoveryPlayerState::RemoveRessource(int32 ressource)
 		CurrentRessource = FMath::Clamp(CurrentRessource - ressource, 0, limit);
 	}
 }
+
+void AWorldDiscoveryPlayerState::AddRoboPart(int32 part)
+{
+	CollectedParts = CollectedParts | part;
+}
+
+int32 AWorldDiscoveryPlayerState::GetRoboParts()
+{
+	return CollectedParts;
+}

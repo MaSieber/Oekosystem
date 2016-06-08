@@ -24,7 +24,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Player)
 	void RemoveEnergy(int32 energy);
 
-
 	UFUNCTION(BlueprintPure, Category = Player)
 	int32 GetCurrentRessource();
 
@@ -34,9 +33,26 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Player)
 	void RemoveRessource(int32 ressource);
 
+	UENUM(BlueprintType)
+	enum class eRoboParts : uint8
+	{
+		NONE = 0,
+		HEAD,
+	};
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Player)
+	eRoboParts RoboParts;
+
+	UFUNCTION(BlueprintCallable, Category = Player)
+	void AddRoboPart(int32 part);
+
+	UFUNCTION(BlueprintCallable, Category = Player)
+	int32 GetRoboParts();
+
 private:
 	int32 CurrentEnergy;
 	int32 CurrentRessource;
+
+	int32 CollectedParts;
 
 	
 };
