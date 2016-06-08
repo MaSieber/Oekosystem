@@ -89,10 +89,14 @@ void AFirePipe::OnOverlapBegin(class AActor* OtherActor, class UPrimitiveCompone
 
 void AFirePipe::OnOverlapEnd(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
+	ANewWorldDiscoveryCharacter* playerCharacter = Cast<ANewWorldDiscoveryCharacter>(OtherActor);
+	if (playerCharacter)
+	{
+		character = nullptr;
+	}
 	AMagneticShield* magneticShield = Cast<AMagneticShield>(OtherActor);
 	if (magneticShield)
 	{
-		character = nullptr;
 		SetCanDoDamage(true);
 	}
 }
