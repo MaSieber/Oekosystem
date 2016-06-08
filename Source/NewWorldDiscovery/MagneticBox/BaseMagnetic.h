@@ -24,6 +24,9 @@ public:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = BaseMagnetic)
 	UStaticMeshComponent* MagneticMesh;
 
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = BaseMagnetic)
+	UMovementComponent *MovementComponent;
+
 	UFUNCTION(BlueprintCallable, Category = BaseMagnetic)
 	void triggerMagnetic(FVector direction, float force);
 
@@ -125,4 +128,8 @@ protected:
 
 	FVector OriginLocation;
 	FRotator OriginRotation;
+
+	bool bStop;
+
+	int counter;
 };

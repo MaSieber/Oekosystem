@@ -128,6 +128,11 @@ void AMovingPlatform::Tick( float DeltaTime )
 		
 			if (actor != nullptr)
 			{
+				if (actor->IsActorBeingDestroyed())
+				{
+					actor = nullptr;
+					return;
+				}
 				FVector RelLoc = PlatformEnergySocketMesh->RelativeLocation;
 				FVector ActorLocation = GetActorLocation() + PlatformLocationVector;
 
@@ -173,14 +178,11 @@ void AMovingPlatform::OverlapBegin(class AActor* OtherActor, class UPrimitiveCom
 	if (energyProvider)
 	{
 		SetStoringEnergy(energyProvider->MaxEnergy);
-
-		//energyProvider->MagneticMesh->SetEnableGravity(false);
-		//energyProvider->MagneticMesh->bIgnoreRadialForce = true;
-		//energyProvider->MagneticMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		energyProvider->TriggerMagneticStop();
+		energyProvider->MagneticMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel5, ECollisionResponse::ECR_Ignore);
 		energyProvider->bIgnoreMagnetic = true;
-		//energyProvider->MagneticMesh->SetSimulatePhysics(true);
+		
 
-		//actor = energyProvider;
 		TriggerPlatform(true);
 	}
 }
@@ -192,8 +194,6 @@ void AMovingPlatform::OverlapEnd(class AActor* OtherActor, class UPrimitiveCompo
 	{
 		SetStoringEnergy(0);
 		TriggerPlatform(false);
-		energyProvider->bIgnoreMagnetic = false;
-		//energyProvider->MagneticMesh->SetEnableGravity(true);
 		actor = nullptr;
 	}
 }
