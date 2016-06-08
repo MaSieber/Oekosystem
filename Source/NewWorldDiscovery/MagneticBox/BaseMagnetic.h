@@ -75,6 +75,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = BaseMagnetic)
 	float PushAmount;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = BaseMagnetic)
+	bool bIgnoreMagnetic;
+
 	UFUNCTION()
 	void SetRotationRate(float Val);
 
@@ -83,6 +86,12 @@ public:
 
 	UFUNCTION()
 	bool IsInteractible();
+
+	UFUNCTION()
+	void SetNewMassScale(const float& Scale);
+
+	UFUNCTION()
+	void Reset();
 
 protected:
 	void Accelerate(float DeltaTime);
@@ -113,4 +122,7 @@ protected:
 	
 	bool bDestroying;
 	bool bIsDestroyed;
+
+	FVector OriginLocation;
+	FRotator OriginRotation;
 };

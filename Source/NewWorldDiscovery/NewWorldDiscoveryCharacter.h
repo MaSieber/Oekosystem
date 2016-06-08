@@ -115,4 +115,7 @@ public:
 	UFUNCTION()
 	void Reset();
 
+	UFUNCTION(BlueprintImplementableEvent, Category = Checkpoint)
+	void OnReset();
+
 };

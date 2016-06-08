@@ -49,6 +49,9 @@ void ABaseMagnetic::BeginPlay()
 	Super::BeginPlay();
 
 	StaticXPos = GetActorLocation().X;
+
+	OriginLocation = GetActorLocation();
+	OriginRotation = GetActorRotation();
 }
 
 void ABaseMagnetic::SetRotationRate(float Value)
@@ -83,7 +86,6 @@ void ABaseMagnetic::Tick(float DeltaTime)
 		OnDestroying();
 		return;
 	}
-		
 
 	switch (PullingType)
 	{
@@ -188,10 +190,13 @@ void ABaseMagnetic::Tick(float DeltaTime)
 
 void ABaseMagnetic::triggerMagnetic(FVector direction, float force)
 {
+	if (bIgnoreMagnetic) return;
 	if (PullingType == ePulling::NONE)
 	{
 		MagneticMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1, ECollisionResponse::ECR_Ignore);
 		MagneticMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
+
+		//SetNewMassScale(1.0f);
 
 		ForceDirection = direction.GetSafeNormal();
 		ForceAmount = force;
@@ -233,6 +238,7 @@ void ABaseMagnetic::TriggerMagneticStop()
 
 void ABaseMagnetic::TriggerMagneticPush()
 {
+	if (bIgnoreMagnetic) return;
 	if (PullingType == ePulling::FOLLOWING)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Push"));
@@ -309,5 +315,23 @@ void ABaseMagnetic::OnOverlapEnd(class AActor* OtherActor, class UPrimitiveCompo
 bool ABaseMagnetic::IsInteractible()
 {
 	return (PullingType == ePulling::NONE);
+}
+
+void ABaseMagnetic::Reset()
+{
+	SetActorLocation(OriginLocation);
+	SetActorRotation(OriginRotation);
+	TriggerMagneticStop();
+}
+
+void ABaseMagnetic::SetNewMassScale(const float& NewScale)
+{
+	if (!MagneticMesh) return;
+
+	FBodyInstance *BodyInst = MagneticMesh->GetBodyInstance();
+	if (!BodyInst) return;
+
+	BodyInst->MassScale = NewScale;
+	BodyInst->UpdateMassProperties();
 }
 
