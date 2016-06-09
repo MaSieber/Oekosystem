@@ -116,7 +116,7 @@ void ABaseMagnetic::Tick(float DeltaTime)
 		TargetLocation += -ForceDirection * Radius;
 
 		float dist = FVector::Dist(TargetLocation, ActorPos);
-		if (dist >= (Radius + 50.0f))
+		if (dist >= (Radius + 10.0f))
 		{
 			TriggerMagneticStop();
 		}
@@ -158,15 +158,15 @@ void ABaseMagnetic::Tick(float DeltaTime)
 		MagneticMesh->SetPhysicsLinearVelocity(FVector::ZeroVector);
 		//Set Location to Player Location
 		FVector newLocation = TargetLocation;
-
+		
 		//FQuat rotQuat = GetActorRotation().Quaternion();
 		//bool bOverlapTest = MovementComponent->OverlapTest(newLocation, rotQuat, ECollisionChannel::ECC_WorldStatic, MagneticMesh->GetCollisionShape(), this);
 		//bool bOverlapTest2 = MovementComponent->OverlapTest(newLocation, rotQuat, ECollisionChannel::ECC_GameTraceChannel3, MagneticMesh->GetCollisionShape(), this);
 		//if (!bOverlapTest)
-		{
-			RotationRate *= -1.0f;
+		//{
+		//	RotationRate *= -1.0f;
 			SetActorLocation(newLocation);
-		}
+		//}
 
 		//Rotate
 		FRotator rot = GetActorRotation();
