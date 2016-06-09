@@ -23,8 +23,8 @@ ABaseMagnetic::ABaseMagnetic()
 
 	RootComponent = MagneticMesh;
 
-	MovementComponent = CreateDefaultSubobject<UMovementComponent>(TEXT("MovementComponent"));
-	AddComponent(FName("MovementComponent"), false, FTransform(), nullptr);
+	//MovementComponent = CreateDefaultSubobject<UMovementComponent>(TEXT("MovementComponent"));
+	//AddComponent(FName("MovementComponent"), false, FTransform(), nullptr);
 
 	ForceSeconds = 1.0f;
 	CurrentForceSeconds = 0.0f;
@@ -79,8 +79,8 @@ void ABaseMagnetic::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (MovementComponent)
-		MovementComponent->Velocity = FVector::ZeroVector;
+	//if (MovementComponent)
+	//	MovementComponent->Velocity = FVector::ZeroVector;
 
 	if (bDestroying && !bIsDestroyed)
 	{

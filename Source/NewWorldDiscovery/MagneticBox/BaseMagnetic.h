@@ -24,8 +24,8 @@ public:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = BaseMagnetic)
 	UStaticMeshComponent* MagneticMesh;
 
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = BaseMagnetic)
-	UMovementComponent *MovementComponent;
+	//UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = BaseMagnetic)
+	//UMovementComponent *MovementComponent;
 
 	UFUNCTION(BlueprintCallable, Category = BaseMagnetic)
 	void triggerMagnetic(FVector direction, float force);
