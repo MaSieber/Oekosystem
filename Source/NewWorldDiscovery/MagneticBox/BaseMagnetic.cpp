@@ -14,7 +14,7 @@ ABaseMagnetic::ABaseMagnetic()
 	PrimaryActorTick.bCanEverTick = true;
 
 	MagneticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MagneticMesh"));
-	MagneticMesh->bGenerateOverlapEvents = true;
+	MagneticMesh->bGenerateOverlapEvents = false;
 	MagneticMesh->bMultiBodyOverlap = true;
 	MagneticMesh->SetCollisionProfileName("MagneticBox");
 	MagneticMesh->OnComponentBeginOverlap.AddDynamic(this, &ABaseMagnetic::OnOverlapBegin);
@@ -116,7 +116,11 @@ void ABaseMagnetic::Tick(float DeltaTime)
 		TargetLocation += -ForceDirection * Radius;
 
 		float dist = FVector::Dist(TargetLocation, ActorPos);
-		if (dist > 10)
+		if (dist >= (Radius + 50.0f))
+		{
+			TriggerMagneticStop();
+		}
+		else if (dist > 10)
 		{
 			ForceDirection = (TargetLocation - ActorPos).GetSafeNormal();
 			Accelerate(DeltaTime);
@@ -284,7 +288,17 @@ void ABaseMagnetic::TriggerMagneticPush()
 void ABaseMagnetic::TriggerDestroy(bool bInstant)
 {
 	if (bInstant)
+	{
+		if (!bDestroying)
+		{ 
+			ANewWorldDiscoveryCharacter *playerChar = Cast<ANewWorldDiscoveryCharacter>(parentCharacter);
+			if (playerChar)
+			{
+				playerChar->RemovePulledObject(this);
+			}
+		}
 		this->K2_DestroyActor();
+	}
 	else
 	{
 		//trigger some blueprint event
