@@ -5,6 +5,8 @@
 
 #include "WorldDiscoveryPlayerState.h"
 
+#include "DrawDebugHelpers.h"
+
 #include "MagneticBox/BaseMagnetic.h"
 #include "MagneticBox/MagneticBox.h"
 #include "MagneticBox/MagneticEnergyProvider.h"
@@ -155,6 +157,10 @@ bool ANewWorldDiscoveryCharacter::RemoveEnergy()
 */
 void ANewWorldDiscoveryCharacter::CreateMagneticBox()
 {
+	FVector SpawnLocation = GetSpawnLocation();
+	if (!IsSpawnPossible(GetActorLocation(), SpawnLocation))
+		return;
+
 	//We have no energy .. so we cant create more objects
 	if (!RemoveEnergy())
 		return;
@@ -164,14 +170,6 @@ void ANewWorldDiscoveryCharacter::CreateMagneticBox()
 		Cast<AMagneticBox>(CreatedBoxes[0])->TriggerDestroy(true);
 		CreatedBoxes.RemoveAt(0);
 	}
-
-	float xDir = 1.0f;
-	FVector forward = GetActorForwardVector();
-	xDir = forward.Y <= 0 ? -1.0f : 1.0f;
-	FVector direction = FVector(0.0f, xDir, 1.0f);
-	FVector SpawnLocation = SpawnPoint->RelativeLocation;
-	SpawnLocation.Y = SpawnLocation.X;
-	SpawnLocation = (SpawnLocation * direction) + GetActorLocation();
 
 	FActorSpawnParameters SpawnParameters = FActorSpawnParameters();
 	SpawnParameters.bNoFail = true;
@@ -187,6 +185,10 @@ void ANewWorldDiscoveryCharacter::CreateMagneticBox()
 }
 void ANewWorldDiscoveryCharacter::CreateMagneticBall()
 {
+	FVector SpawnLocation = GetSpawnLocation();
+	if (!IsSpawnPossible(GetActorLocation(), SpawnLocation))
+		return;
+
 	//We have no energy .. so we cant create more objects
 	if (!RemoveEnergy())
 		return;
@@ -196,14 +198,6 @@ void ANewWorldDiscoveryCharacter::CreateMagneticBall()
 		Cast<AMagneticEnergyTransfer>(CreatedBalls[0])->TriggerDestroy(true);
 		CreatedBalls.RemoveAt(0);
 	}
-
-	float xDir = 1.0f;
-	FVector forward = GetActorForwardVector();
-	xDir = forward.Y <= 0 ? -1.0f : 1.0f;
-	FVector direction = FVector(0.0f, xDir, 1.0f);
-	FVector SpawnLocation = SpawnPoint->RelativeLocation;
-	SpawnLocation.Y = SpawnLocation.X;
-	SpawnLocation = (SpawnLocation * direction) + GetActorLocation();
 
 	FActorSpawnParameters SpawnParameters = FActorSpawnParameters();
 	SpawnParameters.bNoFail = true;
@@ -220,6 +214,10 @@ void ANewWorldDiscoveryCharacter::CreateMagneticBall()
 }
 void ANewWorldDiscoveryCharacter::CreateMagneticPyramide()
 {
+	FVector SpawnLocation = GetSpawnLocation();
+	if (!IsSpawnPossible(GetActorLocation(), SpawnLocation))
+		return;
+
 	//We have no energy .. so we cant create more objects
 	if (!RemoveEnergy())
 		return;
@@ -229,14 +227,6 @@ void ANewWorldDiscoveryCharacter::CreateMagneticPyramide()
 		Cast<AMagneticEnergyProvider>(CreatedPyramides[0])->TriggerDestroy(true);
 		CreatedPyramides.RemoveAt(0);
 	}
-
-	float xDir = 1.0f;
-	FVector forward = GetActorForwardVector();
-	xDir = forward.Y <= 0 ? -1.0f : 1.0f;
-	FVector direction = FVector(0.0f, xDir, 1.0f);
-	FVector SpawnLocation = SpawnPoint->RelativeLocation;
-	SpawnLocation.Y = SpawnLocation.X;
-	SpawnLocation = (SpawnLocation * direction) + GetActorLocation();
 
 	FActorSpawnParameters SpawnParameters = FActorSpawnParameters();
 	SpawnParameters.bNoFail = true;
@@ -249,6 +239,40 @@ void ANewWorldDiscoveryCharacter::CreateMagneticPyramide()
 		CreatedPyramides.Add(pyramide);
 		pyramide->OnCreate();
 	}
+}
+
+FVector ANewWorldDiscoveryCharacter::GetSpawnLocation()
+{
+	float xDir = 1.0f;
+	FVector forward = GetActorForwardVector();
+	xDir = forward.Y <= 0 ? -1.0f : 1.0f;
+	FVector direction = FVector(0.0f, xDir, 1.0f);
+	FVector SpawnLocation = SpawnPoint->RelativeLocation;
+	SpawnLocation.Y = SpawnLocation.X;
+	SpawnLocation = (SpawnLocation * direction) + GetActorLocation();
+
+	return SpawnLocation;
+}
+
+bool ANewWorldDiscoveryCharacter::IsSpawnPossible(FVector startLocation,FVector endLocation)
+{
+	FCollisionQueryParams CollisionParameters(
+		FName(TEXT("TraceGround")), // tag name (for debugging)
+		false, // trace against simple collision primitives only
+		this // ignore this actor during the trace
+		);
+	FHitResult Hit;
+	FHitResult Hit2;
+
+	bool blockingHit = GetWorld()->LineTraceSingle(Hit, startLocation, endLocation, ECollisionChannel::ECC_WorldStatic, CollisionParameters);
+	bool blockingHit2 = GetWorld()->LineTraceSingle(Hit2, startLocation, endLocation, ECollisionChannel::ECC_WorldDynamic, CollisionParameters);
+
+	if (blockingHit || blockingHit2)
+	{
+		//No Creation
+		return false;
+	}
+	return true;
 }
 
 void ANewWorldDiscoveryCharacter::RotateAround(float Value)

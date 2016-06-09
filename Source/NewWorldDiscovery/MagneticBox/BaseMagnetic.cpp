@@ -79,7 +79,8 @@ void ABaseMagnetic::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	MovementComponent->Velocity = FVector::ZeroVector;
+	if (MovementComponent)
+		MovementComponent->Velocity = FVector::ZeroVector;
 
 	if (bDestroying && !bIsDestroyed)
 	{

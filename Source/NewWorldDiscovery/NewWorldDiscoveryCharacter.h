@@ -86,6 +86,9 @@ private:
 
 	int32 currentEnergyIndex;
 
+	bool IsSpawnPossible(FVector startLocation, FVector endLocation);
+	FVector GetSpawnLocation();
+
 public:
 	ANewWorldDiscoveryCharacter();
 
