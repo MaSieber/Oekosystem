@@ -97,7 +97,11 @@ void ABaseMagnetic::Tick(float DeltaTime)
 	}
 
 	if (bIgnoreMagnetic)
+	{
+		TriggerMagneticStop();
 		return;
+	}
+		
 
 	switch (PullingType)
 	{
