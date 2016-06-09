@@ -37,4 +37,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Switch)
 	TArray<ABaseDoor*> Doors;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Switch)
+	TArray<AActor*> BackgroundActors;
 };
