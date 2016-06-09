@@ -93,17 +93,23 @@ void ANewWorldDiscoveryCharacter::Reset()
 	{ 
 		for (int i = 0; i < CreatedBoxes.Num(); i++)
 		{
-			Cast<AMagneticBox>(CreatedBoxes[i])->TriggerDestroy(true);
+			AMagneticBox *box = Cast<AMagneticBox>(CreatedBoxes[i]);
+			if (box)
+				box->TriggerDestroy(true);
 		}
 		CreatedBoxes.Empty();
 		for (int i = 0; i < CreatedPyramides.Num(); i++)
 		{
-			Cast<AMagneticEnergyProvider>(CreatedPyramides[i])->TriggerDestroy(true);
+			AMagneticEnergyProvider* provider = Cast<AMagneticEnergyProvider>(CreatedPyramides[i]);
+			if (provider)
+				provider->TriggerDestroy(true);
 		}
 		CreatedPyramides.Empty();
 		for (int i = 0; i < CreatedBalls.Num(); i++)
 		{
-			Cast<AMagneticEnergyTransfer>(CreatedBalls[i])->TriggerDestroy(true);
+			AMagneticEnergyTransfer *transfer = Cast<AMagneticEnergyTransfer>(CreatedBalls[i]);
+			if (transfer)
+				transfer->TriggerDestroy(true);
 		}
 		CreatedBalls.Empty();
 
@@ -167,7 +173,10 @@ void ANewWorldDiscoveryCharacter::CreateMagneticBox()
 
 	if (CreatedBoxes.Num() >= MaxBoxes)
 	{
-		Cast<AMagneticBox>(CreatedBoxes[0])->TriggerDestroy(true);
+		AMagneticBox *box = Cast<AMagneticBox>(CreatedBoxes[0]);
+		if (box)
+			box->TriggerDestroy(true);
+
 		CreatedBoxes.RemoveAt(0);
 	}
 
@@ -179,6 +188,7 @@ void ANewWorldDiscoveryCharacter::CreateMagneticBox()
 	if (box)
 	{ 
 		box->MagneticMesh->SetSimulatePhysics(false);
+		box->MagneticMesh->bGenerateOverlapEvents = false;
 		CreatedBoxes.Add(box);
 		box->OnCreate();
 	}
@@ -195,7 +205,10 @@ void ANewWorldDiscoveryCharacter::CreateMagneticBall()
 
 	if (CreatedBalls.Num() >= MaxBalls)
 	{
-		Cast<AMagneticEnergyTransfer>(CreatedBalls[0])->TriggerDestroy(true);
+		AMagneticEnergyTransfer *transfer = Cast<AMagneticEnergyTransfer>(CreatedBalls[0]);
+		if (transfer)
+			transfer->TriggerDestroy(true);
+
 		CreatedBalls.RemoveAt(0);
 	}
 
@@ -207,6 +220,7 @@ void ANewWorldDiscoveryCharacter::CreateMagneticBall()
 	if (ball)
 	{
 		ball->MagneticMesh->SetSimulatePhysics(false);
+		ball->MagneticMesh->bGenerateOverlapEvents = false;
 		CreatedBalls.Add(ball);
 		ball->OnCreate();
 	}
@@ -224,7 +238,9 @@ void ANewWorldDiscoveryCharacter::CreateMagneticPyramide()
 
 	if (CreatedPyramides.Num() >= MaxPyramides)
 	{
-		Cast<AMagneticEnergyProvider>(CreatedPyramides[0])->TriggerDestroy(true);
+		AMagneticEnergyProvider *provider = Cast<AMagneticEnergyProvider>(CreatedPyramides[0]);
+		if (provider)
+			provider->TriggerDestroy(true);
 		CreatedPyramides.RemoveAt(0);
 	}
 
@@ -236,6 +252,7 @@ void ANewWorldDiscoveryCharacter::CreateMagneticPyramide()
 	if (pyramide)
 	{
 		pyramide->MagneticMesh->SetSimulatePhysics(false);
+		pyramide->MagneticMesh->bGenerateOverlapEvents = false;
 		CreatedPyramides.Add(pyramide);
 		pyramide->OnCreate();
 	}
@@ -345,7 +362,8 @@ void ANewWorldDiscoveryCharacter::RemovePulledObject(ABaseMagnetic* baseMagnetic
 {
 	if (baseMagnetic != nullptr)
 	{
-		HoldingObjects.Remove(baseMagnetic);
+		if (HoldingObjects.Num() > 0)
+			HoldingObjects.Remove(baseMagnetic);
 	}
 }
 
