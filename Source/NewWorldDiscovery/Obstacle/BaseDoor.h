@@ -51,7 +51,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Door)
 	int32 RepeatCount;
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable, Category = Door)
 	void TriggerDoorMove(bool bMove);
 
 	UFUNCTION(BlueprintCallable, Category = Door)
