@@ -24,6 +24,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = SpawnPoint)
 	USceneComponent* SpawnPoint;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = SpawnPoint)
+	UParticleSystemComponent* magneticWave;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MagneticBox)
 	int32 MaxHoldingObjects;
 
@@ -123,5 +126,8 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, Category = Checkpoint)
 	void OnReset();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = Magnetic)
+	void OnRotateAround(float val);
 
 };

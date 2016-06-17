@@ -55,6 +55,9 @@ ANewWorldDiscoveryCharacter::ANewWorldDiscoveryCharacter()
 	magneticTrigger->SetSimulatePhysics(false);
 	magneticTrigger->AttachTo(RootComponent);
 	
+	magneticWave = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("WaveParticle"));
+	magneticWave->AttachTo(RootComponent);
+
 	LastCheckpoint = nullptr;
 	MaxBalls = 1;
 	MaxBoxes = 1;
@@ -295,6 +298,7 @@ bool ANewWorldDiscoveryCharacter::IsSpawnPossible(FVector startLocation,FVector 
 
 void ANewWorldDiscoveryCharacter::RotateAround(float Value)
 {
+	OnRotateAround(Value);
 	for (int i = 0; i < HoldingObjects.Num(); i++)
 	{
 		ABaseMagnetic* BaseMagnetic = Cast<ABaseMagnetic>(HoldingObjects[i]);
