@@ -59,6 +59,7 @@ ANewWorldDiscoveryCharacter::ANewWorldDiscoveryCharacter()
 	MaxBalls = 1;
 	MaxBoxes = 1;
 	MaxPyramides = 1;
+	MaxHoldingObjects = 1;
 
 	currentEnergyIndex = 0;
 

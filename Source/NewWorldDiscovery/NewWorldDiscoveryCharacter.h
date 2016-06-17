@@ -24,6 +24,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = SpawnPoint)
 	USceneComponent* SpawnPoint;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MagneticBox)
+	int32 MaxHoldingObjects;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = MagneticBox)
 	TArray<ABaseMagnetic*> HoldingObjects;
 

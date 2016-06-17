@@ -140,7 +140,6 @@ void ABaseMagnetic::Tick(float DeltaTime)
 		else
 		{
 			PullingType = ePulling::FOLLOWING;
-			playerChar->AddPulledObject(this);
 		}
 		break;
 	}
@@ -219,6 +218,21 @@ void ABaseMagnetic::triggerMagnetic(FVector direction, float force)
 	if (bIgnoreMagnetic) return;
 	if (PullingType == ePulling::NONE)
 	{
+
+		AWorldDiscoveryPlayerController* playerController = Cast<AWorldDiscoveryPlayerController>(GetWorld()->GetFirstPlayerController());
+		if (playerController)
+		{
+			ANewWorldDiscoveryCharacter *playerChar = Cast<ANewWorldDiscoveryCharacter>(playerController->GetCharacter());
+			if (playerChar)
+			{
+				if (playerChar->HoldingObjects.Num() >= playerChar->MaxHoldingObjects)
+					return;
+
+				parentCharacter = playerChar;
+				playerChar->AddPulledObject(this);
+			}
+		}
+
 		MagneticMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1, ECollisionResponse::ECR_Ignore);
 		MagneticMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
 
@@ -235,16 +249,6 @@ void ABaseMagnetic::triggerMagnetic(FVector direction, float force)
 
 		PullingType = ePulling::PULLING;
 		CurrentVelocity = 0;
-
-		AWorldDiscoveryPlayerController* playerController = Cast<AWorldDiscoveryPlayerController>(GetWorld()->GetFirstPlayerController());
-		if (playerController)
-		{
-			ANewWorldDiscoveryCharacter *playerChar = Cast<ANewWorldDiscoveryCharacter>(playerController->GetCharacter());
-			if (playerChar)
-			{
-				parentCharacter = playerChar;
-			}
-		}
 	}
 }
 
