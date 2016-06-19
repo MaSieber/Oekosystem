@@ -2,6 +2,7 @@
 #pragma once
 
 #include "MagneticBox/BaseMagnetic.h"
+#include "PlayerMagnet/PlayerDegree.h"
 #include "GameFramework/Character.h"
 #include "NewWorldDiscoveryCharacter.generated.h"
 
@@ -23,6 +24,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = SpawnPoint)
 	USceneComponent* SpawnPoint;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = SpawnPoint)
+	USceneComponent* MagneticRotation;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = SpawnPoint)
 	UParticleSystemComponent* magneticWave;
@@ -63,6 +67,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MagneticBox)
 	TSubclassOf<class ABaseMagnetic> MagneticPyramide;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Ability)
+	TSubclassOf<class APlayerDegree> MagnetAbility;
+
 protected:
 
 	/** Called for side to side input */
@@ -91,6 +98,7 @@ private:
 	bool RemoveEnergy();
 
 	int32 currentEnergyIndex;
+	float RotationCurrent;
 
 	bool IsSpawnPossible(FVector startLocation, FVector endLocation);
 	FVector GetSpawnLocation();

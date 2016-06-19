@@ -5,6 +5,7 @@
 
 #include "NewWorldDiscoveryCharacter.h"
 #include "WorldDiscoveryPlayerController.h"
+#include "../HelperClass.h"
 #include "DrawDebugHelpers.h"
 
 // Sets default values
@@ -179,17 +180,10 @@ void ABaseMagnetic::Tick(float DeltaTime)
 		if (RotationRate != 0.0f)
 		{
 			//Rotate Around
-			float MouseY = (RotationCurrent * 360);		//percent base x percent of 360
-			float s = RotationAmplitude * FMath::Sin(RotationFrequency * MouseY);
-			float c = RotationAmplitude * FMath::Cos(RotationFrequency * MouseY);
-
 			FVector box = GetActorLocation();
 			FVector player = playerChar->GetActorLocation();
 
-			float newY = player.Y + (c * (box.Y - player.Y) - s * (box.Z - player.Z));
-			float newZ = player.Z + (s * (box.Y - player.Y) + c * (box.Z - player.Z));
-
-			FVector newLocation = FVector(StaticXPos, newY, newZ);
+			FVector newLocation = HelperClass::RotateAround(player, box, StaticXPos, RotationCurrent, RotationAmplitude, RotationFrequency);
 			ForceDirection = (player - newLocation).GetSafeNormal();
 		}
 		break;
