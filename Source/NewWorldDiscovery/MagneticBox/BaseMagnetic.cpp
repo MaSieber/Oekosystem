@@ -3,6 +3,7 @@
 #include "NewWorldDiscovery.h"
 #include "BaseMagnetic.h"
 
+#include "PlayerMagnet/PlayerDegree.h"
 #include "NewWorldDiscoveryCharacter.h"
 #include "WorldDiscoveryPlayerController.h"
 #include "../HelperClass.h"
@@ -209,9 +210,12 @@ void ABaseMagnetic::Tick(float DeltaTime)
 
 void ABaseMagnetic::triggerMagnetic(FVector direction, float force)
 {
+	UE_LOG(LogTemp, Warning, TEXT("triggerMagnetic"));
 	if (bIgnoreMagnetic) return;
 	if (PullingType == ePulling::NONE)
 	{
+
+		UE_LOG(LogTemp,Warning,TEXT("triggerMagnetic - NONE"));
 
 		AWorldDiscoveryPlayerController* playerController = Cast<AWorldDiscoveryPlayerController>(GetWorld()->GetFirstPlayerController());
 		if (playerController)
@@ -221,6 +225,9 @@ void ABaseMagnetic::triggerMagnetic(FVector direction, float force)
 			{
 				if (playerChar->HoldingObjects.Num() >= playerChar->MaxHoldingObjects)
 					return;
+
+
+				UE_LOG(LogTemp, Warning, TEXT("triggerMagnetic - playerChar"));
 
 				parentCharacter = playerChar;
 				playerChar->AddPulledObject(this);
@@ -322,11 +329,10 @@ void ABaseMagnetic::OnOverlap(class AActor* actor,bool bState)
 		if (bIgnoreMagnetic)
 			return;
 
-		UE_LOG(LogTemp, Warning, TEXT("ABaseMagnetic - OnOverlap"));
-		ANewWorldDiscoveryCharacter *playerChar = Cast<ANewWorldDiscoveryCharacter>(actor);
-		if (playerChar)
+		APlayerDegree *playerCollision = Cast<APlayerDegree>(actor);
+		if (playerCollision)
 		{
-			FVector playerPos = playerChar->GetActorLocation();
+			FVector playerPos = playerCollision->GetActorLocation();
 			playerPos.Z += 200.0f;
 
 			FVector direction = playerPos - MagneticMesh->RelativeLocation;
@@ -337,8 +343,8 @@ void ABaseMagnetic::OnOverlap(class AActor* actor,bool bState)
 	}
 	else
 	{
-		ANewWorldDiscoveryCharacter *playerChar = Cast<ANewWorldDiscoveryCharacter>(actor);
-		if (playerChar)
+		APlayerDegree *playerCollision = Cast<APlayerDegree>(actor);
+		if (playerCollision)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("ABaseMagnetic - OnOverlap End"));
 			//PullingType = ePulling::NONE;

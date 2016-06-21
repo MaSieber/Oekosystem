@@ -7,11 +7,17 @@
 
 #include "DrawDebugHelpers.h"
 
+#include "HelperClass.h"
+
 #include "MagneticBox/BaseMagnetic.h"
 #include "MagneticBox/MagneticBox.h"
 #include "MagneticBox/MagneticEnergyProvider.h"
 #include "MagneticBox/MagneticEnergyTransfer.h"
 #include "MagneticBox/MagneticShield.h"
+
+#include "PlayerMagnet/PlayerDegree.h"
+#include "PlayerMagnet/Player360Degree.h"
+#include "PlayerMagnet/PlayerXDegree.h"
 
 ANewWorldDiscoveryCharacter::ANewWorldDiscoveryCharacter()
 {
@@ -50,14 +56,6 @@ ANewWorldDiscoveryCharacter::ANewWorldDiscoveryCharacter()
 	GetCharacterMovement()->MaxWalkSpeed = 600.f;
 	GetCharacterMovement()->MaxFlySpeed = 600.f;
 
-	magneticTrigger = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComponent"));	
-	magneticTrigger->bGenerateOverlapEvents = false;
-	magneticTrigger->SetSimulatePhysics(false);
-	magneticTrigger->AttachTo(RootComponent);
-	
-	magneticWave = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("WaveParticle"));
-	magneticWave->AttachTo(RootComponent);
-
 	LastCheckpoint = nullptr;
 	MaxBalls = 1;
 	MaxBoxes = 1;
@@ -65,6 +63,8 @@ ANewWorldDiscoveryCharacter::ANewWorldDiscoveryCharacter()
 	MaxHoldingObjects = 1;
 
 	currentEnergyIndex = 0;
+
+	MagnetAbility = nullptr;
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
@@ -299,6 +299,9 @@ bool ANewWorldDiscoveryCharacter::IsSpawnPossible(FVector startLocation,FVector 
 void ANewWorldDiscoveryCharacter::RotateAround(float Value)
 {
 	OnRotateAround(Value);
+
+	RotationCurrent = Value * 0.01f;
+
 	for (int i = 0; i < HoldingObjects.Num(); i++)
 	{
 		ABaseMagnetic* BaseMagnetic = Cast<ABaseMagnetic>(HoldingObjects[i]);
@@ -326,17 +329,74 @@ void ANewWorldDiscoveryCharacter::TouchStopped(const ETouchIndex::Type FingerInd
 	StopJumping();
 }
 
+void ANewWorldDiscoveryCharacter::EnableMagnetic()
+{
+	if (MagnetAbility)
+	{
+		FActorSpawnParameters SpawnParameters = FActorSpawnParameters();
+		SpawnParameters.bNoFail = true;
+		SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		FRotator Rotation = FRotator(0.0f, 0.0f, 0.0f);
+		
+		playerDegree = GetWorld()->SpawnActor<APlayerDegree>(MagnetAbility, GetActorLocation(), Rotation, SpawnParameters);
+		if (playerDegree)
+		{
+			
+			playerDegree->magneticTrigger->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+			playerDegree->magneticTrigger->bGenerateOverlapEvents = true;
+			playerDegree->magneticWave->Activate();
+			TargetLocation = FVector::ZeroVector;
+			playerDegree->parentCharacter = this;
+
+			bMagneticEffect = true;
+		}
+	}
+}
+
+void ANewWorldDiscoveryCharacter::DisableMagnetic()
+{
+	if (playerDegree)
+	{
+		playerDegree->magneticTrigger->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		playerDegree->magneticTrigger->bGenerateOverlapEvents = false;
+		playerDegree->magneticWave->Deactivate();
+		playerDegree->K2_DestroyActor();
+		playerDegree = nullptr;
+
+		bMagneticEffect = false;
+	}
+}
+
 void ANewWorldDiscoveryCharacter::Tick(float DeltaTime)
 {
+
+	if (bMagneticEffect && MagnetAbility != nullptr)
+	{
+		if (playerDegree)
+		{			
+			playerDegree->SetActorLocation(GetActorLocation());
+
+			if (TargetLocation == FVector::ZeroVector)
+				TargetLocation = playerDegree->magneticTrigger->RelativeLocation;
+
+			if (RotationCurrent != 0.0f)
+			{
+				float Radius = 150.0f;
+
+				FVector newLocation = HelperClass::RotateAround(FVector::ZeroVector, playerDegree->magneticTrigger->RelativeLocation, 0.0f, RotationCurrent, 1.0f, 0.02f);
+				FVector ForceDirection = (FVector::ZeroVector - newLocation).GetSafeNormal();
+				TargetLocation = -ForceDirection * Radius;
+			}
+
+			playerDegree->magneticTrigger->SetRelativeLocation(TargetLocation);
+		}
+	}
 
 	UCharacterMovementComponent *movementComp = GetCharacterMovement();
 	FVector velocity = movementComp->Velocity;
 	velocity.X = 0.0f;
 	movementComp->Velocity = velocity;
 
-	//To Trigger the Collision Event, if we stay still
-	float rad = magneticTrigger->GetUnscaledSphereRadius();
-	magneticTrigger->SetSphereRadius(rad + FMath::Sin(DeltaTime)/10.0f);
 }
 
 ABaseMagnetic* ANewWorldDiscoveryCharacter::GetActiveObject()

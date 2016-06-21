@@ -16,10 +16,13 @@ APlayerDegree::APlayerDegree()
 	magneticTrigger = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComponent"));
 	magneticTrigger->bGenerateOverlapEvents = false;
 	magneticTrigger->SetSimulatePhysics(false);
+	magneticTrigger->SetCollisionProfileName("PlayerTrigger");
 	magneticTrigger->AttachTo(SceneComponent);
 
 	magneticWave = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("WaveParticle"));
 	magneticWave->AttachTo(magneticTrigger);
+
+	parentCharacter = nullptr;
 
 }
 
@@ -36,4 +39,3 @@ void APlayerDegree::Tick( float DeltaTime )
 	Super::Tick( DeltaTime );
 
 }
-

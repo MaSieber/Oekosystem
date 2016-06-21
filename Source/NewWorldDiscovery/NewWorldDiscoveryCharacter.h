@@ -19,17 +19,8 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent* CameraBoom;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = MagneticCollider)
-	USphereComponent* magneticTrigger;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = SpawnPoint)
 	USceneComponent* SpawnPoint;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = SpawnPoint)
-	USceneComponent* MagneticRotation;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = SpawnPoint)
-	UParticleSystemComponent* magneticWave;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MagneticBox)
 	int32 MaxHoldingObjects;
@@ -103,6 +94,11 @@ private:
 	bool IsSpawnPossible(FVector startLocation, FVector endLocation);
 	FVector GetSpawnLocation();
 
+	bool bMagneticEffect;
+
+	APlayerDegree* playerDegree;
+	FVector TargetLocation;
+
 public:
 	ANewWorldDiscoveryCharacter();
 
@@ -128,6 +124,12 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = Checkpoint)
 	void EmptyHoldingObjects();
+
+	UFUNCTION(BlueprintCallable, Category = Ability)
+	void EnableMagnetic();
+
+	UFUNCTION(BlueprintCallable, Category = Ability)
+	void DisableMagnetic();
 
 	UFUNCTION()
 	void Reset();

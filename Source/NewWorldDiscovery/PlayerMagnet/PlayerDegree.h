@@ -29,4 +29,10 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Degree360)
 	UParticleSystemComponent* magneticWave;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = BaseMagnetic)
+	ACharacter* parentCharacter;
+
+private:
+	float RotationRate;
+
 };
