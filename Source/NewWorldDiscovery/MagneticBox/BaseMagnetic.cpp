@@ -3,8 +3,10 @@
 #include "NewWorldDiscovery.h"
 #include "BaseMagnetic.h"
 
+#include "PlayerMagnet/PlayerDegree.h"
 #include "NewWorldDiscoveryCharacter.h"
 #include "WorldDiscoveryPlayerController.h"
+#include "../HelperClass.h"
 #include "DrawDebugHelpers.h"
 
 // Sets default values
@@ -23,8 +25,8 @@ ABaseMagnetic::ABaseMagnetic()
 
 	RootComponent = MagneticMesh;
 
-	MovementComponent = CreateDefaultSubobject<UMovementComponent>(TEXT("MovementComponent"));
-	AddComponent(FName("MovementComponent"), false, FTransform(), nullptr);
+	//MovementComponent = CreateDefaultSubobject<UMovementComponent>(TEXT("MovementComponent"));
+	//AddComponent(FName("MovementComponent"), false, FTransform(), nullptr);
 
 	ForceSeconds = 1.0f;
 	CurrentForceSeconds = 0.0f;
@@ -79,8 +81,8 @@ void ABaseMagnetic::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (MovementComponent)
-		MovementComponent->Velocity = FVector::ZeroVector;
+	//if (MovementComponent)
+	//	MovementComponent->Velocity = FVector::ZeroVector;
 
 	if (bDestroying && !bIsDestroyed)
 	{
@@ -140,7 +142,6 @@ void ABaseMagnetic::Tick(float DeltaTime)
 		else
 		{
 			PullingType = ePulling::FOLLOWING;
-			playerChar->AddPulledObject(this);
 		}
 		break;
 	}
@@ -180,17 +181,10 @@ void ABaseMagnetic::Tick(float DeltaTime)
 		if (RotationRate != 0.0f)
 		{
 			//Rotate Around
-			float MouseY = (RotationCurrent * 360);		//percent base x percent of 360
-			float s = RotationAmplitude * FMath::Sin(RotationFrequency * MouseY);
-			float c = RotationAmplitude * FMath::Cos(RotationFrequency * MouseY);
-
 			FVector box = GetActorLocation();
 			FVector player = playerChar->GetActorLocation();
 
-			float newY = player.Y + (c * (box.Y - player.Y) - s * (box.Z - player.Z));
-			float newZ = player.Z + (s * (box.Y - player.Y) + c * (box.Z - player.Z));
-
-			FVector newLocation = FVector(StaticXPos, newY, newZ);
+			FVector newLocation = HelperClass::RotateAround(player, box, StaticXPos, RotationCurrent, RotationAmplitude, RotationFrequency);
 			ForceDirection = (player - newLocation).GetSafeNormal();
 		}
 		break;
@@ -216,9 +210,30 @@ void ABaseMagnetic::Tick(float DeltaTime)
 
 void ABaseMagnetic::triggerMagnetic(FVector direction, float force)
 {
+	UE_LOG(LogTemp, Warning, TEXT("triggerMagnetic"));
 	if (bIgnoreMagnetic) return;
 	if (PullingType == ePulling::NONE)
 	{
+
+		UE_LOG(LogTemp,Warning,TEXT("triggerMagnetic - NONE"));
+
+		AWorldDiscoveryPlayerController* playerController = Cast<AWorldDiscoveryPlayerController>(GetWorld()->GetFirstPlayerController());
+		if (playerController)
+		{
+			ANewWorldDiscoveryCharacter *playerChar = Cast<ANewWorldDiscoveryCharacter>(playerController->GetCharacter());
+			if (playerChar)
+			{
+				if (playerChar->HoldingObjects.Num() >= playerChar->MaxHoldingObjects)
+					return;
+
+
+				UE_LOG(LogTemp, Warning, TEXT("triggerMagnetic - playerChar"));
+
+				parentCharacter = playerChar;
+				playerChar->AddPulledObject(this);
+			}
+		}
+
 		MagneticMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1, ECollisionResponse::ECR_Ignore);
 		MagneticMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
 
@@ -235,16 +250,6 @@ void ABaseMagnetic::triggerMagnetic(FVector direction, float force)
 
 		PullingType = ePulling::PULLING;
 		CurrentVelocity = 0;
-
-		AWorldDiscoveryPlayerController* playerController = Cast<AWorldDiscoveryPlayerController>(GetWorld()->GetFirstPlayerController());
-		if (playerController)
-		{
-			ANewWorldDiscoveryCharacter *playerChar = Cast<ANewWorldDiscoveryCharacter>(playerController->GetCharacter());
-			if (playerChar)
-			{
-				parentCharacter = playerChar;
-			}
-		}
 	}
 }
 
@@ -324,11 +329,10 @@ void ABaseMagnetic::OnOverlap(class AActor* actor,bool bState)
 		if (bIgnoreMagnetic)
 			return;
 
-		UE_LOG(LogTemp, Warning, TEXT("ABaseMagnetic - OnOverlap"));
-		ANewWorldDiscoveryCharacter *playerChar = Cast<ANewWorldDiscoveryCharacter>(actor);
-		if (playerChar)
+		APlayerDegree *playerCollision = Cast<APlayerDegree>(actor);
+		if (playerCollision)
 		{
-			FVector playerPos = playerChar->GetActorLocation();
+			FVector playerPos = playerCollision->GetActorLocation();
 			playerPos.Z += 200.0f;
 
 			FVector direction = playerPos - MagneticMesh->RelativeLocation;
@@ -339,8 +343,8 @@ void ABaseMagnetic::OnOverlap(class AActor* actor,bool bState)
 	}
 	else
 	{
-		ANewWorldDiscoveryCharacter *playerChar = Cast<ANewWorldDiscoveryCharacter>(actor);
-		if (playerChar)
+		APlayerDegree *playerCollision = Cast<APlayerDegree>(actor);
+		if (playerCollision)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("ABaseMagnetic - OnOverlap End"));
 			//PullingType = ePulling::NONE;
