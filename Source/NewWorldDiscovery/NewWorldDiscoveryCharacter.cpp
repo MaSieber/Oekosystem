@@ -59,7 +59,7 @@ ANewWorldDiscoveryCharacter::ANewWorldDiscoveryCharacter()
 	LastCheckpoint = nullptr;
 	MaxBalls = 1;
 	MaxBoxes = 1;
-	MaxPyramides = 1;
+	MaxShields = 1;
 	MaxHoldingObjects = 1;
 
 	currentEnergyIndex = 0;
@@ -82,7 +82,7 @@ void ANewWorldDiscoveryCharacter::SetupPlayerInputComponent(class UInputComponen
 	InputComponent->BindAxis("RotateAround", this, &ANewWorldDiscoveryCharacter::RotateAround);
 
 	InputComponent->BindAction("CreateBox", IE_Pressed, this, &ANewWorldDiscoveryCharacter::CreateMagneticBox);
-	InputComponent->BindAction("CreatePyramide", IE_Pressed, this, &ANewWorldDiscoveryCharacter::CreateMagneticPyramide);
+	InputComponent->BindAction("CreatePyramide", IE_Pressed, this, &ANewWorldDiscoveryCharacter::CreateMagneticShields);
 	InputComponent->BindAction("CreateBall", IE_Pressed, this, &ANewWorldDiscoveryCharacter::CreateMagneticBall);
 
 	InputComponent->BindAction("Reset", IE_Pressed, this, &ANewWorldDiscoveryCharacter::Reset);
@@ -102,13 +102,13 @@ void ANewWorldDiscoveryCharacter::Reset()
 				box->TriggerDestroy(true);
 		}
 		CreatedBoxes.Empty();
-		for (int i = 0; i < CreatedPyramides.Num(); i++)
+		for (int i = 0; i < CreatedShields.Num(); i++)
 		{
-			AMagneticEnergyProvider* provider = Cast<AMagneticEnergyProvider>(CreatedPyramides[i]);
+			AMagneticShield* provider = Cast<AMagneticShield>(CreatedShields[i]);
 			if (provider)
 				provider->TriggerDestroy(true);
 		}
-		CreatedPyramides.Empty();
+		CreatedShields.Empty();
 		for (int i = 0; i < CreatedBalls.Num(); i++)
 		{
 			AMagneticEnergyTransfer *transfer = Cast<AMagneticEnergyTransfer>(CreatedBalls[i]);
@@ -230,7 +230,7 @@ void ANewWorldDiscoveryCharacter::CreateMagneticBall()
 	}
 		
 }
-void ANewWorldDiscoveryCharacter::CreateMagneticPyramide()
+void ANewWorldDiscoveryCharacter::CreateMagneticShields()
 {
 	FVector SpawnLocation = GetSpawnLocation();
 	if (!IsSpawnPossible(GetActorLocation(), SpawnLocation))
@@ -240,24 +240,24 @@ void ANewWorldDiscoveryCharacter::CreateMagneticPyramide()
 	if (!RemoveEnergy())
 		return;
 
-	if (CreatedPyramides.Num() >= MaxPyramides)
+	if (CreatedShields.Num() >= MaxShields)
 	{
-		AMagneticEnergyProvider *provider = Cast<AMagneticEnergyProvider>(CreatedPyramides[0]);
+		AMagneticShield *provider = Cast<AMagneticShield>(CreatedShields[0]);
 		if (provider)
 			provider->TriggerDestroy(true);
-		CreatedPyramides.RemoveAt(0);
+		CreatedShields.RemoveAt(0);
 	}
 
 	FActorSpawnParameters SpawnParameters = FActorSpawnParameters();
 	SpawnParameters.bNoFail = true;
 	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
 	FRotator Rotation = FRotator(0.0f, 0.0f, 0.0f);
-	ABaseMagnetic *pyramide = GetWorld()->SpawnActor<ABaseMagnetic>(MagneticPyramide, SpawnLocation, Rotation, SpawnParameters);
+	ABaseMagnetic *pyramide = GetWorld()->SpawnActor<ABaseMagnetic>(MagneticShields, SpawnLocation, Rotation, SpawnParameters);
 	if (pyramide)
 	{
 		pyramide->MagneticMesh->SetSimulatePhysics(false);
 		pyramide->MagneticMesh->bGenerateOverlapEvents = false;
-		CreatedPyramides.Add(pyramide);
+		CreatedShields.Add(pyramide);
 		pyramide->OnCreate();
 	}
 }

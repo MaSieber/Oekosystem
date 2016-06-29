@@ -35,7 +35,7 @@ public:
 	TArray<ABaseMagnetic*> CreatedBalls;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = MagneticBox)
-	TArray<ABaseMagnetic*> CreatedPyramides;
+	TArray<ABaseMagnetic*> CreatedShields;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MagneticBox)
 	TArray<int32> EnergyCosts;
@@ -47,7 +47,7 @@ public:
 	int32 MaxBalls;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MagneticBox)
-	int32 MaxPyramides;
+	int32 MaxShields;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MagneticBox)
 	TSubclassOf<class ABaseMagnetic> MagneticBox;
@@ -56,7 +56,7 @@ public:
 	TSubclassOf<class ABaseMagnetic> MagneticBall;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MagneticBox)
-	TSubclassOf<class ABaseMagnetic> MagneticPyramide;
+	TSubclassOf<class ABaseMagnetic> MagneticShields;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Ability)
 	TSubclassOf<class APlayerDegree> MagnetAbility;
@@ -80,7 +80,7 @@ protected:
 
 	void CreateMagneticBox();
 	void CreateMagneticBall();
-	void CreateMagneticPyramide();
+	void CreateMagneticShields();
 
 	
 
