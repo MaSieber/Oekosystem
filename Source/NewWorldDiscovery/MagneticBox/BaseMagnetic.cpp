@@ -25,8 +25,8 @@ ABaseMagnetic::ABaseMagnetic()
 
 	RootComponent = MagneticMesh;
 
-	//MovementComponent = CreateDefaultSubobject<UMovementComponent>(TEXT("MovementComponent"));
-	//AddComponent(FName("MovementComponent"), false, FTransform(), nullptr);
+	magneticMovement = CreateDefaultSubobject<UMagneticMovementComponent>(TEXT("UMagneticMovementComponent"));
+	AddComponent(FName("UMagneticMovementComponent"), false, FTransform(), NULL);
 
 	ForceSeconds = 1.0f;
 	CurrentForceSeconds = 0.0f;
@@ -104,7 +104,6 @@ void ABaseMagnetic::Tick(float DeltaTime)
 		return;
 	}
 		
-
 	switch (PullingType)
 	{
 	case ePulling::NONE:

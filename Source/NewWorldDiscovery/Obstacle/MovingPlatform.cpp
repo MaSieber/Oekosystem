@@ -3,7 +3,7 @@
 #include "NewWorldDiscovery.h"
 #include "MovingPlatform.h"
 
-#include "MagneticBox/MagneticEnergyProvider.h"
+#include "MagneticBox/MagneticBox.h"
 
 // Sets default values
 AMovingPlatform::AMovingPlatform()
@@ -174,13 +174,12 @@ void AMovingPlatform::SetStoringEnergy(uint32 energy)
 
 void AMovingPlatform::OverlapBegin(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	AMagneticEnergyProvider *energyProvider = Cast<AMagneticEnergyProvider>(OtherActor);
-	if (energyProvider)
+	AMagneticBox *energyBox = Cast<AMagneticBox>(OtherActor);
+	if (energyBox)
 	{
-		SetStoringEnergy(energyProvider->MaxEnergy);
-		energyProvider->TriggerMagneticStop();
-		energyProvider->MagneticMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel5, ECollisionResponse::ECR_Ignore);
-		energyProvider->bIgnoreMagnetic = true;
+		energyBox->TriggerMagneticStop();
+		energyBox->MagneticMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel5, ECollisionResponse::ECR_Ignore);
+		energyBox->bIgnoreMagnetic = true;
 		
 
 		TriggerPlatform(true);
@@ -189,10 +188,9 @@ void AMovingPlatform::OverlapBegin(class AActor* OtherActor, class UPrimitiveCom
 
 void AMovingPlatform::OverlapEnd(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	AMagneticEnergyProvider *energyProvider = Cast<AMagneticEnergyProvider>(OtherActor);
-	if (energyProvider)
+	AMagneticBox *energyBox = Cast<AMagneticBox>(OtherActor);
+	if (energyBox)
 	{
-		SetStoringEnergy(0);
 		TriggerPlatform(false);
 		actor = nullptr;
 	}

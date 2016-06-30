@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "../MagneticMovementComponent.h"
+
 #include "GameFramework/Actor.h"
 #include "BaseMagnetic.generated.h"
 
@@ -23,6 +25,9 @@ public:
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = BaseMagnetic)
 	UStaticMeshComponent* MagneticMesh;
+	
+	UPROPERTY()
+	UMagneticMovementComponent *magneticMovement;
 
 	//UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = BaseMagnetic)
 	//UMovementComponent *MovementComponent;
