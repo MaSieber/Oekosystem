@@ -139,6 +139,8 @@ void ANewWorldDiscoveryCharacter::Reset()
 
 bool ANewWorldDiscoveryCharacter::RemoveEnergy()
 {
+	return true;
+
 	if (currentEnergyIndex == EnergyCosts.Num())
 	{
 		currentEnergyIndex = 0;
