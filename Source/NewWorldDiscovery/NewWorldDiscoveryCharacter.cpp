@@ -436,3 +436,8 @@ void ANewWorldDiscoveryCharacter::EmptyHoldingObjects()
 {
 	HoldingObjects.Empty();
 }
+
+APlayerDegree* ANewWorldDiscoveryCharacter::GetPlayerDegree()
+{
+	return this->playerDegree;
+}

@@ -25,8 +25,16 @@ ABaseMagnetic::ABaseMagnetic()
 
 	RootComponent = MagneticMesh;
 
-	magneticMovement = CreateDefaultSubobject<UMagneticMovementComponent>(TEXT("UMagneticMovementComponent"));
-	AddComponent(FName("UMagneticMovementComponent"), false, FTransform(), NULL);
+	magneticMovement = CreateDefaultSubobject<UProjectileMovementComponent>("MagneticMovmentComponent");
+	magneticMovement->Velocity = FVector::ZeroVector;
+	magneticMovement->ProjectileGravityScale = 0.0f;
+	magneticMovement->bInitialVelocityInLocalSpace = false;
+	magneticMovement->InitialSpeed = 5.0f;
+	magneticMovement->bRotationFollowsVelocity = false;
+	magneticMovement->Bounciness = 0.4f;
+	magneticMovement->Friction = 0.0f;
+	magneticMovement->BounceVelocityStopSimulatingThreshold = -1.0f;
+	magneticMovement->SetIsReplicated(false);
 
 	ForceSeconds = 1.0f;
 	CurrentForceSeconds = 0.0f;
@@ -50,6 +58,9 @@ ABaseMagnetic::ABaseMagnetic()
 
 	bStop = false;
 	bIgnoreMagnetic = false;
+
+	magneticMovement->SetUpdatedComponent(NULL);
+
 }
 
 void ABaseMagnetic::BeginPlay()
@@ -80,9 +91,6 @@ void ABaseMagnetic::Accelerate(float DeltaTime)
 void ABaseMagnetic::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	//if (MovementComponent)
-	//	MovementComponent->Velocity = FVector::ZeroVector;
 
 	if (bDestroying && !bIsDestroyed)
 	{
@@ -158,25 +166,6 @@ void ABaseMagnetic::Tick(float DeltaTime)
 		if (ForceDirection == FVector::ZeroVector)
 			ForceDirection = (TargetLocation - ActorPos).GetSafeNormal();
 
-		TargetLocation += -ForceDirection * Radius;
-		MagneticMesh->SetPhysicsLinearVelocity(FVector::ZeroVector);
-		//Set Location to Player Location
-		FVector newLocation = TargetLocation;
-		
-		//FQuat rotQuat = GetActorRotation().Quaternion();
-		//bool bOverlapTest = MovementComponent->OverlapTest(newLocation, rotQuat, ECollisionChannel::ECC_WorldStatic, MagneticMesh->GetCollisionShape(), this);
-		//bool bOverlapTest2 = MovementComponent->OverlapTest(newLocation, rotQuat, ECollisionChannel::ECC_GameTraceChannel3, MagneticMesh->GetCollisionShape(), this);
-		//if (!bOverlapTest)
-		//{
-		//	RotationRate *= -1.0f;
-			SetActorLocation(newLocation);
-		//}
-
-		//Rotate
-		FRotator rot = GetActorRotation();
-		rot.Roll += xDir * RotationVelocity * FMath::Sin(DeltaTime);
-		SetActorRotation(rot);
-
 		if (RotationRate != 0.0f)
 		{
 			//Rotate Around
@@ -185,7 +174,39 @@ void ABaseMagnetic::Tick(float DeltaTime)
 
 			FVector newLocation = HelperClass::RotateAround(player, box, StaticXPos, RotationCurrent, RotationAmplitude, RotationFrequency);
 			ForceDirection = (player - newLocation).GetSafeNormal();
+
 		}
+		TargetLocation += -ForceDirection * Radius;
+		
+		//Set Location to Player Location
+		FVector newLocation = TargetLocation;
+		FVector moveDirection = newLocation - GetActorLocation();
+
+		APlayerDegree* degree = playerChar->GetPlayerDegree();
+		if (degree)
+		{
+			FVector TriggerLocation = degree->GetActorLocation() + degree->magneticTrigger->RelativeLocation;
+
+			float Dist = FVector::Dist(TriggerLocation, GetActorLocation());
+			if (Dist >= 170.0f)
+			{
+				TriggerMagneticStop();
+				playerChar->EmptyHoldingObjects();
+			}
+			else if (Dist <= 120.0f && Dist >= 30.0f)
+			{
+				//moveDirection = TriggerLocation - GetActorLocation();
+			}
+		}
+
+		MagneticMesh->SetPhysicsLinearVelocity(moveDirection * 110.0f);
+
+		//magneticMovement->Velocity = moveDirection * 120.0f;
+
+		//Rotate
+		FRotator rot = GetActorRotation();
+		rot.Roll += xDir * RotationVelocity * FMath::Sin(DeltaTime);
+		SetActorRotation(rot);
 		break;
 
 	}
@@ -347,6 +368,7 @@ void ABaseMagnetic::OnOverlap(class AActor* actor,bool bState)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("ABaseMagnetic - OnOverlap End"));
 			//PullingType = ePulling::NONE;
+			//TriggerMagneticStop();
 		}
 	}
 }

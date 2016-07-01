@@ -140,4 +140,7 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = Magnetic)
 	void OnRotateAround(float val);
 
+	UFUNCTION()
+	APlayerDegree* GetPlayerDegree();
+
 };
