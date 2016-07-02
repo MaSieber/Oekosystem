@@ -72,6 +72,7 @@ void ABaseDoor::Tick( float DeltaTime )
 				{
 					bMoveDoor = false;
 					DoorState = eState::OPEN;
+					OnOpend();
 					RepeatCount -= 1;
 				}
 				break;
@@ -83,6 +84,7 @@ void ABaseDoor::Tick( float DeltaTime )
 				{
 					bMoveDoor = false;
 					DoorState = eState::CLOSED;
+					OnClosed();
 					RepeatCount -= 1;
 				}
 				break;
