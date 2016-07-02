@@ -199,7 +199,6 @@ void ABaseMagnetic::Tick(float DeltaTime)
 			FVector TriggerLocation = degree->GetActorLocation() + degree->magneticTrigger->RelativeLocation;
 
 			float Dist = FVector::Dist(TriggerLocation, ActorPos);
-			UE_LOG(LogTemp, Warning, TEXT("%f"), Dist);
 			if (Dist >= 150.0f)
 			{
 				TriggerMagneticStop();
@@ -222,7 +221,7 @@ void ABaseMagnetic::Tick(float DeltaTime)
 			}
 			
 		}
-		DrawDebugLine(GetWorld(), ActorPos, moveDirection * 560.0f, FColor(0, 255, 0, 1));
+		//DrawDebugLine(GetWorld(), ActorPos, moveDirection * 560.0f, FColor(0, 255, 0, 1));
 		MagneticMesh->SetPhysicsLinearVelocity(moveDirection * 560.0f);
 		//magneticMovement->Velocity = moveDirection * 550.0f;
 

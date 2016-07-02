@@ -60,6 +60,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Door)
 	void OverlapEnd(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
+	UFUNCTION(BlueprintImplementableEvent, Category = BaseMagneticEvent)
+	void OnOpend();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = BaseMagneticEvent)
+	void OnClosed();
+
 private:
 	bool bMoveDoor;
 
