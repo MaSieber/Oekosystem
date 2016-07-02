@@ -28,10 +28,10 @@ ABaseMagnetic::ABaseMagnetic()
 	magneticMovement = CreateDefaultSubobject<UProjectileMovementComponent>("MagneticMovmentComponent");
 	magneticMovement->Velocity = FVector::ZeroVector;
 	magneticMovement->ProjectileGravityScale = 0.0f;
-	magneticMovement->bInitialVelocityInLocalSpace = false;
+	magneticMovement->bInitialVelocityInLocalSpace = true;
 	magneticMovement->InitialSpeed = 5.0f;
 	magneticMovement->bRotationFollowsVelocity = false;
-	magneticMovement->Bounciness = 0.4f;
+	magneticMovement->Bounciness = 0.0f;
 	magneticMovement->Friction = 0.0f;
 	magneticMovement->BounceVelocityStopSimulatingThreshold = -1.0f;
 	magneticMovement->SetIsReplicated(false);
@@ -162,46 +162,69 @@ void ABaseMagnetic::Tick(float DeltaTime)
 		FVector forward = playerChar->GetActorForwardVector();
 		xDir = forward.Y <= 0 ? -1.0f : 1.0f;
 
-		TargetLocation = playerChar->GetActorLocation();
+		FVector PlayerLocation  = playerChar->GetActorLocation();
+		TargetLocation = PlayerLocation;
 		if (ForceDirection == FVector::ZeroVector)
 			ForceDirection = (TargetLocation - ActorPos).GetSafeNormal();
 
 		if (RotationRate != 0.0f)
 		{
 			//Rotate Around
-			FVector box = GetActorLocation();
 			FVector player = playerChar->GetActorLocation();
 
-			FVector newLocation = HelperClass::RotateAround(player, box, StaticXPos, RotationCurrent, RotationAmplitude, RotationFrequency);
+			FVector newLocation = HelperClass::RotateAround(player, ActorPos, StaticXPos, RotationCurrent, RotationAmplitude, RotationFrequency);
 			ForceDirection = (player - newLocation).GetSafeNormal();
-
 		}
+
+		bool bStaying = false;
 		TargetLocation += -ForceDirection * Radius;
-		
-		//Set Location to Player Location
-		FVector newLocation = TargetLocation;
-		FVector moveDirection = newLocation - GetActorLocation();
+		if (TargetLocation.Equals(OldTarget))
+		{
+			bStaying = true;
+		}
+		OldTarget = TargetLocation;
+
+		FVector moveDirection = (TargetLocation - ActorPos).GetSafeNormal();
+		//moveDirection.X = 0.0f;
+
+		//float directionLength = moveDirection.Size();
+		//if (directionLength >= 20.0f)
+			;// moveDirection = FVector::ZeroVector;
+
+		//UE_LOG(LogTemp,Warning,TEXT("%f"),directionLength);
 
 		APlayerDegree* degree = playerChar->GetPlayerDegree();
 		if (degree)
 		{
 			FVector TriggerLocation = degree->GetActorLocation() + degree->magneticTrigger->RelativeLocation;
 
-			float Dist = FVector::Dist(TriggerLocation, GetActorLocation());
-			if (Dist >= 170.0f)
+			float Dist = FVector::Dist(TriggerLocation, ActorPos);
+			UE_LOG(LogTemp, Warning, TEXT("%f"), Dist);
+			if (Dist >= 150.0f)
 			{
 				TriggerMagneticStop();
 				playerChar->EmptyHoldingObjects();
+				return;
 			}
-			else if (Dist <= 120.0f && Dist >= 30.0f)
+			else if (Dist < 150.0f && Dist >= 5.0f)
 			{
-				//moveDirection = TriggerLocation - GetActorLocation();
+				if (bStaying)
+				{
+					moveDirection = (TriggerLocation - ActorPos).GetSafeNormal();
+				}
 			}
+			else
+			{
+				if (bStaying)
+				{ 
+					moveDirection = FVector::ZeroVector;
+				}
+			}
+			
 		}
-
-		MagneticMesh->SetPhysicsLinearVelocity(moveDirection * 110.0f);
-
-		//magneticMovement->Velocity = moveDirection * 120.0f;
+		DrawDebugLine(GetWorld(), ActorPos, moveDirection * 560.0f, FColor(0, 255, 0, 1));
+		MagneticMesh->SetPhysicsLinearVelocity(moveDirection * 560.0f);
+		//magneticMovement->Velocity = moveDirection * 550.0f;
 
 		//Rotate
 		FRotator rot = GetActorRotation();
@@ -257,11 +280,6 @@ void ABaseMagnetic::triggerMagnetic(FVector direction, float force)
 		MagneticMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1, ECollisionResponse::ECR_Ignore);
 		MagneticMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
 
-		//SetNewMassScale(1.0f);
-
-		ForceDirection = direction.GetSafeNormal();
-		ForceAmount = force;
-		CurrentForceSeconds = ForceSeconds;
 		MagneticMesh->SetEnableGravity(false);
 		MagneticMesh->SetSimulatePhysics(true);
 

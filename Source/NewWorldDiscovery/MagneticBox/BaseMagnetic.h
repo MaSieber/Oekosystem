@@ -137,4 +137,7 @@ protected:
 	bool bStop;
 
 	int counter;
+
+private:
+	FVector OldTarget;
 };
