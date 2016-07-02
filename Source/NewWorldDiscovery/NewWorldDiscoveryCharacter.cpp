@@ -139,6 +139,8 @@ void ANewWorldDiscoveryCharacter::Reset()
 
 bool ANewWorldDiscoveryCharacter::RemoveEnergy()
 {
+	return true;
+
 	if (currentEnergyIndex == EnergyCosts.Num())
 	{
 		currentEnergyIndex = 0;
@@ -435,4 +437,9 @@ void ANewWorldDiscoveryCharacter::RemovePulledObject(ABaseMagnetic* baseMagnetic
 void ANewWorldDiscoveryCharacter::EmptyHoldingObjects()
 {
 	HoldingObjects.Empty();
+}
+
+APlayerDegree* ANewWorldDiscoveryCharacter::GetPlayerDegree()
+{
+	return this->playerDegree;
 }

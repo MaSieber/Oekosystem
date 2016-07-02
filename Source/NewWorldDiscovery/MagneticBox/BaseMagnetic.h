@@ -25,10 +25,10 @@ public:
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = BaseMagnetic)
 	UStaticMeshComponent* MagneticMesh;
-	
-	UPROPERTY()
-	UMagneticMovementComponent *magneticMovement;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = BaseMagnetic)
+	UProjectileMovementComponent *magneticMovement;
+	
 	//UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = BaseMagnetic)
 	//UMovementComponent *MovementComponent;
 
@@ -137,4 +137,7 @@ protected:
 	bool bStop;
 
 	int counter;
+
+private:
+	FVector OldTarget;
 };
