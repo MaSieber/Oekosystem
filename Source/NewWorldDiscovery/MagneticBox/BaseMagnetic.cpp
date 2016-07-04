@@ -220,7 +220,7 @@ void ABaseMagnetic::Tick(float DeltaTime)
 			}			
 		}
 
-		UE_LOG(LogTemp,Warning,TEXT("percentVelo - %f * %f = %f"), percent, RotationFollowVelocity,(RotationFollowVelocity * percent));
+		//UE_LOG(LogTemp,Warning,TEXT("percentVelo - %f * %f = %f"), percent, RotationFollowVelocity,(RotationFollowVelocity * percent));
 		//DrawDebugLine(GetWorld(), ActorPos, moveDirection * 560.0f, FColor(0, 255, 0, 1));
 		MagneticMesh->SetPhysicsLinearVelocity(moveDirection * RotationFollowVelocity * percent);
 		//magneticMovement->Velocity = moveDirection * 550.0f;

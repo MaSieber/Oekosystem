@@ -100,6 +100,7 @@ private:
 	FVector TargetLocation;
 
 	bool bIsReseting;
+	bool bGodmode;
 
 public:
 	ANewWorldDiscoveryCharacter();
@@ -150,5 +151,8 @@ public:
 
 	UFUNCTION()
 	APlayerDegree* GetPlayerDegree();
+
+	UFUNCTION(BlueprintCallable, Category = Cheat)
+	void Godmode();
 
 };
