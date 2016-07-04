@@ -300,6 +300,11 @@ bool ANewWorldDiscoveryCharacter::IsSpawnPossible(FVector startLocation,FVector 
 
 void ANewWorldDiscoveryCharacter::RotateAround(float Value)
 {
+	if (Value > 0.0f)	//Always same speed
+		Value = 1.0f;
+	else if (Value < 0.0f)
+		Value = -1.0f;
+
 	OnRotateAround(Value);
 
 	RotationCurrent = Value * 0.01f;
@@ -442,4 +447,10 @@ void ANewWorldDiscoveryCharacter::EmptyHoldingObjects()
 APlayerDegree* ANewWorldDiscoveryCharacter::GetPlayerDegree()
 {
 	return this->playerDegree;
+}
+
+void ANewWorldDiscoveryCharacter::DoDamage()
+{
+	bIsReseting = true;
+	OnDamaged();
 }

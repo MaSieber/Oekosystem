@@ -51,6 +51,7 @@ ABaseMagnetic::ABaseMagnetic()
 	RotationAroundVelocity = 0.010f;
 	PushAmount = 5000.0f;
 	Radius = 150.0f;
+	RotationFollowVelocity = 660.0f;
 
 	bDestroying = false;
 
@@ -157,11 +158,11 @@ void ABaseMagnetic::Tick(float DeltaTime)
 		AWorldDiscoveryPlayerController* playerController = Cast<AWorldDiscoveryPlayerController>(GetWorld()->GetFirstPlayerController());
 		ANewWorldDiscoveryCharacter *playerChar = Cast<ANewWorldDiscoveryCharacter>(playerController->GetCharacter());
 		FVector ActorPos = GetActorLocation();
-
+		
 		float xDir = 1.0f;
 		FVector forward = playerChar->GetActorForwardVector();
 		xDir = forward.Y <= 0 ? -1.0f : 1.0f;
-
+		/*
 		FVector PlayerLocation  = playerChar->GetActorLocation();
 		TargetLocation = PlayerLocation;
 		if (ForceDirection == FVector::ZeroVector)
@@ -175,7 +176,7 @@ void ABaseMagnetic::Tick(float DeltaTime)
 			FVector newLocation = HelperClass::RotateAround(player, ActorPos, StaticXPos, RotationCurrent, RotationAmplitude, RotationFrequency);
 			ForceDirection = (player - newLocation).GetSafeNormal();
 		}
-
+		
 		bool bStaying = false;
 		TargetLocation += -ForceDirection * Radius;
 		if (TargetLocation.Equals(OldTarget))
@@ -185,6 +186,7 @@ void ABaseMagnetic::Tick(float DeltaTime)
 		OldTarget = TargetLocation;
 
 		FVector moveDirection = (TargetLocation - ActorPos).GetSafeNormal();
+		*/
 		//moveDirection.X = 0.0f;
 
 		//float directionLength = moveDirection.Size();
@@ -192,37 +194,33 @@ void ABaseMagnetic::Tick(float DeltaTime)
 			;// moveDirection = FVector::ZeroVector;
 
 		//UE_LOG(LogTemp,Warning,TEXT("%f"),directionLength);
-
+		FVector moveDirection = FVector::ZeroVector;
 		APlayerDegree* degree = playerChar->GetPlayerDegree();
 		if (degree)
 		{
 			FVector TriggerLocation = degree->GetActorLocation() + degree->magneticTrigger->RelativeLocation;
 
 			float Dist = FVector::Dist(TriggerLocation, ActorPos);
-			if (Dist >= 150.0f)
+			if (Dist >= 160.0f)
 			{
 				TriggerMagneticStop();
 				playerChar->EmptyHoldingObjects();
 				return;
 			}
-			else if (Dist < 150.0f && Dist >= 5.0f)
+			else if (Dist < 160.0f && Dist >= 5.0f)
 			{
-				if (bStaying)
-				{
-					moveDirection = (TriggerLocation - ActorPos).GetSafeNormal();
-				}
+				moveDirection = (TriggerLocation - ActorPos).GetSafeNormal();
 			}
 			else
 			{
-				if (bStaying)
-				{ 
-					moveDirection = FVector::ZeroVector;
-				}
+				moveDirection = FVector::ZeroVector;
 			}
 			
 		}
+
+		UE_LOG(LogTemp, Warning, TEXT("%f %f %f"), moveDirection.X, moveDirection.Y, moveDirection.Z);
 		//DrawDebugLine(GetWorld(), ActorPos, moveDirection * 560.0f, FColor(0, 255, 0, 1));
-		MagneticMesh->SetPhysicsLinearVelocity(moveDirection * 560.0f);
+		MagneticMesh->SetPhysicsLinearVelocity(moveDirection * RotationFollowVelocity);
 		//magneticMovement->Velocity = moveDirection * 550.0f;
 
 		//Rotate

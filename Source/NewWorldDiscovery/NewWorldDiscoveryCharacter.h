@@ -99,6 +99,8 @@ private:
 	APlayerDegree* playerDegree;
 	FVector TargetLocation;
 
+	bool bIsReseting;
+
 public:
 	ANewWorldDiscoveryCharacter();
 
@@ -131,11 +133,17 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Ability)
 	void DisableMagnetic();
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable, Category = Reset)
 	void Reset();
+
+	UFUNCTION()
+	void DoDamage();
 
 	UFUNCTION(BlueprintImplementableEvent, Category = Checkpoint)
 	void OnReset();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = Checkpoint)
+	void OnDamaged();
 
 	UFUNCTION(BlueprintImplementableEvent, Category = Magnetic)
 	void OnRotateAround(float val);

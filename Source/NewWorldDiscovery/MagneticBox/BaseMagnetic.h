@@ -72,6 +72,9 @@ public:
 	float RotationAroundVelocity;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = BaseMagnetic)
+	float RotationFollowVelocity;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = BaseMagnetic)
 	float RotationVelocity;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = BaseMagnetic)

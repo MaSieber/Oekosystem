@@ -57,7 +57,7 @@ void AFirePipe::Tick( float DeltaTime )
 		ANewWorldDiscoveryCharacter* playerCharacter = Cast<ANewWorldDiscoveryCharacter>(character);
 		if (playerCharacter)
 		{
-			playerCharacter->Reset();
+			playerCharacter->DoDamage();
 			character = nullptr;
 		}
 	}
