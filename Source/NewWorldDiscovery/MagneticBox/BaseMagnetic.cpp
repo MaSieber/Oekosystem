@@ -51,7 +51,8 @@ ABaseMagnetic::ABaseMagnetic()
 	RotationAroundVelocity = 0.010f;
 	PushAmount = 5000.0f;
 	Radius = 150.0f;
-	RotationFollowVelocity = 660.0f;
+	RotationFollowVelocity = 860.0f;
+	RotationPercentDistanceVelocity = 60.0f;
 
 	bDestroying = false;
 
@@ -196,6 +197,7 @@ void ABaseMagnetic::Tick(float DeltaTime)
 		//UE_LOG(LogTemp,Warning,TEXT("%f"),directionLength);
 		FVector moveDirection = FVector::ZeroVector;
 		APlayerDegree* degree = playerChar->GetPlayerDegree();
+		float percent = 1.0f;
 		if (degree)
 		{
 			FVector TriggerLocation = degree->GetActorLocation() + degree->magneticTrigger->RelativeLocation;
@@ -210,17 +212,17 @@ void ABaseMagnetic::Tick(float DeltaTime)
 			else if (Dist < 160.0f && Dist >= 5.0f)
 			{
 				moveDirection = (TriggerLocation - ActorPos).GetSafeNormal();
+				percent = Dist/ RotationPercentDistanceVelocity;
 			}
 			else
 			{
 				moveDirection = FVector::ZeroVector;
-			}
-			
+			}			
 		}
 
-		UE_LOG(LogTemp, Warning, TEXT("%f %f %f"), moveDirection.X, moveDirection.Y, moveDirection.Z);
+		UE_LOG(LogTemp,Warning,TEXT("percentVelo - %f * %f = %f"), percent, RotationFollowVelocity,(RotationFollowVelocity * percent));
 		//DrawDebugLine(GetWorld(), ActorPos, moveDirection * 560.0f, FColor(0, 255, 0, 1));
-		MagneticMesh->SetPhysicsLinearVelocity(moveDirection * RotationFollowVelocity);
+		MagneticMesh->SetPhysicsLinearVelocity(moveDirection * RotationFollowVelocity * percent);
 		//magneticMovement->Velocity = moveDirection * 550.0f;
 
 		//Rotate
