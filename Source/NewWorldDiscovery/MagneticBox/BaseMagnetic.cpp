@@ -126,7 +126,32 @@ void ABaseMagnetic::Tick(float DeltaTime)
 		FVector forward = playerChar->GetActorForwardVector();
 		xDir = forward.Y <= 0 ? -1.0f : 1.0f;
 
-		TargetLocation = playerChar->GetActorLocation();
+		FVector moveDirection = FVector::ZeroVector;
+		APlayerDegree* degree = playerChar->GetPlayerDegree();
+		float percent = 1.0f;
+		if (degree)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("degree"));
+
+			FVector TriggerLocation = degree->GetActorLocation() + degree->magneticTrigger->RelativeLocation;
+
+			float Dist = FVector::Dist(TriggerLocation, ActorPos);
+			if (Dist < 160.0f && Dist >= 5.0f)
+			{
+				moveDirection = (TriggerLocation - ActorPos).GetSafeNormal();
+				percent = Dist / RotationPercentDistanceVelocity;
+			}
+			else
+			{
+				moveDirection = FVector::ZeroVector;
+				PullingType = ePulling::FOLLOWING;
+			}
+		}
+		MagneticMesh->SetPhysicsLinearVelocity(moveDirection * RotationFollowVelocity * percent);
+
+
+
+		/*TargetLocation = playerChar->GetActorLocation();
 		ForceDirection = (TargetLocation - ActorPos).GetSafeNormal();
 		TargetLocation += -ForceDirection * Radius;
 
@@ -152,6 +177,7 @@ void ABaseMagnetic::Tick(float DeltaTime)
 		{
 			PullingType = ePulling::FOLLOWING;
 		}
+		*/
 		break;
 	}
 	case ePulling::FOLLOWING:
