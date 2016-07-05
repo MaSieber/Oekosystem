@@ -265,6 +265,8 @@ void ABaseMagnetic::triggerMagnetic(FVector direction, float force)
 			ANewWorldDiscoveryCharacter *playerChar = Cast<ANewWorldDiscoveryCharacter>(playerController->GetCharacter());
 			if (playerChar)
 			{
+				UE_LOG(LogTemp, Warning, TEXT("triggerMagnetic - MaxHoldingObject Check %d >= %d"), playerChar->HoldingObjects.Num(), playerChar->MaxHoldingObjects);
+
 				if (playerChar->HoldingObjects.Num() >= playerChar->MaxHoldingObjects)
 					return;
 

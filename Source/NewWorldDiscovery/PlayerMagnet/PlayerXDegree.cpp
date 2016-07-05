@@ -10,9 +10,17 @@ APlayerXDegree::APlayerXDegree()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	magneticTrigger->RelativeLocation.Y = -200.0f;
+	//magneticTrigger->RelativeLocation.Y = -200.0f;
 
 	UE_LOG(LogTemp, Warning, TEXT("const RelativeLocation %f %f %f"), magneticTrigger->RelativeLocation.X, magneticTrigger->RelativeLocation.Y, magneticTrigger->RelativeLocation.Z);
+
+
+	waveSceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("waveSceneComponent"));
+	waveSceneComponent->AttachTo(RootComponent);
+
+	magneticWaveSingle = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("WaveParticleSingle"));
+	magneticWaveSingle->AttachTo(waveSceneComponent);
+	
 
 }
 
