@@ -102,6 +102,12 @@ private:
 	bool bIsReseting;
 	bool bGodmode;
 
+	float Radius;
+	float CurrentRotTemp;
+	float timeToCircle;
+
+	float decreasingPower;
+
 public:
 	ANewWorldDiscoveryCharacter();
 
@@ -149,7 +155,7 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = Magnetic)
 	void OnRotateAround(float val);
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable, Category = Magnetic)
 	APlayerDegree* GetPlayerDegree();
 
 	UFUNCTION(BlueprintCallable, Category = Cheat)

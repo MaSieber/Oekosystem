@@ -67,6 +67,9 @@ ANewWorldDiscoveryCharacter::ANewWorldDiscoveryCharacter()
 	MagnetAbility = nullptr;
 
 	bGodmode = false;
+	Radius = 212.0f;
+	timeToCircle = 1.0f;
+	decreasingPower = 0.01f * 0.0175f;
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
@@ -309,7 +312,7 @@ void ANewWorldDiscoveryCharacter::RotateAround(float Value)
 
 	OnRotateAround(Value);
 
-	RotationCurrent = Value * 0.01f;
+	RotationCurrent = Value;
 
 	for (int i = 0; i < HoldingObjects.Num(); i++)
 	{
@@ -347,10 +350,15 @@ void ANewWorldDiscoveryCharacter::EnableMagnetic()
 		SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 		FRotator Rotation = FRotator(0.0f, 0.0f, 0.0f);
 		
-		playerDegree = GetWorld()->SpawnActor<APlayerDegree>(MagnetAbility, GetActorLocation(), Rotation, SpawnParameters);
+		FVector ActorPos = GetActorLocation();
+		ActorPos.Y += 150.0f;
+
+		playerDegree = GetWorld()->SpawnActor<APlayerDegree>(MagnetAbility, ActorPos, Rotation, SpawnParameters);
 		if (playerDegree)
 		{
-			
+			FVector DegreeLocation = playerDegree->magneticTrigger->RelativeLocation;
+			Radius = FMath::Sqrt(FMath::Pow(DegreeLocation.Z, 2) + FMath::Pow(DegreeLocation.Y, 2));
+
 			playerDegree->magneticTrigger->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 			playerDegree->magneticTrigger->bGenerateOverlapEvents = true;
 			playerDegree->magneticWave->Activate();
@@ -383,20 +391,20 @@ void ANewWorldDiscoveryCharacter::Tick(float DeltaTime)
 	{
 		if (playerDegree)
 		{			
-			playerDegree->SetActorLocation(GetActorLocation());
+			FVector ActorPos = GetActorLocation();
+			playerDegree->SetActorLocation(ActorPos);
 
 			if (TargetLocation == FVector::ZeroVector)
 				TargetLocation = playerDegree->magneticTrigger->RelativeLocation;
 
 			if (RotationCurrent != 0.0f)
-			{
-				float Radius = 150.0f;
-
-				FVector newLocation = HelperClass::RotateAround(FVector::ZeroVector, playerDegree->magneticTrigger->RelativeLocation, 0.0f, RotationCurrent, 1.0f, 0.02f);
+			{				
+				FVector newLocation = HelperClass::RotateAround(FVector::ZeroVector, playerDegree->magneticTrigger->RelativeLocation, 0.0f, RotationCurrent * decreasingPower, 1.0f, 1.0f);
 				FVector ForceDirection = (FVector::ZeroVector - newLocation).GetSafeNormal();
 				TargetLocation = -ForceDirection * Radius;
 			}
 
+			DrawDebugLine(GetWorld(), ActorPos, TargetLocation * 500.0f, FColor(255, 0, 0, 1));
 			playerDegree->magneticTrigger->SetRelativeLocation(TargetLocation);
 		}
 	}
@@ -429,7 +437,7 @@ void ANewWorldDiscoveryCharacter::AddPulledObject(ABaseMagnetic* baseMagnetic)
 {
 	if (baseMagnetic != nullptr)
 	{
-		HoldingObjects.Add(baseMagnetic);
+		HoldingObjects.Add(baseMagnetic);	
 	}
 }
 void ANewWorldDiscoveryCharacter::RemovePulledObject(ABaseMagnetic* baseMagnetic)

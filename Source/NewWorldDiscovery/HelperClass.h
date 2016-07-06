@@ -7,6 +7,7 @@ namespace
 	FVector RotateAroundS(FVector Center, FVector ToRotate, float StaticXPos, float StartRotation, float Amplitude = 1.0f, float Frequency = 1.0f) 
 	{
 		float MouseY = (StartRotation * 360);		//percent base x percent of 360
+
 		float s = Amplitude * FMath::Sin(Frequency * MouseY);
 		float c = Amplitude * FMath::Cos(Frequency * MouseY);
 

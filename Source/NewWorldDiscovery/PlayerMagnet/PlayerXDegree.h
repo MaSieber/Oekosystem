@@ -22,5 +22,11 @@ public:
 	// Called every frame
 	virtual void Tick( float DeltaSeconds ) override;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = DegreeX)
+	USceneComponent* waveSceneComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = DegreeX)
+	UParticleSystemComponent* magneticWaveSingle;
+
 	
 };
