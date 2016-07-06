@@ -386,11 +386,15 @@ void ANewWorldDiscoveryCharacter::DisableMagnetic()
 
 void ANewWorldDiscoveryCharacter::BeginPlay()
 {
+	Super::BeginPlay();
+
 	OriginPosition = GetActorLocation();
 }
 
 void ANewWorldDiscoveryCharacter::Tick(float DeltaTime)
 {
+	Super::Tick(DeltaTime);
+
 	FVector ActorPos = GetActorLocation();
 	if (bMagneticEffect && MagnetAbility != nullptr)
 	{
