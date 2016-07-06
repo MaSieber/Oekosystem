@@ -384,14 +384,18 @@ void ANewWorldDiscoveryCharacter::DisableMagnetic()
 	}
 }
 
+void ANewWorldDiscoveryCharacter::BeginPlay()
+{
+	OriginPosition = GetActorLocation();
+}
+
 void ANewWorldDiscoveryCharacter::Tick(float DeltaTime)
 {
-
+	FVector ActorPos = GetActorLocation();
 	if (bMagneticEffect && MagnetAbility != nullptr)
 	{
 		if (playerDegree)
 		{			
-			FVector ActorPos = GetActorLocation();
 			playerDegree->SetActorLocation(ActorPos);
 
 			if (TargetLocation == FVector::ZeroVector)
@@ -409,9 +413,26 @@ void ANewWorldDiscoveryCharacter::Tick(float DeltaTime)
 		}
 	}
 
+	//Force to OriginX to prevent Glitches and Slides, if we go to far off we move back to X
 	UCharacterMovementComponent *movementComp = GetCharacterMovement();
 	FVector velocity = movementComp->Velocity;
-	velocity.X = 0.0f;
+	if (ActorPos.X != OriginPosition.X)
+	{
+		float absDist = FMath::Abs(ActorPos.X - OriginPosition.X);
+		if (absDist <= 0.1f)
+			velocity.X = 0.0f;
+		else
+		{
+			if (ActorPos.X > OriginPosition.X)
+				velocity.X = ActorPos.X - OriginPosition.X;
+			else if (ActorPos.X < OriginPosition.X)
+				velocity.X = OriginPosition.X - ActorPos.X;
+		}
+	}
+	else
+	{
+		velocity.X = 0.0f;
+	}
 	movementComp->Velocity = velocity;
 
 }
