@@ -5,7 +5,7 @@
 
 
 // Sets default values
-APlayerXDegree::APlayerXDegree()
+APlayerXDegree::APlayerXDegree() : Super()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -28,6 +28,7 @@ APlayerXDegree::APlayerXDegree()
 void APlayerXDegree::BeginPlay()
 {
 	Super::BeginPlay();
+	UE_LOG(LogTemp, Warning, TEXT("const RelativeLocation2 %f %f %f"), magneticTrigger->RelativeLocation.X, magneticTrigger->RelativeLocation.Y, magneticTrigger->RelativeLocation.Z);
 	
 }
 

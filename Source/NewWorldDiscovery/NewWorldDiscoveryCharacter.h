@@ -108,8 +108,12 @@ private:
 
 	float decreasingPower;
 
+	FVector OriginPosition;
+
 public:
 	ANewWorldDiscoveryCharacter();
+
+	virtual void BeginPlay() override;
 
 	// Called every frame
 	virtual void Tick(float DeltaSeconds) override;
