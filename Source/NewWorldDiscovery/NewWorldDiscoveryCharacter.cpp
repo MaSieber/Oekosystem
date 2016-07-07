@@ -481,6 +481,11 @@ APlayerDegree* ANewWorldDiscoveryCharacter::GetPlayerDegree()
 	return this->playerDegree;
 }
 
+float ANewWorldDiscoveryCharacter::GetRadius()
+{
+	return this->Radius;
+}
+
 void ANewWorldDiscoveryCharacter::DoDamage()
 {
 	if (bGodmode)
