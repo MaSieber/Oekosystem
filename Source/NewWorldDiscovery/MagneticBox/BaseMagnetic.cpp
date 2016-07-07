@@ -134,15 +134,22 @@ void ABaseMagnetic::Tick(float DeltaTime)
 			UE_LOG(LogTemp, Warning, TEXT("degree"));
 
 			FVector TriggerLocation = degree->GetActorLocation() + degree->magneticTrigger->RelativeLocation;
-
+			
 			float Dist = FVector::Dist(TriggerLocation, ActorPos);
-			if (Dist < 160.0f && Dist >= 5.0f)
+			if (Dist > Radius)
+			{
+				TriggerMagneticStop();
+				playerChar->EmptyHoldingObjects();
+				return;
+			}
+			else if (Dist <= Radius && Dist >= 5.0f)
 			{
 				moveDirection = (TriggerLocation - ActorPos).GetSafeNormal();
 				percent = Dist / RotationPercentDistanceVelocity;
 			}
 			else
 			{
+				UE_LOG(LogTemp, Warning, TEXT("Set following"));
 				moveDirection = FVector::ZeroVector;
 				PullingType = ePulling::FOLLOWING;
 			}
@@ -229,13 +236,14 @@ void ABaseMagnetic::Tick(float DeltaTime)
 			FVector TriggerLocation = degree->GetActorLocation() + degree->magneticTrigger->RelativeLocation;
 
 			float Dist = FVector::Dist(TriggerLocation, ActorPos);
-			if (Dist >= 160.0f)
+			UE_LOG(LogTemp, Warning, TEXT("following dist %f"),Dist);
+			if (Dist > Radius)
 			{
 				TriggerMagneticStop();
 				playerChar->EmptyHoldingObjects();
 				return;
 			}
-			else if (Dist < 160.0f && Dist >= 5.0f)
+			else if (Dist <= Radius && Dist >= 5.0f)
 			{
 				moveDirection = (TriggerLocation - ActorPos).GetSafeNormal();
 				percent = Dist/ RotationPercentDistanceVelocity;
@@ -299,6 +307,7 @@ void ABaseMagnetic::triggerMagnetic(FVector direction, float force)
 
 				UE_LOG(LogTemp, Warning, TEXT("triggerMagnetic - playerChar"));
 
+				Radius = playerChar->GetRadius();
 				parentCharacter = playerChar;
 				playerChar->AddPulledObject(this);
 			}

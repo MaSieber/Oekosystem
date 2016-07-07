@@ -150,6 +150,9 @@ public:
 	UFUNCTION()
 	void DoDamage();
 
+	UFUNCTION()
+	float GetRadius();
+
 	UFUNCTION(BlueprintImplementableEvent, Category = Checkpoint)
 	void OnReset();
 
