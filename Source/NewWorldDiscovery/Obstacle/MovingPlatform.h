@@ -75,6 +75,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = MovingPlatform)
 	void TriggerPlatform(bool bActiveState);
 
+	UFUNCTION(BlueprintImplementableEvent, Category = BatteryStationEvent)
+	void OnTriggerPlatform(bool bActiveState);
+
 	UFUNCTION()
 	void SetStoringEnergy(uint32 energy);
 

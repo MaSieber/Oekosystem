@@ -164,6 +164,7 @@ void AMovingPlatform::DirectionSwitch(float current,float start, float end)
 
 void AMovingPlatform::TriggerPlatform(bool bActiveState)
 {
+	OnTriggerPlatform(bActiveState);
 	this->bActive = bActiveState;
 }
 
@@ -191,6 +192,7 @@ void AMovingPlatform::OverlapEnd(class AActor* OtherActor, class UPrimitiveCompo
 	AMagneticBox *energyBox = Cast<AMagneticBox>(OtherActor);
 	if (energyBox)
 	{
+		energyBox->bIgnoreMagnetic = false;
 		TriggerPlatform(false);
 		actor = nullptr;
 	}
