@@ -164,6 +164,7 @@ void AMovingPlatform::DirectionSwitch(float current,float start, float end)
 
 void AMovingPlatform::TriggerPlatform(bool bActiveState)
 {
+	OnTriggerPlatform(bActiveState);
 	this->bActive = bActiveState;
 }
 
@@ -179,6 +180,7 @@ void AMovingPlatform::OverlapBegin(class AActor* OtherActor, class UPrimitiveCom
 	{
 		energyBox->TriggerMagneticStop();
 		energyBox->MagneticMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel5, ECollisionResponse::ECR_Ignore);
+		energyBox->SetNewMassScale(20.0f);
 		energyBox->bIgnoreMagnetic = true;
 		
 
@@ -191,6 +193,10 @@ void AMovingPlatform::OverlapEnd(class AActor* OtherActor, class UPrimitiveCompo
 	AMagneticBox *energyBox = Cast<AMagneticBox>(OtherActor);
 	if (energyBox)
 	{
+		energyBox->MagneticMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel5, ECollisionResponse::ECR_Overlap);
+		energyBox->bIgnoreMagnetic = false;
+		energyBox->MagneticMesh->SetSimulatePhysics(true);
+		energyBox->SetNewMassScale(1.0f);
 		TriggerPlatform(false);
 		actor = nullptr;
 	}

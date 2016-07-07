@@ -427,10 +427,7 @@ void ANewWorldDiscoveryCharacter::Tick(float DeltaTime)
 			velocity.X = 0.0f;
 		else
 		{
-			if (ActorPos.X > OriginPosition.X)
-				velocity.X = ActorPos.X - OriginPosition.X;
-			else if (ActorPos.X < OriginPosition.X)
-				velocity.X = OriginPosition.X - ActorPos.X;
+			velocity.X = OriginPosition.X - ActorPos.X;
 		}
 	}
 	else
@@ -482,6 +479,11 @@ void ANewWorldDiscoveryCharacter::EmptyHoldingObjects()
 APlayerDegree* ANewWorldDiscoveryCharacter::GetPlayerDegree()
 {
 	return this->playerDegree;
+}
+
+float ANewWorldDiscoveryCharacter::GetRadius()
+{
+	return this->Radius;
 }
 
 void ANewWorldDiscoveryCharacter::DoDamage()
