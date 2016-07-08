@@ -36,6 +36,8 @@ AElectricCost::AElectricCost()
 	ExplosionParticle->AttachTo(BaseComponent);
 	ExplosionParticle->bAutoActivate = false;
 
+	bExploded = false;
+
 }
 
 // Called when the game starts or when spawned
@@ -55,7 +57,7 @@ void AElectricCost::Tick( float DeltaTime )
 void AElectricCost::OnOverlapBegin(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	AMagneticEnergyTransfer *energyTransfer = Cast<AMagneticEnergyTransfer>(OtherActor);
-	if (energyTransfer && energyTransfer->GetChargeState())
+	if (!bExploded && energyTransfer && energyTransfer->GetChargeState())
 	{
 		UE_LOG(LogTemp, Warning, TEXT("AElectricCost - OnOverlapBegin"));
 
@@ -74,5 +76,6 @@ void AElectricCost::OnOverlapBegin(class AActor* OtherActor, class UPrimitiveCom
 		ElectricParticle->Deactivate();
 
 		OnExploding();
+		bExploded = true;
 	}
 }
