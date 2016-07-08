@@ -412,7 +412,7 @@ void ANewWorldDiscoveryCharacter::Tick(float DeltaTime)
 				TargetLocation = -ForceDirection * Radius;
 			}
 
-			DrawDebugLine(GetWorld(), ActorPos, TargetLocation * 500.0f, FColor(255, 0, 0, 1));
+			//DrawDebugLine(GetWorld(), ActorPos, TargetLocation * 500.0f, FColor(255, 0, 0, 1));
 			playerDegree->magneticTrigger->SetRelativeLocation(TargetLocation);
 		}
 	}
