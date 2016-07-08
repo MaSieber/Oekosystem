@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "../MagneticMovementComponent.h"
+
 #include "GameFramework/Actor.h"
 #include "BaseMagnetic.generated.h"
 
@@ -24,6 +26,9 @@ public:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = BaseMagnetic)
 	UStaticMeshComponent* MagneticMesh;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = BaseMagnetic)
+	UProjectileMovementComponent *magneticMovement;
+	
 	//UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = BaseMagnetic)
 	//UMovementComponent *MovementComponent;
 
@@ -65,6 +70,12 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = BaseMagnetic)
 	float RotationAroundVelocity;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = BaseMagnetic)
+	float RotationFollowVelocity;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = BaseMagnetic)
+	float RotationPercentDistanceVelocity;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = BaseMagnetic)
 	float RotationVelocity;
@@ -132,4 +143,7 @@ protected:
 	bool bStop;
 
 	int counter;
+
+private:
+	FVector OldTarget;
 };

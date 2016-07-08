@@ -57,7 +57,7 @@ void AFirePipe::Tick( float DeltaTime )
 		ANewWorldDiscoveryCharacter* playerCharacter = Cast<ANewWorldDiscoveryCharacter>(character);
 		if (playerCharacter)
 		{
-			playerCharacter->Reset();
+			playerCharacter->DoDamage();
 			character = nullptr;
 		}
 	}
@@ -73,12 +73,17 @@ void AFirePipe::OnOverlapBegin(class AActor* OtherActor, class UPrimitiveCompone
 	ABaseMagnetic* baseMagnetic = Cast<ABaseMagnetic>(OtherActor);
 	if (baseMagnetic)
 	{
-		SetCanDoDamage(false);
 		AMagneticShield* magneticShield = Cast<AMagneticShield>(baseMagnetic);
-		if (!magneticShield)
+		if (magneticShield)
 		{
-			baseMagnetic->TriggerDestroy(false);
+			SetCanDoDamage(false);
 		}
+		else
+		{
+			if(bCanBeDamaged)
+				baseMagnetic->TriggerDestroy(false);
+		}
+			
 	}
 	ANewWorldDiscoveryCharacter* playerCharacter = Cast<ANewWorldDiscoveryCharacter>(OtherActor);
 	if (playerCharacter)

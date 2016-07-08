@@ -3,6 +3,6 @@
 #ifndef __NEWWORLDDISCOVERY_H__
 #define __NEWWORLDDISCOVERY_H__
 
-#include "EngineMinimal.h"
+#include "Engine.h"
 				   
 #endif

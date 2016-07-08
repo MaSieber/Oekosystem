@@ -3,7 +3,7 @@
 #include "NewWorldDiscovery.h"
 #include "MovingPlatform.h"
 
-#include "MagneticBox/MagneticEnergyProvider.h"
+#include "MagneticBox/MagneticBox.h"
 
 // Sets default values
 AMovingPlatform::AMovingPlatform()
@@ -164,6 +164,7 @@ void AMovingPlatform::DirectionSwitch(float current,float start, float end)
 
 void AMovingPlatform::TriggerPlatform(bool bActiveState)
 {
+	OnTriggerPlatform(bActiveState);
 	this->bActive = bActiveState;
 }
 
@@ -174,13 +175,13 @@ void AMovingPlatform::SetStoringEnergy(uint32 energy)
 
 void AMovingPlatform::OverlapBegin(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	AMagneticEnergyProvider *energyProvider = Cast<AMagneticEnergyProvider>(OtherActor);
-	if (energyProvider)
+	AMagneticBox *energyBox = Cast<AMagneticBox>(OtherActor);
+	if (energyBox)
 	{
-		SetStoringEnergy(energyProvider->MaxEnergy);
-		energyProvider->TriggerMagneticStop();
-		energyProvider->MagneticMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel5, ECollisionResponse::ECR_Ignore);
-		energyProvider->bIgnoreMagnetic = true;
+		energyBox->TriggerMagneticStop();
+		energyBox->MagneticMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel5, ECollisionResponse::ECR_Ignore);
+		energyBox->SetNewMassScale(20.0f);
+		energyBox->bIgnoreMagnetic = true;
 		
 
 		TriggerPlatform(true);
@@ -189,10 +190,13 @@ void AMovingPlatform::OverlapBegin(class AActor* OtherActor, class UPrimitiveCom
 
 void AMovingPlatform::OverlapEnd(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	AMagneticEnergyProvider *energyProvider = Cast<AMagneticEnergyProvider>(OtherActor);
-	if (energyProvider)
+	AMagneticBox *energyBox = Cast<AMagneticBox>(OtherActor);
+	if (energyBox)
 	{
-		SetStoringEnergy(0);
+		energyBox->MagneticMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel5, ECollisionResponse::ECR_Overlap);
+		energyBox->bIgnoreMagnetic = false;
+		energyBox->MagneticMesh->SetSimulatePhysics(true);
+		energyBox->SetNewMassScale(1.0f);
 		TriggerPlatform(false);
 		actor = nullptr;
 	}

@@ -2,6 +2,7 @@
 #pragma once
 
 #include "MagneticBox/BaseMagnetic.h"
+#include "PlayerMagnet/PlayerDegree.h"
 #include "GameFramework/Character.h"
 #include "NewWorldDiscoveryCharacter.generated.h"
 
@@ -18,11 +19,11 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent* CameraBoom;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = MagneticCollider)
-	USphereComponent* magneticTrigger;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = SpawnPoint)
 	USceneComponent* SpawnPoint;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MagneticBox)
+	int32 MaxHoldingObjects;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = MagneticBox)
 	TArray<ABaseMagnetic*> HoldingObjects;
@@ -34,7 +35,7 @@ public:
 	TArray<ABaseMagnetic*> CreatedBalls;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = MagneticBox)
-	TArray<ABaseMagnetic*> CreatedPyramides;
+	TArray<ABaseMagnetic*> CreatedShields;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MagneticBox)
 	TArray<int32> EnergyCosts;
@@ -46,7 +47,7 @@ public:
 	int32 MaxBalls;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MagneticBox)
-	int32 MaxPyramides;
+	int32 MaxShields;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MagneticBox)
 	TSubclassOf<class ABaseMagnetic> MagneticBox;
@@ -55,7 +56,10 @@ public:
 	TSubclassOf<class ABaseMagnetic> MagneticBall;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MagneticBox)
-	TSubclassOf<class ABaseMagnetic> MagneticPyramide;
+	TSubclassOf<class ABaseMagnetic> MagneticShields;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Ability)
+	TSubclassOf<class APlayerDegree> MagnetAbility;
 
 protected:
 
@@ -76,7 +80,7 @@ protected:
 
 	void CreateMagneticBox();
 	void CreateMagneticBall();
-	void CreateMagneticPyramide();
+	void CreateMagneticShields();
 
 	
 
@@ -85,12 +89,31 @@ private:
 	bool RemoveEnergy();
 
 	int32 currentEnergyIndex;
+	float RotationCurrent;
 
 	bool IsSpawnPossible(FVector startLocation, FVector endLocation);
 	FVector GetSpawnLocation();
 
+	bool bMagneticEffect;
+
+	APlayerDegree* playerDegree;
+	FVector TargetLocation;
+
+	bool bIsReseting;
+	bool bGodmode;
+
+	float Radius;
+	float CurrentRotTemp;
+	float timeToCircle;
+
+	float decreasingPower;
+
+	FVector OriginPosition;
+
 public:
 	ANewWorldDiscoveryCharacter();
+
+	virtual void BeginPlay() override;
 
 	// Called every frame
 	virtual void Tick(float DeltaSeconds) override;
@@ -115,10 +138,34 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Checkpoint)
 	void EmptyHoldingObjects();
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable, Category = Ability)
+	void EnableMagnetic();
+
+	UFUNCTION(BlueprintCallable, Category = Ability)
+	void DisableMagnetic();
+
+	UFUNCTION(BlueprintCallable, Category = Reset)
 	void Reset();
+
+	UFUNCTION()
+	void DoDamage();
+
+	UFUNCTION()
+	float GetRadius();
 
 	UFUNCTION(BlueprintImplementableEvent, Category = Checkpoint)
 	void OnReset();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = Checkpoint)
+	void OnDamaged();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = Magnetic)
+	void OnRotateAround(float val);
+
+	UFUNCTION(BlueprintCallable, Category = Magnetic)
+	APlayerDegree* GetPlayerDegree();
+
+	UFUNCTION(BlueprintCallable, Category = Cheat)
+	void Godmode();
 
 };

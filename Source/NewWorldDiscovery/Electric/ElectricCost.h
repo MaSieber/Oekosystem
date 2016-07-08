@@ -48,5 +48,8 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, Category = ElectricCostEvent)
 	void OnExploding();
+
+private:
+	bool bExploded;
 	
 };
