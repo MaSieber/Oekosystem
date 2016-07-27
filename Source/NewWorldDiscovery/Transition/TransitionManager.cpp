@@ -15,11 +15,17 @@ ATransitionManager::ATransitionManager()
 	SceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("SceneComponent"));
 	RootComponent = SceneComponent;
 
-	transitionTrigger = CreateDefaultSubobject<UBoxComponent>(TEXT("UBoxComponent"));
-	transitionTrigger->OnComponentBeginOverlap.AddDynamic(this, &ATransitionManager::OnOverlapBegin);
-	transitionTrigger->bGenerateOverlapEvents = true;
-	transitionTrigger->SetSimulatePhysics(false);
-	transitionTrigger->AttachTo(SceneComponent);
+	transitionLoadTrigger = CreateDefaultSubobject<UBoxComponent>(TEXT("UBoxComponent"));
+	transitionLoadTrigger->OnComponentBeginOverlap.AddDynamic(this, &ATransitionManager::OnOverlapBegin);
+	transitionLoadTrigger->bGenerateOverlapEvents = true;
+	transitionLoadTrigger->SetSimulatePhysics(false);
+	transitionLoadTrigger->AttachTo(SceneComponent);
+
+	transitionUnloadTrigger = CreateDefaultSubobject<UBoxComponent>(TEXT("UBoxComponent"));
+	transitionUnloadTrigger->OnComponentBeginOverlap.AddDynamic(this, &ATransitionManager::OnOverlapBegin);
+	transitionUnloadTrigger->bGenerateOverlapEvents = true;
+	transitionUnloadTrigger->SetSimulatePhysics(false);
+	transitionUnloadTrigger->AttachTo(SceneComponent);
 
 	bLoadAsync = false;
 	bLoadingScreen = false;
