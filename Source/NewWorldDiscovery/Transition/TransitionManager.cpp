@@ -15,15 +15,23 @@ ATransitionManager::ATransitionManager()
 	SceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("SceneComponent"));
 	RootComponent = SceneComponent;
 
-	transitionTrigger = CreateDefaultSubobject<UBoxComponent>(TEXT("UBoxComponent"));
-	transitionTrigger->OnComponentBeginOverlap.AddDynamic(this, &ATransitionManager::OnOverlapBegin);
-	transitionTrigger->bGenerateOverlapEvents = true;
-	transitionTrigger->SetSimulatePhysics(false);
-	transitionTrigger->AttachTo(SceneComponent);
+	transitionLoadTrigger = CreateDefaultSubobject<UBoxComponent>(TEXT("transitionLoadTrigger"));
+	transitionLoadTrigger->OnComponentBeginOverlap.AddDynamic(this, &ATransitionManager::OnOverlapLoadBegin);
+	transitionLoadTrigger->bGenerateOverlapEvents = true;
+	transitionLoadTrigger->SetSimulatePhysics(false);
+	transitionLoadTrigger->AttachTo(SceneComponent);
+
+	transitionUnloadTrigger = CreateDefaultSubobject<UBoxComponent>(TEXT("transitionUnloadTrigger"));
+	transitionUnloadTrigger->OnComponentBeginOverlap.AddDynamic(this, &ATransitionManager::OnOverlapUnloadBegin);
+	transitionUnloadTrigger->bGenerateOverlapEvents = true;
+	transitionUnloadTrigger->SetSimulatePhysics(false);
+	transitionUnloadTrigger->AttachTo(SceneComponent);
 
 	bLoadAsync = false;
 	bLoadingScreen = false;
 	MapName = "FirstLevel";
+
+	Reverse = false;
 }
 
 // Called when the game starts or when spawned
@@ -39,12 +47,21 @@ void ATransitionManager::Tick( float DeltaTime )
 	Super::Tick( DeltaTime );
 }
 
-void ATransitionManager::OnOverlapBegin(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void ATransitionManager::OnOverlapLoadBegin(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	ANewWorldDiscoveryCharacter *playerChar = Cast<ANewWorldDiscoveryCharacter>(OtherActor);
 	if (playerChar)
 	{
-		OnLoadNewLevel();
+		OnLoadNewLevel(Reverse);
+		Reverse = false;
 	}
 }
-
+void ATransitionManager::OnOverlapUnloadBegin(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	ANewWorldDiscoveryCharacter *playerChar = Cast<ANewWorldDiscoveryCharacter>(OtherActor);
+	if (playerChar)
+	{
+		OnUnloadOldLevel(Reverse);
+		Reverse = true;
+	}
+}

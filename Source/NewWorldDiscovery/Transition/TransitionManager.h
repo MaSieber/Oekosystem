@@ -24,13 +24,22 @@ public:
 	USceneComponent* SceneComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = TransitionManager)
-	UBoxComponent* transitionTrigger;
-	
+	UBoxComponent* transitionLoadTrigger;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = TransitionManager)
+	UBoxComponent* transitionUnloadTrigger;
+
 	UFUNCTION()
-	void OnOverlapBegin(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	void OnOverlapLoadBegin(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+	void OnOverlapUnloadBegin(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	UFUNCTION(BlueprintImplementableEvent, Category = TransitionManager)
-	void OnLoadNewLevel();
+	void OnLoadNewLevel(bool Reverse);
+
+	UFUNCTION(BlueprintImplementableEvent, Category = TransitionManager)
+	void OnUnloadOldLevel(bool Reverse);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = TransitionManager)
 	bool bLoadAsync;
@@ -41,4 +50,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = TransitionManager)
 	FString MapName;
 
+private:
+	bool Reverse;
 };
