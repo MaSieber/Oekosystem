@@ -35,11 +35,18 @@ public:
 	UFUNCTION()
 	void OnOverlapUnloadBegin(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
-	UFUNCTION(BlueprintImplementableEvent, Category = TransitionManager)
-	void OnLoadNewLevel(bool Reverse);
+	UFUNCTION()
+	void OnOverlapLoadEnd(AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	UFUNCTION()
+	void OnOverlapUnloadEnd(AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
 
 	UFUNCTION(BlueprintImplementableEvent, Category = TransitionManager)
-	void OnUnloadOldLevel(bool Reverse);
+	void OnLoadNewLevel(bool Reverse, int32 xDir);
+
+	UFUNCTION(BlueprintImplementableEvent, Category = TransitionManager)
+	void OnUnloadOldLevel(bool Reverse, int32 xDir);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = TransitionManager)
 	bool bLoadAsync;
@@ -48,8 +55,11 @@ public:
 	bool bLoadingScreen;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = TransitionManager)
+	bool bReverse;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = TransitionManager)
 	FString MapName;
 
 private:
-	bool Reverse;
+	FVector LastInsertDirection;
 };
