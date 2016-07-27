@@ -89,7 +89,7 @@ void ATransitionManager::OnOverlapLoadEnd(AActor* OtherActor, UPrimitiveComponen
 		{
 			int32 increaseIndex = 0;
 			//remove from current level
-			if (direction.Y < 0.0f)
+			if (direction.Y > 0.0f)
 			{
 				increaseIndex = -1;
 			}
@@ -114,7 +114,7 @@ void ATransitionManager::OnOverlapUnloadEnd(AActor* OtherActor, UPrimitiveCompon
 		if (direction == LastInsertDirection)
 		{
 			int32 increaseIndex = 0;
-			if (direction.Y > 0.0f)
+			if (direction.Y < 0.0f)
 			{
 				increaseIndex = 1;
 			}
