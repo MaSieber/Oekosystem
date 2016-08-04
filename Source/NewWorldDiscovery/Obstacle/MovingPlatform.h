@@ -2,13 +2,11 @@
 
 #pragma once
 
-#include "BaseObstacle.h"
-
 #include "GameFramework/Actor.h"
 #include "MovingPlatform.generated.h"
 
 UCLASS()
-class NEWWORLDDISCOVERY_API AMovingPlatform : public ABaseObstacle
+class NEWWORLDDISCOVERY_API AMovingPlatform : public AActor
 {
 	GENERATED_BODY()
 	
@@ -74,9 +72,6 @@ public:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = MovingPlatform)
 	UBoxComponent* BoxCollisionTrigger;
 
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = MovingPlatform)
-	USphereComponent* SpherePullingTrigger;
-
 	UFUNCTION(BlueprintCallable, Category = MovingPlatform)
 	void TriggerPlatform(bool bActiveState);
 
@@ -88,9 +83,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = MovingPlatform)
 	void ResetPlatform();
-
-	UFUNCTION()
-	float GetRadius();
 
 
 private:

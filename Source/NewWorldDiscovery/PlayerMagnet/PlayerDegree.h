@@ -32,5 +32,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = BaseMagnetic)
 	ACharacter* parentCharacter;
 
+private:
+	float RotationRate;
 
 };

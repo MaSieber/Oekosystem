@@ -3,7 +3,6 @@
 #include "NewWorldDiscovery.h"
 #include "BaseMagnetic.h"
 
-#include "ObjectMagnet/ObjectMagnet.h"
 #include "PlayerMagnet/PlayerDegree.h"
 #include "NewWorldDiscoveryCharacter.h"
 #include "WorldDiscoveryPlayerController.h"
@@ -59,11 +58,10 @@ ABaseMagnetic::ABaseMagnetic()
 
 	ForceDirection = FVector::ZeroVector;
 
+	bStop = false;
 	bIgnoreMagnetic = false;
 
 	magneticMovement->SetUpdatedComponent(NULL);
-
-	bUpdating = false;
 
 }
 
@@ -85,19 +83,11 @@ void ABaseMagnetic::SetRotationRate(float Value)
 	FMath::Clamp(RotationCurrent,-1.0f,1.0f);
 }
 
-void ABaseMagnetic::UpdateTargetLocation(FVector Location)
-{
-	if (!bUpdating)
-		return;
-	TargetLocation = Location;
-}
-
 void ABaseMagnetic::Accelerate(float DeltaTime)
 {
 	CurrentVelocity += DeltaTime * PullAcceleration * PullVelocity;
 	CurrentVelocity = FMath::Clamp(CurrentVelocity, 0.0f, PullVelocity);
 }
-
 
 // Called every frame
 void ABaseMagnetic::Tick(float DeltaTime)
@@ -124,79 +114,217 @@ void ABaseMagnetic::Tick(float DeltaTime)
 		return;
 	}
 		
-	FVector moveDirection = FVector::ZeroVector;
-	FVector ActorPos = GetActorLocation();
-	float percent = 1.0f;
-
 	switch (PullingType)
 	{
-		case ePulling::NONE:
-			break;
-		case ePulling::PULLING:
-		{			
-			float Dist = FVector::Dist(TargetLocation, ActorPos);
+	case ePulling::NONE:
+		break;
+	case ePulling::PULLING:
+	{
+		ANewWorldDiscoveryCharacter *playerChar = Cast<ANewWorldDiscoveryCharacter>(GetWorld()->GetFirstPlayerController()->GetCharacter());
+		FVector ActorPos = GetActorLocation();
+		float xDir = 1.0f;
+		FVector forward = playerChar->GetActorForwardVector();
+		xDir = forward.Y <= 0 ? -1.0f : 1.0f;
+
+		FVector moveDirection = FVector::ZeroVector;
+		APlayerDegree* degree = playerChar->GetPlayerDegree();
+		float percent = 1.0f;
+		if (degree)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("degree"));
+
+			FVector TriggerLocation = degree->GetActorLocation() + degree->magneticTrigger->RelativeLocation;
+			
+			float Dist = FVector::Dist(TriggerLocation, ActorPos);
 			if (Dist > Radius)
 			{
 				TriggerMagneticStop();
+				playerChar->EmptyHoldingObjects();
 				return;
 			}
 			else if (Dist <= Radius && Dist >= 5.0f)
 			{
-				moveDirection = (TargetLocation - ActorPos).GetSafeNormal();
+				moveDirection = (TriggerLocation - ActorPos).GetSafeNormal();
 				percent = Dist / RotationPercentDistanceVelocity;
-			}			
-			break;
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Set following"));
+				moveDirection = FVector::ZeroVector;
+				PullingType = ePulling::FOLLOWING;
+			}
 		}
-		case ePulling::PUSHING:
-		{
-			AWorldDiscoveryPlayerController* playerController = Cast<AWorldDiscoveryPlayerController>(GetWorld()->GetFirstPlayerController());
-			ANewWorldDiscoveryCharacter *playerChar = Cast<ANewWorldDiscoveryCharacter>(playerController->GetCharacter());
-			FVector ActorPos = GetActorLocation();
-			FVector PlayerPos = playerChar->GetActorLocation();
-
-			FVector PushDirection = -1.0f * (PlayerPos - ActorPos).GetSafeNormal();
-
-			MagneticMesh->AddImpulseAtLocation(PushDirection * PushAmount, GetActorLocation());
-
-			PullingType = ePulling::NONE;
-
-			break;
-		}
-		default:
-			throw "Error: EnumVal not defined";
-	} //end switch
-
-	//aftermath
-	if (PullingType != ePulling::NONE)
 		MagneticMesh->SetPhysicsLinearVelocity(moveDirection * RotationFollowVelocity * percent);
-	if (PullingType == ePulling::PULLING)
-	{ 
+
+
+
+		/*TargetLocation = playerChar->GetActorLocation();
+		ForceDirection = (TargetLocation - ActorPos).GetSafeNormal();
+		TargetLocation += -ForceDirection * Radius;
+
+		float dist = FVector::Dist(TargetLocation, ActorPos);
+		if (dist >= (Radius + 10.0f))
+		{
+			TriggerMagneticStop();
+		}
+		else if (dist > 10)
+		{
+			ForceDirection = (TargetLocation - ActorPos).GetSafeNormal();
+			Accelerate(DeltaTime);
+			FVector newLocation = ActorPos + CurrentVelocity * ForceDirection * DeltaTime;
+			DrawDebugLine(GetWorld(), ActorPos, TargetLocation, FColor(255, 255, 0, 1));
+			SetActorLocation(newLocation);
+
+			//FRotator rot = GetActorRotation();
+			//rot.Roll += xDir * 80.0f * FMath::Sin(DeltaTime);
+			//SetActorRotation(rot);
+
+		}
+		else
+		{
+			PullingType = ePulling::FOLLOWING;
+		}
+		*/
+		break;
+	}
+	case ePulling::FOLLOWING:
+	{
+		AWorldDiscoveryPlayerController* playerController = Cast<AWorldDiscoveryPlayerController>(GetWorld()->GetFirstPlayerController());
+		ANewWorldDiscoveryCharacter *playerChar = Cast<ANewWorldDiscoveryCharacter>(playerController->GetCharacter());
+		FVector ActorPos = GetActorLocation();
+		
+		float xDir = 1.0f;
+		FVector forward = playerChar->GetActorForwardVector();
+		xDir = forward.Y <= 0 ? -1.0f : 1.0f;
+		/*
+		FVector PlayerLocation  = playerChar->GetActorLocation();
+		TargetLocation = PlayerLocation;
+		if (ForceDirection == FVector::ZeroVector)
+			ForceDirection = (TargetLocation - ActorPos).GetSafeNormal();
+
+		if (RotationRate != 0.0f)
+		{
+			//Rotate Around
+			FVector player = playerChar->GetActorLocation();
+
+			FVector newLocation = HelperClass::RotateAround(player, ActorPos, StaticXPos, RotationCurrent, RotationAmplitude, RotationFrequency);
+			ForceDirection = (player - newLocation).GetSafeNormal();
+		}
+		
+		bool bStaying = false;
+		TargetLocation += -ForceDirection * Radius;
+		if (TargetLocation.Equals(OldTarget))
+		{
+			bStaying = true;
+		}
+		OldTarget = TargetLocation;
+
+		FVector moveDirection = (TargetLocation - ActorPos).GetSafeNormal();
+		*/
+		//moveDirection.X = 0.0f;
+
+		//float directionLength = moveDirection.Size();
+		//if (directionLength >= 20.0f)
+			;// moveDirection = FVector::ZeroVector;
+
+		//UE_LOG(LogTemp,Warning,TEXT("%f"),directionLength);
+		FVector moveDirection = FVector::ZeroVector;
+		APlayerDegree* degree = playerChar->GetPlayerDegree();
+		float percent = 1.0f;
+		if (degree)
+		{
+			FVector TriggerLocation = degree->GetActorLocation() + degree->magneticTrigger->RelativeLocation;
+
+			float Dist = FVector::Dist(TriggerLocation, ActorPos);
+			UE_LOG(LogTemp, Warning, TEXT("following dist %f"),Dist);
+			if (Dist > Radius)
+			{
+				TriggerMagneticStop();
+				playerChar->EmptyHoldingObjects();
+				return;
+			}
+			else if (Dist <= Radius && Dist >= 5.0f)
+			{
+				moveDirection = (TriggerLocation - ActorPos).GetSafeNormal();
+				percent = Dist/ RotationPercentDistanceVelocity;
+			}
+			else
+			{
+				moveDirection = FVector::ZeroVector;
+			}			
+		}
+
+		//UE_LOG(LogTemp,Warning,TEXT("percentVelo - %f * %f = %f"), percent, RotationFollowVelocity,(RotationFollowVelocity * percent));
+		//DrawDebugLine(GetWorld(), ActorPos, moveDirection * 560.0f, FColor(0, 255, 0, 1));
+		MagneticMesh->SetPhysicsLinearVelocity(moveDirection * RotationFollowVelocity * percent);
+		//magneticMovement->Velocity = moveDirection * 550.0f;
+
 		//Rotate
 		FRotator rot = GetActorRotation();
-		rot.Roll += RotationVelocity * FMath::Sin(DeltaTime);
+		rot.Roll += xDir * RotationVelocity * FMath::Sin(DeltaTime);
 		SetActorRotation(rot);
+		break;
+
 	}
+	case ePulling::PUSHING:
+	{
+		AWorldDiscoveryPlayerController* playerController = Cast<AWorldDiscoveryPlayerController>(GetWorld()->GetFirstPlayerController());
+		ANewWorldDiscoveryCharacter *playerChar = Cast<ANewWorldDiscoveryCharacter>(playerController->GetCharacter());
+		FVector ActorPos = GetActorLocation();
+		FVector PlayerPos = playerChar->GetActorLocation();
 
+		FVector PushDirection = -1.0f * (PlayerPos - ActorPos).GetSafeNormal();
 
+		MagneticMesh->AddImpulseAtLocation(PushDirection * PushAmount, GetActorLocation());
+
+		PullingType = ePulling::NONE;
+
+		break;
+	}
+	}
 }
 
-void ABaseMagnetic::triggerMagnetic(FVector Location, bool bUpdating)
+void ABaseMagnetic::triggerMagnetic(FVector direction, float force)
 {
+	UE_LOG(LogTemp, Warning, TEXT("triggerMagnetic"));
 	if (bIgnoreMagnetic) return;
+	if (PullingType == ePulling::NONE)
+	{
 
-		TargetLocation = Location;
+		UE_LOG(LogTemp,Warning,TEXT("triggerMagnetic - NONE"));
 
-		this->bUpdating = bUpdating;
-		
+		AWorldDiscoveryPlayerController* playerController = Cast<AWorldDiscoveryPlayerController>(GetWorld()->GetFirstPlayerController());
+		if (playerController)
+		{
+			ANewWorldDiscoveryCharacter *playerChar = Cast<ANewWorldDiscoveryCharacter>(playerController->GetCharacter());
+			if (playerChar)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("triggerMagnetic - MaxHoldingObject Check %d >= %d"), playerChar->HoldingObjects.Num(), playerChar->MaxHoldingObjects);
+
+				if (playerChar->HoldingObjects.Num() >= playerChar->MaxHoldingObjects)
+					return;
+
+
+				UE_LOG(LogTemp, Warning, TEXT("triggerMagnetic - playerChar"));
+
+				Radius = playerChar->GetRadius();
+				parentCharacter = playerChar;
+				playerChar->AddPulledObject(this);
+			}
+		}
+
 		MagneticMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1, ECollisionResponse::ECR_Ignore);
 		MagneticMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
+
 		MagneticMesh->SetEnableGravity(false);
 		MagneticMesh->SetSimulatePhysics(true);
+
 		MagneticMesh->bGenerateOverlapEvents = true;
 		MagneticMesh->bMultiBodyOverlap = true;
+
 		PullingType = ePulling::PULLING;
 		CurrentVelocity = 0;
-	
+	}
 }
 
 void ABaseMagnetic::TriggerMagneticStop()
@@ -207,11 +335,6 @@ void ABaseMagnetic::TriggerMagneticStop()
 	MagneticMesh->SetSimulatePhysics(true);
 	MagneticMesh->bGenerateOverlapEvents = true;
 	MagneticMesh->bMultiBodyOverlap = true;
-	ANewWorldDiscoveryCharacter *playerChar = Cast<ANewWorldDiscoveryCharacter>(parentCharacter);
-	if (playerChar)
-	{
-		playerChar->EmptyHoldingObjects();
-	}
 
 	parentCharacter = nullptr;
 	//Clearing of Pulled Objects with Blueprint
@@ -221,7 +344,7 @@ void ABaseMagnetic::TriggerMagneticStop()
 void ABaseMagnetic::TriggerMagneticPush()
 {
 	if (bIgnoreMagnetic) return;
-	if (PullingType == ePulling::PULLING)
+	if (PullingType == ePulling::FOLLOWING)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Push"));
 
@@ -268,6 +391,8 @@ void ABaseMagnetic::TriggerDestroy(bool bInstant)
 
 void ABaseMagnetic::OnOverlapBegin(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	UE_LOG(LogTemp, Warning, TEXT("ABaseMagnetic - OnOverlapBegin"));
+
 	OnOverlap(OtherActor,true);
 }
 
@@ -277,47 +402,35 @@ void ABaseMagnetic::OnOverlap(class AActor* actor,bool bState)
 	{
 		if (bIgnoreMagnetic)
 			return;
-		if (PullingType == ePulling::NONE)
+
+		APlayerDegree *playerCollision = Cast<APlayerDegree>(actor);
+		if (playerCollision)
 		{
-			AObjectMagnet *magnet = Cast<AObjectMagnet>(actor);
-			if (magnet)
-			{
-				FVector TargetLocation = magnet->GetActorLocation() + magnet->magneticTrigger->RelativeLocation;
-				if (GetActorLocation().Z > TargetLocation.Z) //critical test
-				{
-					ANewWorldDiscoveryCharacter *playerChar = Cast<ANewWorldDiscoveryCharacter>(parentCharacter);
-					if (playerChar)
-					{
-						playerChar->RemovePulledObject(this);
-					}
+			FVector playerPos = playerCollision->GetActorLocation();
+			playerPos.Z += 200.0f;
 
-					parentCharacter = nullptr;
-					Radius = platform->GetRadius();
-					triggerMagnetic(TargetLocation, false);
-				}
-				return;
-			}
-
-			APlayerDegree *playerDegree = Cast<APlayerDegree>(actor);
-			if (playerDegree)
-			{
-				parentCharacter = playerDegree->parentCharacter;
-				ANewWorldDiscoveryCharacter *playerChar = Cast<ANewWorldDiscoveryCharacter>(parentCharacter);
-				if (playerChar)
-				{
-					Radius = playerChar->GetRadius();
-					playerChar->AddPulledObject(this);
-				}
-				triggerMagnetic(playerDegree->GetActorLocation() + playerDegree->magneticTrigger->RelativeLocation, true);
-			}
+			FVector direction = playerPos - MagneticMesh->RelativeLocation;
+			triggerMagnetic(direction, 1500);
 		}
-
+		else
+			bStop = true;
+	}
+	else
+	{
+		APlayerDegree *playerCollision = Cast<APlayerDegree>(actor);
+		if (playerCollision)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("ABaseMagnetic - OnOverlap End"));
+			//PullingType = ePulling::NONE;
+			//TriggerMagneticStop();
+		}
 	}
 }
 
 void ABaseMagnetic::OnOverlapEnd(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 	OnOverlap(OtherActor, false);
+	bStop = false;
 }
 
 bool ABaseMagnetic::IsInteractible()

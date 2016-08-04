@@ -20,19 +20,19 @@ AMovingPlatform::AMovingPlatform()
 	PlatformMesh->bGenerateOverlapEvents = false;
 	PlatformMesh->AttachTo(BaseComponent);
 
+	BoxCollisionTrigger = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxCollisionTrigger"));
+	BoxCollisionTrigger->bGenerateOverlapEvents = true;
+	BoxCollisionTrigger->SetCollisionProfileName("PlatformTrigger");
+
 	PlatformEnergySocketMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PlatformEnergySocketMesh"));
 	PlatformEnergySocketMesh->bGenerateOverlapEvents = false;
 	PlatformEnergySocketMesh->AttachTo(PlatformMesh);
 
-	BoxCollisionTrigger = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxCollisionTrigger"));
-	BoxCollisionTrigger->bGenerateOverlapEvents = true;
-	BoxCollisionTrigger->SetCollisionProfileName("PlatformTrigger");
-	BoxCollisionTrigger->AttachTo(PlatformEnergySocketMesh);
+	//doenst work because, 2 blueprints ref to 1 c++ class ?
+	//BoxCollisionTrigger->OnComponentBeginOverlap.AddDynamic(this, &AMovingPlatform::OnOverlapBegin);
+	//BoxCollisionTrigger->OnComponentEndOverlap.AddDynamic(this, &AMovingPlatform::OnOverlapEnd);
 
-	SpherePullingTrigger = CreateDefaultSubobject<USphereComponent>(TEXT("SpherePullingTrigger"));
-	SpherePullingTrigger->bGenerateOverlapEvents = true;
-	SpherePullingTrigger->SetCollisionProfileName("PlayerTrigger");
-	SpherePullingTrigger->AttachTo(BoxCollisionTrigger);
+	BoxCollisionTrigger->AttachTo(PlatformEnergySocketMesh);
 
 	PlatformLineMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PlatformLineMesh"));
 	PlatformLineMesh->bGenerateOverlapEvents = false;
@@ -202,7 +202,3 @@ void AMovingPlatform::OverlapEnd(class AActor* OtherActor, class UPrimitiveCompo
 	}
 }
 
-float AMovingPlatform::GetRadius()
-{
-	return SpherePullingTrigger->GetUnscaledSphereRadius();
-}
