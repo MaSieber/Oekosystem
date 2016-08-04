@@ -111,6 +111,9 @@ public:
 	UFUNCTION()
 	void Reset();
 
+	UFUNCTION()
+	bool IsDestroyed();
+
 protected:
 	void Accelerate(float DeltaTime);
 

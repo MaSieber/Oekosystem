@@ -261,8 +261,9 @@ void ABaseMagnetic::TriggerDestroy(bool bInstant)
 			{
 				playerChar->RemovePulledObject(this);
 			}
+			this->K2_DestroyActor();
 		}
-		this->K2_DestroyActor();
+		
 	}
 	else
 	{
@@ -354,3 +355,7 @@ void ABaseMagnetic::SetNewMassScale(const float& NewScale)
 	BodyInst->UpdateMassProperties();
 }
 
+bool ABaseMagnetic::IsDestroyed()
+{
+	return bIsDestroyed || bDestroying;
+}

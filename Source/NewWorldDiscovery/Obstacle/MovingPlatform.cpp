@@ -191,43 +191,51 @@ void AMovingPlatform::OverlapBegin(class AActor* OtherActor, class UPrimitiveCom
 		energyBox->SetNewMassScale(20.0f);
 		energyBox->bIgnoreMagnetic = true;
 
-		const TArray<UActorComponent*> components = energyBox->GetComponents();
-		if (components.Num() > 0)
+		if (!energyBox->IsDestroyed())
 		{
-			UStaticMeshComponent* firstComponent = Cast<UStaticMeshComponent>(components[0]);
-			UStaticMeshComponent* NewComp = ConstructObject<UStaticMeshComponent>(UStaticMeshComponent::StaticClass(), this, TEXT("MyCompName"));
-			if (NewComp)
+			const TArray<UActorComponent*> components = energyBox->GetComponents();
+			if (components.Num() > 0)
 			{
-				FVector originScale = energyBox->GetActorScale3D();
-
-				NewComp->RegisterComponent();
-				
-				NewComp->SetRelativeScale3D(originScale);
-				NewComp->SetStaticMesh(firstComponent->StaticMesh);
-				int32 numMaterials = firstComponent->GetNumMaterials();
-				for (int32 i = 0; i < numMaterials; i++)
+				UStaticMeshComponent* firstComponent = Cast<UStaticMeshComponent>(components[0]);
+				UStaticMeshComponent* NewComp = ConstructObject<UStaticMeshComponent>(UStaticMeshComponent::StaticClass(), this, TEXT("MyCompName"));
+				if (NewComp)
 				{
-					NewComp->SetMaterial(i, firstComponent->GetMaterial(i));
+					FVector originScale = energyBox->GetActorScale3D();
+
+					NewComp->RegisterComponent();
+
+					NewComp->SetRelativeScale3D(originScale);
+					NewComp->SetStaticMesh(firstComponent->StaticMesh);
+					int32 numMaterials = firstComponent->GetNumMaterials();
+					for (int32 i = 0; i < numMaterials; i++)
+					{
+						NewComp->SetMaterial(i, firstComponent->GetMaterial(i));
+					}
+
+					NewComp->AttachTo(PlatformEnergySocketMesh, NAME_None, EAttachLocation::SnapToTarget);
+					float offsetZ = 125.0f;
+					if (Type == eTypeDirection::HORIZONTAL)
+						offsetZ = 275.0f;
+
+					NewComp->SetRelativeLocation(FVector(0.0f, 0.0f, offsetZ));
 				}
 
-				NewComp->AttachTo(PlatformEnergySocketMesh, NAME_None, EAttachLocation::SnapToTarget);
-				NewComp->SetRelativeLocation(FVector(0.0f,0.0f,125.0f));
-			}
-
-			AWorldDiscoveryPlayerController* playerController = Cast<AWorldDiscoveryPlayerController>(GetWorld()->GetFirstPlayerController());
-			if (playerController)
-			{
-				ANewWorldDiscoveryCharacter *playerChar = Cast<ANewWorldDiscoveryCharacter>(playerController->GetCharacter());
-				if (playerChar)
+				AWorldDiscoveryPlayerController* playerController = Cast<AWorldDiscoveryPlayerController>(GetWorld()->GetFirstPlayerController());
+				if (playerController)
 				{
-					playerChar->SetCurrentObjectHolder((ABaseObstacle*)this);
+					ANewWorldDiscoveryCharacter *playerChar = Cast<ANewWorldDiscoveryCharacter>(playerController->GetCharacter());
+					if (playerChar)
+					{
+						playerChar->SetCurrentObjectHolder((ABaseObstacle*)this);
+					}
 				}
+
+				MagneticObject = NewComp;
 			}
 
-			MagneticObject = NewComp;
+			energyBox->TriggerDestroy(true);
 		}
-		
-		energyBox->K2_DestroyActor();
+
 		
 		TriggerPlatform(true);
 	}
