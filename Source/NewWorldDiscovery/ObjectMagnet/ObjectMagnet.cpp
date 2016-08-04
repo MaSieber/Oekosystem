@@ -34,7 +34,7 @@ void AObjectMagnet::BeginPlay()
 // Called every frame
 void AObjectMagnet::Tick( float DeltaTime )
 {
-	Super::Tick( DeltaTime );
+	Super::Tick( DeltaTime ); 
 
 }
 
