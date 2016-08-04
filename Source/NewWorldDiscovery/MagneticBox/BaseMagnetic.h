@@ -28,7 +28,7 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = BaseMagnetic)
 	UProjectileMovementComponent *magneticMovement;
-	
+
 	//UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = BaseMagnetic)
 	//UMovementComponent *MovementComponent;
 

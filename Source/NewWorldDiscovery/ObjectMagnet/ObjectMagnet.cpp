@@ -22,12 +22,16 @@ AObjectMagnet::AObjectMagnet()
 	magneticWave = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("WaveParticle"));
 	magneticWave->AttachTo(magneticTrigger);
 
+	PullingVelocity = 500.0f;
+
 }
 
 // Called when the game starts or when spawned
 void AObjectMagnet::BeginPlay()
 {
 	Super::BeginPlay();
+
+	Radius = magneticTrigger->GetUnscaledSphereRadius() + 50.0f;
 	
 }
 

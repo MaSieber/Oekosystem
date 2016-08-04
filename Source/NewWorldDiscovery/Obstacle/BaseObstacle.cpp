@@ -11,13 +11,16 @@ ABaseObstacle::ABaseObstacle()
 	PrimaryActorTick.bCanEverTick = true;
 
 	objectMagnet = nullptr;
-
+	bStatic = false;
+	MagneticObject = nullptr;
 }
 
 // Called when the game starts or when spawned
 void ABaseObstacle::BeginPlay()
 {
 	Super::BeginPlay();
+
+	SpawnMagnet();
 	
 }
 
@@ -39,11 +42,12 @@ void ABaseObstacle::SpawnMagnet()
 
 		FVector ActorPos = GetActorLocation();
 
-		objectMagnet = GetWorld()->SpawnActor<APlayerDegree>(MagnetAbility, ActorPos, Rotation, SpawnParameters);
+		objectMagnet = GetWorld()->SpawnActor<AObjectMagnet>(MagnetAbility, ActorPos, Rotation, SpawnParameters);
 		if (objectMagnet)
 		{
 			FVector DegreeLocation = objectMagnet->magneticTrigger->RelativeLocation;
-			Radius = FMath::Sqrt(FMath::Pow(DegreeLocation.Z, 2) + FMath::Pow(DegreeLocation.Y, 2));
+			float Radius = FMath::Sqrt(FMath::Pow(DegreeLocation.Z, 2) + FMath::Pow(DegreeLocation.Y, 2));
+
 
 			objectMagnet->magneticTrigger->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 			objectMagnet->magneticTrigger->bGenerateOverlapEvents = true;
@@ -51,6 +55,11 @@ void ABaseObstacle::SpawnMagnet()
 			bMagneticEffect = true;
 		}
 	}
+}
+
+void ABaseObstacle::DestroyMagneticObject()
+{
+	MagneticObject->DestroyComponent();
 }
 
 

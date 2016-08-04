@@ -202,7 +202,15 @@ void ANewWorldDiscoveryCharacter::CreateMagneticBox()
 		box->MagneticMesh->bGenerateOverlapEvents = false;
 		CreatedBoxes.Add(box);
 		box->OnCreate();
+		
+		if (obstacle != nullptr)
+		{
+			obstacle->DestroyMagneticObject();
+			obstacle = nullptr;
+		}
 	}
+
+
 }
 void ANewWorldDiscoveryCharacter::CreateMagneticBall()
 {
@@ -235,6 +243,8 @@ void ANewWorldDiscoveryCharacter::CreateMagneticBall()
 		CreatedBalls.Add(ball);
 		ball->OnCreate();
 	}
+
+	
 		
 }
 void ANewWorldDiscoveryCharacter::CreateMagneticShields()
@@ -267,6 +277,8 @@ void ANewWorldDiscoveryCharacter::CreateMagneticShields()
 		CreatedShields.Add(pyramide);
 		pyramide->OnCreate();
 	}
+
+	
 }
 
 FVector ANewWorldDiscoveryCharacter::GetSpawnLocation()
@@ -444,8 +456,6 @@ void ANewWorldDiscoveryCharacter::Tick(float DeltaTime)
 
 ABaseMagnetic* ANewWorldDiscoveryCharacter::GetActiveObject()
 {
-	UE_LOG(LogTemp,Warning,TEXT("%d"), HoldingObjects.Num());
-
 	if (HoldingObjects.Num() > 0)
 	{
 		return HoldingObjects[0];
@@ -504,4 +514,7 @@ void ANewWorldDiscoveryCharacter::Godmode()
 	bGodmode = !bGodmode;
 }
 
-
+void ANewWorldDiscoveryCharacter::SetCurrentObjectHolder(ABaseObstacle* obstacle)
+{
+	this->obstacle = obstacle;
+}

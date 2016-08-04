@@ -5,6 +5,8 @@
 
 #include "ObjectMagnet/ObjectMagnet.h"
 #include "PlayerMagnet/PlayerDegree.h"
+
+#include "../Obstacle/MovingPlatform.h"
 #include "NewWorldDiscoveryCharacter.h"
 #include "WorldDiscoveryPlayerController.h"
 #include "../HelperClass.h"
@@ -127,7 +129,7 @@ void ABaseMagnetic::Tick(float DeltaTime)
 	FVector moveDirection = FVector::ZeroVector;
 	FVector ActorPos = GetActorLocation();
 	float percent = 1.0f;
-
+	
 	switch (PullingType)
 	{
 		case ePulling::NONE:
@@ -135,6 +137,7 @@ void ABaseMagnetic::Tick(float DeltaTime)
 		case ePulling::PULLING:
 		{			
 			float Dist = FVector::Dist(TargetLocation, ActorPos);
+			UE_LOG(LogTemp, Warning, TEXT("dist:%f,Radius: %f"), Dist, Radius);
 			if (Dist > Radius)
 			{
 				TriggerMagneticStop();
@@ -145,6 +148,7 @@ void ABaseMagnetic::Tick(float DeltaTime)
 				moveDirection = (TargetLocation - ActorPos).GetSafeNormal();
 				percent = Dist / RotationPercentDistanceVelocity;
 			}			
+
 			break;
 		}
 		case ePulling::PUSHING:
@@ -168,7 +172,7 @@ void ABaseMagnetic::Tick(float DeltaTime)
 
 	//aftermath
 	if (PullingType != ePulling::NONE)
-		MagneticMesh->SetPhysicsLinearVelocity(moveDirection * RotationFollowVelocity * percent);
+		MagneticMesh->SetPhysicsLinearVelocity(moveDirection * CurrentVelocity * percent);
 	if (PullingType == ePulling::PULLING)
 	{ 
 		//Rotate
@@ -184,18 +188,19 @@ void ABaseMagnetic::triggerMagnetic(FVector Location, bool bUpdating)
 {
 	if (bIgnoreMagnetic) return;
 
-		TargetLocation = Location;
+	TargetLocation = Location;
 
-		this->bUpdating = bUpdating;
+	this->bUpdating = bUpdating;
 		
-		MagneticMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1, ECollisionResponse::ECR_Ignore);
-		MagneticMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
-		MagneticMesh->SetEnableGravity(false);
-		MagneticMesh->SetSimulatePhysics(true);
-		MagneticMesh->bGenerateOverlapEvents = true;
-		MagneticMesh->bMultiBodyOverlap = true;
-		PullingType = ePulling::PULLING;
-		CurrentVelocity = 0;
+	MagneticMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1, ECollisionResponse::ECR_Ignore);
+	MagneticMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
+	MagneticMesh->SetEnableGravity(false);
+	MagneticMesh->SetSimulatePhysics(true);
+	MagneticMesh->bGenerateOverlapEvents = true;
+	MagneticMesh->bMultiBodyOverlap = true;
+	PullingType = ePulling::PULLING;
+
+	UE_LOG(LogTemp,Warning,TEXT("triggerMagnetic"));
 	
 }
 
@@ -277,12 +282,15 @@ void ABaseMagnetic::OnOverlap(class AActor* actor,bool bState)
 	{
 		if (bIgnoreMagnetic)
 			return;
+
 		if (PullingType == ePulling::NONE)
 		{
 			AObjectMagnet *magnet = Cast<AObjectMagnet>(actor);
 			if (magnet)
 			{
+				UE_LOG(LogTemp,Warning,TEXT("ObjectMagnet"));
 				FVector TargetLocation = magnet->GetActorLocation() + magnet->magneticTrigger->RelativeLocation;
+				UE_LOG(LogTemp, Warning, TEXT("ObjectMagnet Actor z:%f,target z: %f"), GetActorLocation().Z,TargetLocation.Z);
 				if (GetActorLocation().Z > TargetLocation.Z) //critical test
 				{
 					ANewWorldDiscoveryCharacter *playerChar = Cast<ANewWorldDiscoveryCharacter>(parentCharacter);
@@ -292,21 +300,24 @@ void ABaseMagnetic::OnOverlap(class AActor* actor,bool bState)
 					}
 
 					parentCharacter = nullptr;
-					Radius = platform->GetRadius();
+					Radius = magnet->Radius;
+					CurrentVelocity = magnet->PullingVelocity;
 					triggerMagnetic(TargetLocation, false);
 				}
 				return;
 			}
-
+			
 			APlayerDegree *playerDegree = Cast<APlayerDegree>(actor);
 			if (playerDegree)
 			{
+				UE_LOG(LogTemp, Warning, TEXT("PlayerMagnet"));
 				parentCharacter = playerDegree->parentCharacter;
 				ANewWorldDiscoveryCharacter *playerChar = Cast<ANewWorldDiscoveryCharacter>(parentCharacter);
 				if (playerChar)
 				{
 					Radius = playerChar->GetRadius();
 					playerChar->AddPulledObject(this);
+					CurrentVelocity = RotationFollowVelocity;
 				}
 				triggerMagnetic(playerDegree->GetActorLocation() + playerDegree->magneticTrigger->RelativeLocation, true);
 			}

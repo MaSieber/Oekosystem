@@ -29,5 +29,15 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = ObjectMagnet)
 	UParticleSystemComponent* magneticWave;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = ObjectMagnet)
+	AActor* parent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = ObjectMagnet)
+	float PullingVelocity;
+
+	float Radius;
+	
+
+
 	
 };

@@ -4,6 +4,10 @@
 
 #include "../ObjectMagnet/ObjectMagnet.h"
 
+
+#include "../WorldDiscoveryPlayerController.h"
+#include "../NewWorldDiscoveryCharacter.h"
+
 #include "GameFramework/Actor.h"
 #include "BaseObstacle.generated.h"
 
@@ -24,7 +28,17 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Ability)
 	TSubclassOf<class AObjectMagnet> MagnetAbility;
+
+	UFUNCTION()
+	void SpawnMagnet();
+
+	UFUNCTION()
+	virtual void DestroyMagneticObject();
 	
 protected:
 	AObjectMagnet* objectMagnet;
+	bool bMagneticEffect;
+	bool bStatic;
+	UStaticMeshComponent* MagneticObject;
+
 };

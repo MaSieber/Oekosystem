@@ -74,9 +74,6 @@ public:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = MovingPlatform)
 	UBoxComponent* BoxCollisionTrigger;
 
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = MovingPlatform)
-	USphereComponent* SpherePullingTrigger;
-
 	UFUNCTION(BlueprintCallable, Category = MovingPlatform)
 	void TriggerPlatform(bool bActiveState);
 
@@ -90,8 +87,7 @@ public:
 	void ResetPlatform();
 
 	UFUNCTION()
-	float GetRadius();
-
+	virtual void DestroyMagneticObject() override;
 
 private:
 	uint32 StoringEnergy;
