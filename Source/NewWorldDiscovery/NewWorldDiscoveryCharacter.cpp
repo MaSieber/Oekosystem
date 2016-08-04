@@ -411,9 +411,13 @@ void ANewWorldDiscoveryCharacter::Tick(float DeltaTime)
 				FVector ForceDirection = (FVector::ZeroVector - newLocation).GetSafeNormal();
 				TargetLocation = -ForceDirection * Radius;
 			}
-
-			//DrawDebugLine(GetWorld(), ActorPos, TargetLocation * 500.0f, FColor(255, 0, 0, 1));
 			playerDegree->magneticTrigger->SetRelativeLocation(TargetLocation);
+
+			ABaseMagnetic* baseMagnetic = GetActiveObject();
+			if (baseMagnetic)
+			{
+				baseMagnetic->UpdateTargetLocation(playerDegree->GetActorLocation() + playerDegree->magneticTrigger->RelativeLocation);
+			}
 		}
 	}
 

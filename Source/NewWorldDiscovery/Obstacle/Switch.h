@@ -3,12 +3,13 @@
 #pragma once
 
 #include "BaseDoor.h"
+#include "BaseObstacle.h"
 
 #include "GameFramework/Actor.h"
 #include "Switch.generated.h"
 
 UCLASS()
-class NEWWORLDDISCOVERY_API ASwitch : public AActor
+class NEWWORLDDISCOVERY_API ASwitch : public ABaseObstacle
 {
 	GENERATED_BODY()
 	

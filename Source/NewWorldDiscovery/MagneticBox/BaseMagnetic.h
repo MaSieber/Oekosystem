@@ -33,7 +33,7 @@ public:
 	//UMovementComponent *MovementComponent;
 
 	UFUNCTION(BlueprintCallable, Category = BaseMagnetic)
-	void triggerMagnetic(FVector direction, float force);
+	void triggerMagnetic(FVector Location, bool bUpdating);
 
 	UFUNCTION(BlueprintCallable, Category = BaseMagnetic)
 	void TriggerMagneticStop();
@@ -93,6 +93,10 @@ public:
 	bool bIgnoreMagnetic;
 
 	UFUNCTION()
+	void UpdateTargetLocation(FVector Location);
+
+
+	UFUNCTION()
 	void SetRotationRate(float Val);
 
 	UFUNCTION()
@@ -118,12 +122,11 @@ protected:
 	float ForceSeconds;
 	float CurrentForceSeconds;
 
-	FVector TargetLocation;
-
 	enum ePulling
 	{
 		NONE = 0,
 		PULLING,
+		PULLING_PLATFORM,
 		FOLLOWING,
 		PUSHING
 	};
@@ -146,4 +149,8 @@ protected:
 
 private:
 	FVector OldTarget;
+	FVector TargetLocation;
+
+	bool bUpdating;
+	bool bSnaped;
 };

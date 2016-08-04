@@ -3,16 +3,16 @@
 #pragma once
 
 #include "GameFramework/Actor.h"
-#include "PlayerDegree.generated.h"
+#include "ObjectMagnet.generated.h"
 
 UCLASS()
-class NEWWORLDDISCOVERY_API APlayerDegree : public AActor
+class NEWWORLDDISCOVERY_API AObjectMagnet : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	APlayerDegree();
+	AObjectMagnet();
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -20,17 +20,14 @@ public:
 	// Called every frame
 	virtual void Tick( float DeltaSeconds ) override;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Degree360)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = ObjectMagnet)
 	USceneComponent* SceneComponent;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Degree360)
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = ObjectMagnet)
 	USphereComponent* magneticTrigger;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Degree360)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = ObjectMagnet)
 	UParticleSystemComponent* magneticWave;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = BaseMagnetic)
-	ACharacter* parentCharacter;
-
-
+	
 };
