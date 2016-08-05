@@ -40,5 +40,9 @@ protected:
 	bool bMagneticEffect;
 	bool bStatic;
 	UStaticMeshComponent* MagneticObject;
+	bool IsDestroyed;
+
+private:
+	bool bBeginDestroy;
 
 };

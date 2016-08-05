@@ -178,7 +178,7 @@ void ABaseMagnetic::Tick(float DeltaTime)
 		//Rotate
 		FRotator rot = GetActorRotation();
 
-		UE_LOG(LogTemp, Warning, TEXT("Rotate %f"),rot.Roll,RotationVelocity);
+		//UE_LOG(LogTemp, Warning, TEXT("Rotate %f"),rot.Roll,RotationVelocity);
 		rot.Roll += RotationVelocity * FMath::Sin(DeltaTime);
 		SetActorRotation(rot);
 	}
