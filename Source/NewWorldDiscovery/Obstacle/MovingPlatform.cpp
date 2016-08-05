@@ -64,7 +64,7 @@ void AMovingPlatform::BeginPlay()
 
 	if (objectMagnet != nullptr)
 	{
-		objectMagnet->SetActorLocation(PlatformMesh->GetComponentLocation());
+		objectMagnet->SetActorLocation(PlatformEnergySocketMesh->GetComponentLocation());
 	}
 	
 }
@@ -191,15 +191,29 @@ void AMovingPlatform::OverlapBegin(class AActor* OtherActor, class UPrimitiveCom
 		energyBox->SetNewMassScale(20.0f);
 		energyBox->bIgnoreMagnetic = true;
 
-		if (!energyBox->IsDestroyed())
+		if (IsDestroyed && !energyBox->IsDestroyed())
 		{
+			UE_LOG(LogTemp,Warning,TEXT("IsNotDestroying"));
 			const TArray<UActorComponent*> components = energyBox->GetComponents();
+			
 			if (components.Num() > 0)
 			{
+				UE_LOG(LogTemp, Warning, TEXT("%d"), components.Num());
+
+				FString name = "TempMagneticBox_";
+				FMath::RandInit(FMath::Rand());
+				name.AppendInt(FMath::RandRange(100, 999));
+				FMath::RandInit(FMath::Rand());
+				name.AppendInt(FMath::RandRange(100, 999));
 				UStaticMeshComponent* firstComponent = Cast<UStaticMeshComponent>(components[0]);
-				UStaticMeshComponent* NewComp = ConstructObject<UStaticMeshComponent>(UStaticMeshComponent::StaticClass(), this, TEXT("MyCompName"));
+
+				UE_LOG(LogTemp,Warning,TEXT("Object-Name: %s"),*name);
+				FName ObjectName = FName(*name);
+				UStaticMeshComponent* NewComp = ConstructObject<UStaticMeshComponent>(UStaticMeshComponent::StaticClass(), this, ObjectName);
 				if (NewComp)
 				{
+					UE_LOG(LogTemp, Warning, TEXT("NewComp"));
+
 					FVector originScale = energyBox->GetActorScale3D();
 
 					NewComp->RegisterComponent();
@@ -211,8 +225,9 @@ void AMovingPlatform::OverlapBegin(class AActor* OtherActor, class UPrimitiveCom
 					{
 						NewComp->SetMaterial(i, firstComponent->GetMaterial(i));
 					}
-
+					UE_LOG(LogTemp, Warning, TEXT("Before AttachTo"));
 					NewComp->AttachTo(PlatformEnergySocketMesh, NAME_None, EAttachLocation::SnapToTarget);
+					UE_LOG(LogTemp, Warning, TEXT("After AttachTo"));
 					float offsetZ = 125.0f;
 					if (Type == eTypeDirection::HORIZONTAL)
 						offsetZ = 275.0f;
@@ -226,17 +241,22 @@ void AMovingPlatform::OverlapBegin(class AActor* OtherActor, class UPrimitiveCom
 					ANewWorldDiscoveryCharacter *playerChar = Cast<ANewWorldDiscoveryCharacter>(playerController->GetCharacter());
 					if (playerChar)
 					{
+
+						UE_LOG(LogTemp, Warning, TEXT("Before CurrentObjectHolder"));
 						playerChar->SetCurrentObjectHolder((ABaseObstacle*)this);
+						UE_LOG(LogTemp, Warning, TEXT("After CurrentObjectHolder"));
 					}
 				}
-
+				IsDestroyed = false;
 				MagneticObject = NewComp;
 			}
 
+			UE_LOG(LogTemp, Warning, TEXT("Before Box TriggerDestroy"));
 			energyBox->TriggerDestroy(true);
+			UE_LOG(LogTemp, Warning, TEXT("After Box TriggerDestroy"));
 		}
 
-		
+		UE_LOG(LogTemp, Warning, TEXT("Trigger Platform true"));
 		TriggerPlatform(true);
 	}
 }
