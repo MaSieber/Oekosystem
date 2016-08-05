@@ -320,7 +320,7 @@ void ABaseMagnetic::OnOverlap(class AActor* actor,bool bState)
 					playerChar->AddPulledObject(this);
 					CurrentVelocity = RotationFollowVelocity;
 				}
-				triggerMagnetic(playerDegree->GetActorLocation() + playerDegree->magneticTrigger->RelativeLocation, true);
+				triggerMagnetic(playerDegree->magneticTrigger->GetComponentLocation(), true);
 			}
 		}
 
