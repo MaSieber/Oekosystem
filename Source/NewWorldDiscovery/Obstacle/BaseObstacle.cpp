@@ -45,10 +45,6 @@ void ABaseObstacle::SpawnMagnet()
 		objectMagnet = GetWorld()->SpawnActor<AObjectMagnet>(MagnetAbility, ActorPos, Rotation, SpawnParameters);
 		if (objectMagnet)
 		{
-			FVector DegreeLocation = objectMagnet->magneticTrigger->RelativeLocation;
-			float Radius = FMath::Sqrt(FMath::Pow(DegreeLocation.Z, 2) + FMath::Pow(DegreeLocation.Y, 2));
-
-
 			objectMagnet->magneticTrigger->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 			objectMagnet->magneticTrigger->bGenerateOverlapEvents = true;
 			objectMagnet->magneticWave->Activate();

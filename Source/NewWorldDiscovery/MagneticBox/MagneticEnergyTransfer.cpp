@@ -12,7 +12,7 @@ AMagneticEnergyTransfer::AMagneticEnergyTransfer()
 	PrimaryActorTick.bCanEverTick = true;
 
 	bCharged = false;
-
+	Type = 3;
 }
 
 // Called when the game starts or when spawned

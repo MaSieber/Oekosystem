@@ -31,7 +31,7 @@ void AObjectMagnet::BeginPlay()
 {
 	Super::BeginPlay();
 
-	Radius = magneticTrigger->GetUnscaledSphereRadius() + 50.0f;
+	Radius = magneticTrigger->GetUnscaledSphereRadius() + 55.0f;
 	
 }
 

@@ -114,6 +114,8 @@ public:
 	UFUNCTION()
 	bool IsDestroyed();
 
+	int32 Type;
+
 protected:
 	void Accelerate(float DeltaTime);
 

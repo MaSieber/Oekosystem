@@ -58,14 +58,11 @@ ABaseMagnetic::ABaseMagnetic()
 	RotationPercentDistanceVelocity = 60.0f;
 
 	bDestroying = false;
-
 	ForceDirection = FVector::ZeroVector;
-
 	bIgnoreMagnetic = false;
-
 	magneticMovement->SetUpdatedComponent(NULL);
-
 	bUpdating = false;
+	Type = 0;
 
 }
 
@@ -137,7 +134,9 @@ void ABaseMagnetic::Tick(float DeltaTime)
 		case ePulling::PULLING:
 		{			
 			float Dist = FVector::Dist(TargetLocation, ActorPos);
-			UE_LOG(LogTemp, Warning, TEXT("dist:%f,Radius: %f"), Dist, Radius);
+			
+
+			//UE_LOG(LogTemp, Warning, TEXT("dist:%f,Radius: %f"), Dist, Radius);
 			if (Dist > Radius)
 			{
 				TriggerMagneticStop();
@@ -175,8 +174,11 @@ void ABaseMagnetic::Tick(float DeltaTime)
 		MagneticMesh->SetPhysicsLinearVelocity(moveDirection * CurrentVelocity * percent);
 	if (PullingType == ePulling::PULLING)
 	{ 
+		
 		//Rotate
 		FRotator rot = GetActorRotation();
+
+		UE_LOG(LogTemp, Warning, TEXT("Rotate %f"),rot.Roll,RotationVelocity);
 		rot.Roll += RotationVelocity * FMath::Sin(DeltaTime);
 		SetActorRotation(rot);
 	}
@@ -287,11 +289,11 @@ void ABaseMagnetic::OnOverlap(class AActor* actor,bool bState)
 		if (PullingType == ePulling::NONE)
 		{
 			AObjectMagnet *magnet = Cast<AObjectMagnet>(actor);
-			if (magnet)
+			if (magnet && Type == 1)
 			{
 				UE_LOG(LogTemp,Warning,TEXT("ObjectMagnet"));
-				FVector TargetLocation = magnet->GetActorLocation() + magnet->magneticTrigger->RelativeLocation;
-				UE_LOG(LogTemp, Warning, TEXT("ObjectMagnet Actor z:%f,target z: %f"), GetActorLocation().Z,TargetLocation.Z);
+				TargetLocation = magnet->magneticTrigger->GetComponentLocation();
+				UE_LOG(LogTemp, Warning, TEXT("ObjectMagnet Actor z:%f,target x: %f y: %f z: %f"), GetActorLocation().Z,TargetLocation.X, TargetLocation.Y, TargetLocation.Z);
 				if (GetActorLocation().Z > TargetLocation.Z) //critical test
 				{
 					ANewWorldDiscoveryCharacter *playerChar = Cast<ANewWorldDiscoveryCharacter>(parentCharacter);
@@ -317,13 +319,20 @@ void ABaseMagnetic::OnOverlap(class AActor* actor,bool bState)
 				if (playerChar)
 				{
 					Radius = playerChar->GetRadius();
-					playerChar->AddPulledObject(this);
-					CurrentVelocity = RotationFollowVelocity;
+					if (playerChar->GetActiveObject() == nullptr)
+					{ 
+						playerChar->AddPulledObject(this);
+						CurrentVelocity = RotationFollowVelocity;
+						triggerMagnetic(playerDegree->magneticTrigger->GetComponentLocation(), true);
+					}
 				}
-				triggerMagnetic(playerDegree->magneticTrigger->GetComponentLocation(), true);
 			}
 		}
 
+	}
+	else
+	{
+		TriggerMagneticStop();
 	}
 }
 
