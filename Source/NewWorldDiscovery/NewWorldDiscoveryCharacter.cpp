@@ -243,8 +243,6 @@ void ANewWorldDiscoveryCharacter::CreateMagneticBall()
 		CreatedBalls.Add(ball);
 		ball->OnCreate();
 	}
-
-	
 		
 }
 void ANewWorldDiscoveryCharacter::CreateMagneticShields()
@@ -277,8 +275,6 @@ void ANewWorldDiscoveryCharacter::CreateMagneticShields()
 		CreatedShields.Add(pyramide);
 		pyramide->OnCreate();
 	}
-
-	
 }
 
 FVector ANewWorldDiscoveryCharacter::GetSpawnLocation()
@@ -363,7 +359,7 @@ void ANewWorldDiscoveryCharacter::EnableMagnetic()
 		FRotator Rotation = FRotator(0.0f, 0.0f, 0.0f);
 		
 		FVector ActorPos = GetActorLocation();
-		ActorPos.Y += 150.0f;
+		ActorPos.Z += 20.0f;
 
 		playerDegree = GetWorld()->SpawnActor<APlayerDegree>(MagnetAbility, ActorPos, Rotation, SpawnParameters);
 		if (playerDegree)
@@ -373,7 +369,15 @@ void ANewWorldDiscoveryCharacter::EnableMagnetic()
 
 			playerDegree->magneticTrigger->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 			playerDegree->magneticTrigger->bGenerateOverlapEvents = true;
-			playerDegree->magneticWave->Activate();
+			
+			if (playerDegree->bParticleRotation)
+			{
+				playerDegree->magneticWave->Activate();
+				APlayerXDegree *degree = Cast<APlayerXDegree>(playerDegree);
+				if (degree)
+					degree->magneticWaveSingle->Activate();
+			}
+				
 			TargetLocation = FVector::ZeroVector;
 			playerDegree->parentCharacter = this;
 
@@ -412,10 +416,12 @@ void ANewWorldDiscoveryCharacter::Tick(float DeltaTime)
 	{
 		if (playerDegree)
 		{			
-			playerDegree->SetActorLocation(ActorPos);
+			if (playerDegree->bParticleRotation)
+			{
+				playerDegree->SetActorLocation(ActorPos);
 
-			if (TargetLocation == FVector::ZeroVector)
-				TargetLocation = playerDegree->magneticTrigger->RelativeLocation;
+				if (TargetLocation == FVector::ZeroVector)
+					TargetLocation = playerDegree->magneticTrigger->RelativeLocation;
 
 			if (RotationCurrent != 0.0f)
 			{				

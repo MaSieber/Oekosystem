@@ -32,5 +32,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = BaseMagnetic)
 	ACharacter* parentCharacter;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Degree)
+	bool bParticleRotation;
+
 
 };
