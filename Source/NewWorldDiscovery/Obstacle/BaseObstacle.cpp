@@ -13,6 +13,8 @@ ABaseObstacle::ABaseObstacle()
 	objectMagnet = nullptr;
 	bStatic = false;
 	MagneticObject = nullptr;
+	IsDestroyed = true;
+	bBeginDestroy = false;
 }
 
 // Called when the game starts or when spawned
@@ -28,6 +30,25 @@ void ABaseObstacle::BeginPlay()
 void ABaseObstacle::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
+
+	int state = 0;
+	if (MagneticObject != nullptr && MagneticObject->IsBeingDestroyed())
+	{
+		state = 1;
+		UE_LOG(LogTemp, Warning, TEXT("%d"), state);
+	}
+		
+
+	
+
+	if (bBeginDestroy && MagneticObject != nullptr && MagneticObject->IsBeingDestroyed())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Finishing Destroying"));
+		MagneticObject = nullptr;
+		IsDestroyed = true;
+		bBeginDestroy = false;
+		
+	}
 
 }
 
@@ -55,7 +76,16 @@ void ABaseObstacle::SpawnMagnet()
 
 void ABaseObstacle::DestroyMagneticObject()
 {
-	MagneticObject->DestroyComponent();
+	UE_LOG(LogTemp,Warning,TEXT("DestroyMagneticObject"));
+	if (MagneticObject != nullptr)
+	{
+		bBeginDestroy = true;
+		MagneticObject->UnregisterComponent();
+		MagneticObject->DestroyComponent();
+
+		IsDestroyed = false;
+		UE_LOG(LogTemp, Warning, TEXT("Destroy triggered"));
+	}	
 }
 
 
