@@ -28,12 +28,12 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = BaseMagnetic)
 	UProjectileMovementComponent *magneticMovement;
-	
+
 	//UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = BaseMagnetic)
 	//UMovementComponent *MovementComponent;
 
 	UFUNCTION(BlueprintCallable, Category = BaseMagnetic)
-	void triggerMagnetic(FVector direction, float force);
+	void triggerMagnetic(FVector Location, bool bUpdating);
 
 	UFUNCTION(BlueprintCallable, Category = BaseMagnetic)
 	void TriggerMagneticStop();
@@ -93,6 +93,10 @@ public:
 	bool bIgnoreMagnetic;
 
 	UFUNCTION()
+	void UpdateTargetLocation(FVector Location);
+
+
+	UFUNCTION()
 	void SetRotationRate(float Val);
 
 	UFUNCTION()
@@ -107,6 +111,11 @@ public:
 	UFUNCTION()
 	void Reset();
 
+	UFUNCTION()
+	bool IsDestroyed();
+
+	int32 Type;
+
 protected:
 	void Accelerate(float DeltaTime);
 
@@ -118,12 +127,11 @@ protected:
 	float ForceSeconds;
 	float CurrentForceSeconds;
 
-	FVector TargetLocation;
-
 	enum ePulling
 	{
 		NONE = 0,
 		PULLING,
+		PULLING_PLATFORM,
 		FOLLOWING,
 		PUSHING
 	};
@@ -146,4 +154,8 @@ protected:
 
 private:
 	FVector OldTarget;
+	FVector TargetLocation;
+
+	bool bUpdating;
+	bool bSnaped;
 };

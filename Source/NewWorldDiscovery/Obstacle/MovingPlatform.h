@@ -2,11 +2,13 @@
 
 #pragma once
 
+#include "BaseObstacle.h"
+
 #include "GameFramework/Actor.h"
 #include "MovingPlatform.generated.h"
 
 UCLASS()
-class NEWWORLDDISCOVERY_API AMovingPlatform : public AActor
+class NEWWORLDDISCOVERY_API AMovingPlatform : public ABaseObstacle
 {
 	GENERATED_BODY()
 	
@@ -84,6 +86,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = MovingPlatform)
 	void ResetPlatform();
 
+	UFUNCTION()
+	virtual void DestroyMagneticObject() override;
 
 private:
 	uint32 StoringEnergy;
