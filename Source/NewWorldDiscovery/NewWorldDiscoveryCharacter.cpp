@@ -2,11 +2,8 @@
 
 #include "NewWorldDiscovery.h"
 #include "NewWorldDiscoveryCharacter.h"
-
 #include "WorldDiscoveryPlayerState.h"
-
 #include "DrawDebugHelpers.h"
-
 #include "HelperClass.h"
 
 #include "MagneticBox/BaseMagnetic.h"
@@ -15,7 +12,6 @@
 #include "MagneticBox/MagneticEnergyTransfer.h"
 #include "MagneticBox/MagneticShield.h"
 
-#include "PlayerMagnet/PlayerDegree.h"
 #include "PlayerMagnet/Player360Degree.h"
 #include "PlayerMagnet/PlayerXDegree.h"
 
@@ -202,7 +198,15 @@ void ANewWorldDiscoveryCharacter::CreateMagneticBox()
 		box->MagneticMesh->bGenerateOverlapEvents = false;
 		CreatedBoxes.Add(box);
 		box->OnCreate();
+		
+		if (obstacle != nullptr)
+		{
+			obstacle->DestroyMagneticObject();
+			obstacle = nullptr;
+		}
 	}
+
+
 }
 void ANewWorldDiscoveryCharacter::CreateMagneticBall()
 {
@@ -351,17 +355,27 @@ void ANewWorldDiscoveryCharacter::EnableMagnetic()
 		FRotator Rotation = FRotator(0.0f, 0.0f, 0.0f);
 		
 		FVector ActorPos = GetActorLocation();
-		ActorPos.Y += 150.0f;
+		ActorPos.Z += 20.0f;
 
 		playerDegree = GetWorld()->SpawnActor<APlayerDegree>(MagnetAbility, ActorPos, Rotation, SpawnParameters);
 		if (playerDegree)
 		{
 			FVector DegreeLocation = playerDegree->magneticTrigger->RelativeLocation;
-			Radius = FMath::Sqrt(FMath::Pow(DegreeLocation.Z, 2) + FMath::Pow(DegreeLocation.Y, 2));
-
+			Radius = playerDegree->magneticTrigger->GetUnscaledSphereRadius();
+			
 			playerDegree->magneticTrigger->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 			playerDegree->magneticTrigger->bGenerateOverlapEvents = true;
 			playerDegree->magneticWave->Activate();
+			if (playerDegree->bParticleRotation)
+			{
+				APlayerXDegree *degree = Cast<APlayerXDegree>(playerDegree);
+				if (degree)
+				{
+					degree->magneticWaveSingle->Activate();
+				}
+			}
+				
+				
 			TargetLocation = FVector::ZeroVector;
 			playerDegree->parentCharacter = this;
 
@@ -400,20 +414,39 @@ void ANewWorldDiscoveryCharacter::Tick(float DeltaTime)
 	{
 		if (playerDegree)
 		{			
-			playerDegree->SetActorLocation(ActorPos);
+			if (playerDegree->bParticleRotation)
+			{
+				playerDegree->SetActorLocation(ActorPos);
 
-			if (TargetLocation == FVector::ZeroVector)
-				TargetLocation = playerDegree->magneticTrigger->RelativeLocation;
+				if (TargetLocation == FVector::ZeroVector)
+					TargetLocation = playerDegree->magneticTrigger->RelativeLocation;
 
-			if (RotationCurrent != 0.0f)
-			{				
-				FVector newLocation = HelperClass::RotateAround(FVector::ZeroVector, playerDegree->magneticTrigger->RelativeLocation, 0.0f, RotationCurrent * decreasingPower, 1.0f, 1.0f);
-				FVector ForceDirection = (FVector::ZeroVector - newLocation).GetSafeNormal();
-				TargetLocation = -ForceDirection * Radius;
+				if (RotationCurrent != 0.0f)
+				{
+					FVector newLocation = HelperClass::RotateAround(FVector::ZeroVector, playerDegree->magneticTrigger->RelativeLocation, 0.0f, RotationCurrent * decreasingPower, 1.0f, 1.0f);
+					FVector ForceDirection = (FVector::ZeroVector - newLocation).GetSafeNormal();
+					TargetLocation = -ForceDirection * Radius;
+				}
+				playerDegree->magneticTrigger->SetRelativeLocation(TargetLocation);
+
+			}
+			else
+			{
+				FVector newLocation = GetActorLocation();
+				newLocation.Z += 20.0f;
+				playerDegree->SetActorLocation(newLocation);
+
+				FRotator Rot = playerDegree->GetActorRotation();
+				Rot.Roll -= DeltaTime * RotationCurrent * 180.0f;
+				playerDegree->SetActorRotation(Rot);
+
 			}
 
-			//DrawDebugLine(GetWorld(), ActorPos, TargetLocation * 500.0f, FColor(255, 0, 0, 1));
-			playerDegree->magneticTrigger->SetRelativeLocation(TargetLocation);
+			ABaseMagnetic* baseMagnetic = GetActiveObject();
+			if (baseMagnetic)
+			{
+				baseMagnetic->UpdateTargetLocation(playerDegree->magneticTrigger->GetComponentLocation());
+			}
 		}
 	}
 
@@ -440,8 +473,6 @@ void ANewWorldDiscoveryCharacter::Tick(float DeltaTime)
 
 ABaseMagnetic* ANewWorldDiscoveryCharacter::GetActiveObject()
 {
-	UE_LOG(LogTemp,Warning,TEXT("%d"), HoldingObjects.Num());
-
 	if (HoldingObjects.Num() > 0)
 	{
 		return HoldingObjects[0];
@@ -500,4 +531,7 @@ void ANewWorldDiscoveryCharacter::Godmode()
 	bGodmode = !bGodmode;
 }
 
-
+void ANewWorldDiscoveryCharacter::SetCurrentObjectHolder(ABaseObstacle* obstacle)
+{
+	this->obstacle = obstacle;
+}

@@ -3,14 +3,17 @@
 
 #include "MagneticBox/BaseMagnetic.h"
 #include "PlayerMagnet/PlayerDegree.h"
+#include "Obstacle/BaseObstacle.h"
 #include "GameFramework/Character.h"
 #include "NewWorldDiscoveryCharacter.generated.h"
+
 
 UCLASS(config=Game)
 class ANewWorldDiscoveryCharacter : public ACharacter
 {
 	GENERATED_BODY()
 public:
+
 	/** Side view camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
 	class UCameraComponent* SideViewCameraComponent;
@@ -96,6 +99,7 @@ private:
 
 	bool bMagneticEffect;
 
+	ABaseObstacle* obstacle;
 	APlayerDegree* playerDegree;
 	FVector TargetLocation;
 
@@ -125,6 +129,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = MagneticBox)
 	ABaseMagnetic* GetActiveObject();
+
+	UFUNCTION()
+	void SetCurrentObjectHolder(ABaseObstacle* obstacle);
 
 	UFUNCTION(BlueprintCallable, Category = Checkpoint)
 	void SetLastCheckpoint(AActor* Checkpoint);

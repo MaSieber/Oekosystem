@@ -20,18 +20,13 @@ AMovingPlatform::AMovingPlatform()
 	PlatformMesh->bGenerateOverlapEvents = false;
 	PlatformMesh->AttachTo(BaseComponent);
 
-	BoxCollisionTrigger = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxCollisionTrigger"));
-	BoxCollisionTrigger->bGenerateOverlapEvents = true;
-	BoxCollisionTrigger->SetCollisionProfileName("PlatformTrigger");
-
 	PlatformEnergySocketMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PlatformEnergySocketMesh"));
 	PlatformEnergySocketMesh->bGenerateOverlapEvents = false;
 	PlatformEnergySocketMesh->AttachTo(PlatformMesh);
 
-	//doenst work because, 2 blueprints ref to 1 c++ class ?
-	//BoxCollisionTrigger->OnComponentBeginOverlap.AddDynamic(this, &AMovingPlatform::OnOverlapBegin);
-	//BoxCollisionTrigger->OnComponentEndOverlap.AddDynamic(this, &AMovingPlatform::OnOverlapEnd);
-
+	BoxCollisionTrigger = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxCollisionTrigger"));
+	BoxCollisionTrigger->bGenerateOverlapEvents = true;
+	BoxCollisionTrigger->SetCollisionProfileName("PlatformTrigger");
 	BoxCollisionTrigger->AttachTo(PlatformEnergySocketMesh);
 
 	PlatformLineMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PlatformLineMesh"));
@@ -49,6 +44,8 @@ AMovingPlatform::AMovingPlatform()
 	MoveDirection = 1.0f;
 
 	actor = nullptr;
+	MagneticObject = nullptr;
+
 }
 
 // Called when the game starts or when spawned
@@ -64,6 +61,11 @@ void AMovingPlatform::BeginPlay()
 	RelOriginPosition = PlatformMesh->RelativeLocation;
 	OriginDirection = InitialDirection;
 	bOriginActive = bActive;
+
+	if (objectMagnet != nullptr)
+	{
+		objectMagnet->SetActorLocation(PlatformMesh->GetComponentLocation());
+	}
 	
 }
 
@@ -139,8 +141,14 @@ void AMovingPlatform::Tick( float DeltaTime )
 				ActorLocation.Y -= RelLoc.X;
 				ActorLocation.Z += RelLoc.Z;
 				actor->SetActorLocation(ActorLocation);
-				UE_LOG(LogTemp, Warning, TEXT("AcLoc %f %f %f"), ActorLocation.X, ActorLocation.Y, ActorLocation.Z);
-			}			
+			}		
+
+			if (!bStatic && objectMagnet != nullptr)
+			{
+				objectMagnet->SetActorLocation(PlatformMesh->GetComponentLocation());
+			}
+
+
 		}
 		else
 		{
@@ -182,8 +190,53 @@ void AMovingPlatform::OverlapBegin(class AActor* OtherActor, class UPrimitiveCom
 		energyBox->MagneticMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel5, ECollisionResponse::ECR_Ignore);
 		energyBox->SetNewMassScale(20.0f);
 		energyBox->bIgnoreMagnetic = true;
-		
 
+		if (!energyBox->IsDestroyed())
+		{
+			const TArray<UActorComponent*> components = energyBox->GetComponents();
+			if (components.Num() > 0)
+			{
+				UStaticMeshComponent* firstComponent = Cast<UStaticMeshComponent>(components[0]);
+				UStaticMeshComponent* NewComp = ConstructObject<UStaticMeshComponent>(UStaticMeshComponent::StaticClass(), this, TEXT("MyCompName"));
+				if (NewComp)
+				{
+					FVector originScale = energyBox->GetActorScale3D();
+
+					NewComp->RegisterComponent();
+
+					NewComp->SetRelativeScale3D(originScale);
+					NewComp->SetStaticMesh(firstComponent->StaticMesh);
+					int32 numMaterials = firstComponent->GetNumMaterials();
+					for (int32 i = 0; i < numMaterials; i++)
+					{
+						NewComp->SetMaterial(i, firstComponent->GetMaterial(i));
+					}
+
+					NewComp->AttachTo(PlatformEnergySocketMesh, NAME_None, EAttachLocation::SnapToTarget);
+					float offsetZ = 125.0f;
+					if (Type == eTypeDirection::HORIZONTAL)
+						offsetZ = 275.0f;
+
+					NewComp->SetRelativeLocation(FVector(0.0f, 0.0f, offsetZ));
+				}
+
+				AWorldDiscoveryPlayerController* playerController = Cast<AWorldDiscoveryPlayerController>(GetWorld()->GetFirstPlayerController());
+				if (playerController)
+				{
+					ANewWorldDiscoveryCharacter *playerChar = Cast<ANewWorldDiscoveryCharacter>(playerController->GetCharacter());
+					if (playerChar)
+					{
+						playerChar->SetCurrentObjectHolder((ABaseObstacle*)this);
+					}
+				}
+
+				MagneticObject = NewComp;
+			}
+
+			energyBox->TriggerDestroy(true);
+		}
+
+		
 		TriggerPlatform(true);
 	}
 }
@@ -202,3 +255,10 @@ void AMovingPlatform::OverlapEnd(class AActor* OtherActor, class UPrimitiveCompo
 	}
 }
 
+
+void AMovingPlatform::DestroyMagneticObject()
+{
+	TriggerPlatform(false);
+
+	Super::DestroyMagneticObject();
+}

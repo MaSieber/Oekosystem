@@ -20,7 +20,11 @@ APlayerXDegree::APlayerXDegree() : Super()
 
 	magneticWaveSingle = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("WaveParticleSingle"));
 	magneticWaveSingle->AttachTo(waveSceneComponent);
-	
+
+	magnetismusComponent = CreateDefaultSubobject<UChildActorComponent>(TEXT("WaveMagnetismusComponent"));
+	magnetismusComponent->AttachTo(waveSceneComponent);
+
+	magneticTrigger->AttachTo(magnetismusComponent);
 
 }
 
