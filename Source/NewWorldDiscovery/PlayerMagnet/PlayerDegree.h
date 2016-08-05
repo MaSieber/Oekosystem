@@ -32,7 +32,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = BaseMagnetic)
 	ACharacter* parentCharacter;
 
-private:
-	float RotationRate;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Degree)
+	bool bParticleRotation;
+
 
 };

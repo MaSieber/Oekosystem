@@ -28,5 +28,6 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = DegreeX)
 	UParticleSystemComponent* magneticWaveSingle;
 
-	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = DegreeX)
+	UChildActorComponent* magnetismusComponent;
 };
