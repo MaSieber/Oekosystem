@@ -230,7 +230,7 @@ void AMovingPlatform::OverlapBegin(class AActor* OtherActor, class UPrimitiveCom
 					UE_LOG(LogTemp, Warning, TEXT("After AttachTo"));
 					float offsetZ = 125.0f;
 					if (Type == eTypeDirection::HORIZONTAL)
-						offsetZ = 275.0f;
+						offsetZ = 112.0f;
 
 					NewComp->SetRelativeLocation(FVector(0.0f, 0.0f, offsetZ));
 				}
