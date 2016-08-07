@@ -51,7 +51,7 @@ void APickupRoboterPart::OnOverlapBegin(class AActor* OtherActor, class UPrimiti
 		AWorldDiscoveryPlayerState * playerState = (AWorldDiscoveryPlayerState*)playerChar->PlayerState;
 		if (playerState != nullptr)
 		{
-			playerState->AddRoboPart((int32)AWorldDiscoveryPlayerState::eRoboParts::HEAD);
+			playerState->AddRoboPart((int32)RoboPartType);
 			K2_DestroyActor();
 
 		}
