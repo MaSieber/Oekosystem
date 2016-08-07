@@ -3,6 +3,7 @@
 #pragma once
 
 #include "../BaseMagnetic.h"
+#include "RobopartSpawn.h"
 
 #include "GameFramework/Actor.h"
 #include "BaseRoboPart.generated.h"
@@ -22,6 +23,7 @@ public:
 	// Called every frame
 	virtual void Tick( float DeltaSeconds ) override;
 
-	
-	
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = BaseRoboParts)
+	USceneComponent* BaseComponent;
+
 };
