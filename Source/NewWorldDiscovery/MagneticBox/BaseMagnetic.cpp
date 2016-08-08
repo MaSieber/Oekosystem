@@ -332,7 +332,11 @@ void ABaseMagnetic::OnOverlap(class AActor* actor,bool bState)
 	}
 	else
 	{
-		TriggerMagneticStop();
+		AObjectMagnet *magnet = Cast<AObjectMagnet>(actor);
+		if (magnet)
+		{
+			TriggerMagneticStop();
+		}
 	}
 }
 

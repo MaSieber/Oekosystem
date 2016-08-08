@@ -1,10 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "../../WorldDiscoveryPlayerState.h"
+
 
 #include "NewWorldDiscovery.h"
 #include "RobopartSpawn.h"
 
+#include "../../WorldDiscoveryPlayerState.h"
 
 // Sets default values
 ARobopartSpawn::ARobopartSpawn()
@@ -55,8 +56,10 @@ void ARobopartSpawn::OnOverlapBegin(class AActor* OtherActor, class UPrimitiveCo
 		RoboPart = GetWorld()->SpawnActor<ABaseRoboPart>(SpawnRoboPart, ActorPos, Rotation, SpawnParameters);
 		if (RoboPart)
 		{
-			RoboPart->MagneticMesh->SetSimulatePhysics(false);
+			RoboPart->MagneticMesh->bGenerateOverlapEvents = true;
+			RoboPart->MagneticMesh->SetSimulatePhysics(true);
 			RoboPart->MagneticMesh->SetEnableGravity(false);
+
 		}
 	}
 }

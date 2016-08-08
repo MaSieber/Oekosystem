@@ -3,6 +3,8 @@
 #include "NewWorldDiscovery.h"
 #include "Switch.h"
 
+#include "../WorldDiscoveryPlayerController.h"
+#include "../NewWorldDiscoveryCharacter.h"
 
 // Sets default values
 ASwitch::ASwitch()

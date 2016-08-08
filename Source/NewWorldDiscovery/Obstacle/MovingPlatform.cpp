@@ -3,6 +3,9 @@
 #include "NewWorldDiscovery.h"
 #include "MovingPlatform.h"
 
+
+#include "../WorldDiscoveryPlayerController.h"
+#include "../NewWorldDiscoveryCharacter.h"
 #include "MagneticBox/MagneticBox.h"
 
 // Sets default values
