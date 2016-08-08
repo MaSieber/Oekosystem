@@ -32,5 +32,18 @@ public:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = PickupRoboterPart)
 	UStaticMeshComponent *RoboPartMesh;
 
+	UENUM(BlueprintType)
+	enum class ERoboterPart : uint8
+	{
+		NONE = 0,
+		HEAD = 1,
+		ARM_LEFT = 2,
+		ARM_RIGHT = 4,
+		LEG_LEFT = 8,
+		LEG_RIGHT = 16
+	};
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PickupRoboterPart)
+	ERoboterPart RoboPartType;
 	
 };

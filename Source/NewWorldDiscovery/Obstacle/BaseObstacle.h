@@ -4,10 +4,6 @@
 
 #include "../ObjectMagnet/ObjectMagnet.h"
 
-
-#include "../WorldDiscoveryPlayerController.h"
-#include "../NewWorldDiscoveryCharacter.h"
-
 #include "GameFramework/Actor.h"
 #include "BaseObstacle.generated.h"
 

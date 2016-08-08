@@ -352,8 +352,14 @@ void ANewWorldDiscoveryCharacter::EnableMagnetic()
 		FActorSpawnParameters SpawnParameters = FActorSpawnParameters();
 		SpawnParameters.bNoFail = true;
 		SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+		float direction = 1.0f;
+		FVector forward = this->GetActorForwardVector();
+		direction = forward.Y <= 0 ? -1.0f : 1.0f;
+
+
 		FRotator Rotation = FRotator(0.0f, 0.0f, 0.0f);
-		
+		Rotation.Roll = 90.0f + 70.0f * direction;
 		FVector ActorPos = GetActorLocation();
 		ActorPos.Z += 20.0f;
 
@@ -374,7 +380,6 @@ void ANewWorldDiscoveryCharacter::EnableMagnetic()
 					degree->magneticWaveSingle->Activate();
 				}
 			}
-				
 				
 			TargetLocation = FVector::ZeroVector;
 			playerDegree->parentCharacter = this;
