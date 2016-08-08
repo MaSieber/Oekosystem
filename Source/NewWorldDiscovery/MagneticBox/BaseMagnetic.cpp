@@ -333,7 +333,7 @@ void ABaseMagnetic::OnOverlap(class AActor* actor,bool bState)
 	else
 	{
 		AObjectMagnet *magnet = Cast<AObjectMagnet>(actor);
-		if (magnet)
+		if (magnet && parentCharacter == nullptr)
 		{
 			TriggerMagneticStop();
 		}
