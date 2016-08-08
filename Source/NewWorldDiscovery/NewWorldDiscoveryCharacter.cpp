@@ -170,6 +170,13 @@ bool ANewWorldDiscoveryCharacter::RemoveEnergy()
 */
 void ANewWorldDiscoveryCharacter::CreateMagneticBox()
 {
+	AWorldDiscoveryPlayerState * playerState = (AWorldDiscoveryPlayerState*)this->PlayerState;
+	if (playerState != nullptr)
+	{
+		if (!playerState->HasBoxAbility())
+			return;
+	}
+
 	FVector SpawnLocation = GetSpawnLocation();
 	if (!IsSpawnPossible(GetActorLocation(), SpawnLocation))
 		return;
@@ -210,6 +217,13 @@ void ANewWorldDiscoveryCharacter::CreateMagneticBox()
 }
 void ANewWorldDiscoveryCharacter::CreateMagneticBall()
 {
+	AWorldDiscoveryPlayerState * playerState = (AWorldDiscoveryPlayerState*)this->PlayerState;
+	if (playerState != nullptr)
+	{
+		if (!playerState->HasBallAbility())
+			return;
+	}
+
 	FVector SpawnLocation = GetSpawnLocation();
 	if (!IsSpawnPossible(GetActorLocation(), SpawnLocation))
 		return;
@@ -243,6 +257,13 @@ void ANewWorldDiscoveryCharacter::CreateMagneticBall()
 }
 void ANewWorldDiscoveryCharacter::CreateMagneticShields()
 {
+	AWorldDiscoveryPlayerState * playerState = (AWorldDiscoveryPlayerState*)this->PlayerState;
+	if (playerState != nullptr)
+	{
+		if (!playerState->HasShieldAbility())
+			return;
+	}
+
 	FVector SpawnLocation = GetSpawnLocation();
 	if (!IsSpawnPossible(GetActorLocation(), SpawnLocation))
 		return;

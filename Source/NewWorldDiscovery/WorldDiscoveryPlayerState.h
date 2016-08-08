@@ -33,6 +33,18 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Player)
 	void RemoveRessource(int32 ressource);
 
+	UFUNCTION(BlueprintCallable, Category = Player)
+	void AddAbility(int32 ability);
+
+	UFUNCTION(BlueprintCallable, Category = Player)
+	bool HasBallAbility();
+
+	UFUNCTION(BlueprintCallable, Category = Player)
+	bool HasBoxAbility();
+
+	UFUNCTION(BlueprintCallable, Category = Player)
+	bool HasShieldAbility();
+
 	UENUM(BlueprintType)
 	enum class eRoboParts : uint8
 	{
@@ -58,5 +70,6 @@ private:
 
 	int32 CollectedParts;
 
+	int32 Abilitys;
 	
 };
