@@ -29,10 +29,14 @@ public:
 	void SpawnMagnet();
 
 	UFUNCTION()
+	void SpawnMagnet2();
+
+	UFUNCTION()
 	virtual void DestroyMagneticObject();
 	
 protected:
 	AObjectMagnet* objectMagnet;
+	AObjectMagnet* objectMagnet2;
 	bool bMagneticEffect;
 	bool bStatic;
 	UStaticMeshComponent* MagneticObject;

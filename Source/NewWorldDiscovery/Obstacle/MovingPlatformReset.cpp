@@ -48,7 +48,7 @@ void AMovingPlatformReset::Reset()
 	
 	for (AMovingPlatform* platform : Platforms)
 	{
-		platform->ResetPlatform();
+		platform->ResetPlatform(false);
 	}
 }
 
