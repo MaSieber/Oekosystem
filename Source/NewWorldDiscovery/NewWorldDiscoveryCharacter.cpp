@@ -309,10 +309,12 @@ bool ANewWorldDiscoveryCharacter::IsSpawnPossible(FVector startLocation,FVector 
 
 void ANewWorldDiscoveryCharacter::RotateAround(float Value)
 {
-	if (Value > 0.0f)	//Always same speed
-		Value = 1.0f;
-	else if (Value < 0.0f)
-		Value = -1.0f;
+	//if (Value > 0.0f)	//Always same speed
+	//	Value = 1.0f;
+	//else if (Value < 0.0f)
+	//	Value = -1.0f;
+
+	Value = FMath::Clamp(Value,-1.0f,1.0f);
 
 	OnRotateAround(Value);
 

@@ -11,6 +11,7 @@ ABaseObstacle::ABaseObstacle()
 	PrimaryActorTick.bCanEverTick = true;
 
 	objectMagnet = nullptr;
+	objectMagnet2 = nullptr;
 	bStatic = false;
 	MagneticObject = nullptr;
 	IsDestroyed = true;
@@ -23,6 +24,7 @@ void ABaseObstacle::BeginPlay()
 	Super::BeginPlay();
 
 	SpawnMagnet();
+	SpawnMagnet2();
 	
 }
 
@@ -69,6 +71,28 @@ void ABaseObstacle::SpawnMagnet()
 			objectMagnet->magneticTrigger->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 			objectMagnet->magneticTrigger->bGenerateOverlapEvents = true;
 			objectMagnet->magneticWave->Activate();
+			bMagneticEffect = true;
+		}
+	}
+}
+
+void ABaseObstacle::SpawnMagnet2()
+{
+	if (MagnetAbility)
+	{
+		FActorSpawnParameters SpawnParameters = FActorSpawnParameters();
+		SpawnParameters.bNoFail = true;
+		SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		FRotator Rotation = FRotator(0.0f, 0.0f, 0.0f);
+
+		FVector ActorPos = GetActorLocation();
+
+		objectMagnet2 = GetWorld()->SpawnActor<AObjectMagnet>(MagnetAbility, ActorPos, Rotation, SpawnParameters);
+		if (objectMagnet2)
+		{
+			objectMagnet2->magneticTrigger->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+			objectMagnet2->magneticTrigger->bGenerateOverlapEvents = true;
+			objectMagnet2->magneticWave->Activate();
 			bMagneticEffect = true;
 		}
 	}

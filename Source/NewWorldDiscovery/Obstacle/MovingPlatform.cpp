@@ -27,10 +27,19 @@ AMovingPlatform::AMovingPlatform()
 	PlatformEnergySocketMesh->bGenerateOverlapEvents = false;
 	PlatformEnergySocketMesh->AttachTo(PlatformMesh);
 
+	PlatformEnergySocketMeshRight = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PlatformEnergySocketMesh2"));
+	PlatformEnergySocketMeshRight->bGenerateOverlapEvents = false;
+	PlatformEnergySocketMeshRight->AttachTo(PlatformMesh);
+
 	BoxCollisionTrigger = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxCollisionTrigger"));
 	BoxCollisionTrigger->bGenerateOverlapEvents = true;
 	BoxCollisionTrigger->SetCollisionProfileName("PlatformTrigger");
 	BoxCollisionTrigger->AttachTo(PlatformEnergySocketMesh);
+
+	BoxCollisionTrigger2 = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxCollisionTrigger2"));
+	BoxCollisionTrigger2->bGenerateOverlapEvents = true;
+	BoxCollisionTrigger2->SetCollisionProfileName("PlatformTrigger");
+	BoxCollisionTrigger2->AttachTo(PlatformEnergySocketMeshRight);
 
 	PlatformLineMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PlatformLineMesh"));
 	PlatformLineMesh->bGenerateOverlapEvents = false;
@@ -49,6 +58,8 @@ AMovingPlatform::AMovingPlatform()
 	actor = nullptr;
 	MagneticObject = nullptr;
 
+	bStarted = false;
+
 }
 
 // Called when the game starts or when spawned
@@ -56,10 +67,14 @@ void AMovingPlatform::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	if ((Type == eTypeDirection::HORIZONTAL && InitialDirection == eInitialDirection::END) || (Type == eTypeDirection::VERTICAL && InitialDirection == eInitialDirection::START))
+	if ((Type == eTypeDirection::HORIZONTAL && InitialDirection == eInitialDirection::END) || (Type == eTypeDirection::VERTICAL && InitialDirection == eInitialDirection::END))
 		MoveDirection = -1.0f;
 	else
 		MoveDirection = 1.0f;
+
+	StartDirection = MoveDirection;
+
+	UE_LOG(LogTemp, Warning, TEXT("Begin Play Platform %f %f"), StartDirection, MoveDirection);
 
 	RelOriginPosition = PlatformMesh->RelativeLocation;
 	OriginDirection = InitialDirection;
@@ -68,16 +83,45 @@ void AMovingPlatform::BeginPlay()
 	if (objectMagnet != nullptr)
 	{
 		objectMagnet->SetActorLocation(PlatformEnergySocketMesh->GetComponentLocation());
+		objectMagnet2->SetActorLocation(PlatformEnergySocketMeshRight->GetComponentLocation());
 	}
 	
 }
 
-void AMovingPlatform::ResetPlatform()
+void AMovingPlatform::ResetPlatform(bool bInstant)
 {
+	if (!bStarted)
+		return;
+
 	CurrentVelocity = 0.0f;
-	PlatformMesh->SetRelativeLocation(RelOriginPosition);
-	InitialDirection = OriginDirection;
-	bActive = bOriginActive;
+
+	if (bRestAnim == true)
+		return;
+
+	if (bInstant)
+	{
+		PlatformMesh->RelativeLocation = RelOriginPosition;
+		bActive = bOriginActive;
+		InitialDirection = OriginDirection;
+	}
+	else
+	{
+		float dist = FVector::Dist(RelOriginPosition,PlatformMesh->RelativeLocation);
+		UE_LOG(LogTemp, Warning, TEXT("Dist %f"), dist);
+		if (dist >= 2.0f)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Start Platform %f %f"), StartDirection, MoveDirection);
+
+			if (StartDirection == 1.0f)
+				MoveDirection = -1.0f;
+			if (StartDirection == -1.0f)
+				MoveDirection = 1.0f;
+
+			UE_LOG(LogTemp, Warning, TEXT("Start Platform %f %f"), StartDirection, MoveDirection);
+		}
+		bRestAnim = true;
+		bActive = true;
+	}	
 }
 
 //ToDo: Write generell Acceleration/Movement-Helper Class
@@ -111,6 +155,7 @@ void AMovingPlatform::Tick( float DeltaTime )
 			FVector End = LineLocationVector;
 			FVector Start = FVector::ZeroVector;
 			
+
 
 			if (Type == eTypeDirection::HORIZONTAL)
 			{
@@ -170,13 +215,24 @@ void AMovingPlatform::DirectionSwitch(float current,float start, float end)
 		MoveDirection = 1.0f;
 
 	if (oldDirection != MoveDirection)
+	{
 		CurrentVelocity = 0.0f;
+		if (bRestAnim)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Stop Platform"));
+			bRestAnim = false;
+			bActive = false;
+			return;
+		}
+	}
+		
 }
 
 void AMovingPlatform::TriggerPlatform(bool bActiveState)
 {
 	OnTriggerPlatform(bActiveState);
 	this->bActive = bActiveState;
+	bStarted = true;
 }
 
 void AMovingPlatform::SetStoringEnergy(uint32 energy)
@@ -186,6 +242,8 @@ void AMovingPlatform::SetStoringEnergy(uint32 energy)
 
 void AMovingPlatform::OverlapBegin(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	UE_LOG(LogTemp, Warning, TEXT("Overlapping"));
+
 	AMagneticBox *energyBox = Cast<AMagneticBox>(OtherActor);
 	if (energyBox)
 	{
