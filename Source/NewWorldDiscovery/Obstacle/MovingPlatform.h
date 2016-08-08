@@ -72,7 +72,13 @@ public:
 	UStaticMeshComponent* PlatformEnergySocketMesh;
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = MovingPlatform)
+	UStaticMeshComponent* PlatformEnergySocketMeshRight;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = MovingPlatform)
 	UBoxComponent* BoxCollisionTrigger;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = MovingPlatform)
+	UBoxComponent* BoxCollisionTrigger2;
 
 	UFUNCTION(BlueprintCallable, Category = MovingPlatform)
 	void TriggerPlatform(bool bActiveState);
@@ -84,7 +90,7 @@ public:
 	void SetStoringEnergy(uint32 energy);
 
 	UFUNCTION(BlueprintCallable, Category = MovingPlatform)
-	void ResetPlatform();
+	void ResetPlatform(bool bInstant);
 
 	UFUNCTION()
 	virtual void DestroyMagneticObject() override;
@@ -95,6 +101,7 @@ private:
 
 	void Accelerate(float DeltaTime);
 
+	float StartDirection;
 	float MoveDirection;
 
 	void DirectionSwitch(float current, float start, float end);
@@ -104,5 +111,8 @@ private:
 	bool bOriginActive;
 
 	AActor *actor;
+
+	bool bRestAnim;
+	bool bStarted;
 	
 };
