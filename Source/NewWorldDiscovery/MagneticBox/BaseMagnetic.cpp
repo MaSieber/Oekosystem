@@ -205,9 +205,8 @@ void ABaseMagnetic::Tick(float DeltaTime)
 			FVector PlayerPos = playerChar->GetActorLocation();
 
 			FVector PushDirection = -1.0f * (PlayerPos - ActorPos).GetSafeNormal();
-
+			PushDirection.X = 0.0f;
 			MagneticMesh->AddImpulseAtLocation(PushDirection * PushAmount, GetActorLocation());
-
 			PullingType = ePulling::NONE;
 
 			break;
@@ -230,6 +229,24 @@ void ABaseMagnetic::Tick(float DeltaTime)
 		SetActorRotation(rot);
 	}
 
+
+
+	FVector velocity = magneticMovement->Velocity;
+	if (ActorPos.X != OriginLocation.X)
+	{
+		float absDist = FMath::Abs(ActorPos.X - OriginLocation.X);
+		if (absDist <= 0.1f)
+			velocity.X = 0.0f;
+		else
+		{
+			velocity.X = OriginLocation.X - ActorPos.X;
+		}
+	}
+	else
+	{
+		velocity.X = 0.0f;
+	}
+	magneticMovement->Velocity = velocity;
 
 }
 

@@ -18,46 +18,10 @@ void AMagneticBox::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UE_LOG(LogTemp,Warning,TEXT("BeginPlay - MagneticBox"));
-
-	if (MagneticMesh->IsSimulatingPhysics())
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Physic Enabled"));
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Physic Disabled"));
-	}
-
-	if (MagneticMesh->IsGravityEnabled())
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Gravity Enabled"));
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Gravity Disabled"));
-	}
-
-	if (MagneticMesh->bGenerateOverlapEvents)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Overlap Enabled"));
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Overlap Disabled"));
-	}
-
-	UE_LOG(LogTemp, Warning, TEXT("%s"), *MagneticMesh->GetCollisionProfileName().ToString());
 }
 
 void AMagneticBox::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	//Todo: better solution: workaround
-	if (bForceShit == true)
-	{
-		MagneticMesh->SetSimulatePhysics(false);
-		MagneticMesh->SetEnableGravity(false);
-	}
 }
