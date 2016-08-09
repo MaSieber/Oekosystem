@@ -64,6 +64,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Ability)
 	TSubclassOf<class APlayerDegree> MagnetAbility;
 
+	UFUNCTION(BlueprintImplementableEvent, Category = BaseMagneticEvent)
+	void OnCreate();
+
 protected:
 
 	/** Called for side to side input */

@@ -220,6 +220,7 @@ void ANewWorldDiscoveryCharacter::CreateMagneticBox()
 		box->MagneticMesh->SetCollisionProfileName("MagneticBox");
 		box->bForceShit = false;
 		CreatedBoxes.Add(box);
+		OnCreate();
 		box->OnCreate();
 		
 		if (obstacle != nullptr)
@@ -272,6 +273,7 @@ void ANewWorldDiscoveryCharacter::CreateMagneticBall()
 		ball->bForceShit = false;
 		ball->MagneticMesh->SetCollisionProfileName("MagneticBox");
 		CreatedBalls.Add(ball);
+		OnCreate();
 		ball->OnCreate();
 	}
 		
@@ -316,6 +318,7 @@ void ANewWorldDiscoveryCharacter::CreateMagneticShields()
 		pyramide->MagneticMesh->SetCollisionProfileName("MagneticBox");
 		pyramide->bForceShit = false;
 		CreatedShields.Add(pyramide);
+		OnCreate();
 		pyramide->OnCreate();
 	}
 }
