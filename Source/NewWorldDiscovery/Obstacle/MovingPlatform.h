@@ -23,10 +23,10 @@ public:
 	virtual void Tick( float DeltaSeconds ) override;
 
 	UFUNCTION(BlueprintCallable, Category = MovingPlatform)
-	void OverlapBegin(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	void OverlapBegin(int32 Collider, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	UFUNCTION(BlueprintCallable, Category = MovingPlatform)
-	void OverlapEnd(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+	void OverlapEnd(int32 Collider, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 	UENUM(BlueprintType)
 	enum class eTypeDirection : uint8
@@ -105,12 +105,16 @@ private:
 	float MoveDirection;
 
 	void DirectionSwitch(float current, float start, float end);
+	void SpawnChildActor(AActor* box);
+	void EnablePlatform();
 
 	FVector RelOriginPosition;
 	eInitialDirection OriginDirection;
 	bool bOriginActive;
 
 	AActor *actor;
+	AActor *CollisionActor;
+	int32 ColliderType;
 
 	bool bRestAnim;
 	bool bStarted;

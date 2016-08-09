@@ -25,6 +25,18 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Ability)
 	TSubclassOf<class AObjectMagnet> MagnetAbility;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Ability)
+	TSubclassOf<class AActor> ObjectToSnap;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Ability)
+	bool bLeftActive;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Ability)
+	bool bRightActive;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Ability)
+	int SnapDelay;
+
 	UFUNCTION()
 	void SpawnMagnet();
 
@@ -34,13 +46,18 @@ public:
 	UFUNCTION()
 	virtual void DestroyMagneticObject();
 	
+
+
 protected:
 	AObjectMagnet* objectMagnet;
 	AObjectMagnet* objectMagnet2;
 	bool bMagneticEffect;
 	bool bStatic;
-	UStaticMeshComponent* MagneticObject;
+
+	UChildActorComponent* MagneticObject;
+
 	bool IsDestroyed;
+	bool bSnapDelay;
 
 private:
 	bool bBeginDestroy;

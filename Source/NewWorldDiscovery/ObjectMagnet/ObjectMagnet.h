@@ -20,13 +20,16 @@ public:
 	// Called every frame
 	virtual void Tick( float DeltaSeconds ) override;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = ObjectMagnet)
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = ObjectMagnet)
 	USceneComponent* SceneComponent;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = ObjectMagnet)
-	USphereComponent* magneticTrigger;
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = ObjectMagnet)
+	UStaticMeshComponent* magneticTrigger;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = ObjectMagnet)
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = ObjectMagnet)
+	UStaticMeshComponent* UnrealFickDich;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = ObjectMagnet)
 	UParticleSystemComponent* magneticWave;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = ObjectMagnet)
@@ -35,6 +38,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = ObjectMagnet)
 	float PullingVelocity;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = ObjectMagnet)
 	float Radius;
 	
 

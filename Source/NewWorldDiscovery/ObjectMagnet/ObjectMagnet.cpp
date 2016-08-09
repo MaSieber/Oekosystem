@@ -13,25 +13,29 @@ AObjectMagnet::AObjectMagnet()
 	SceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("SceneComponent"));
 	RootComponent = SceneComponent;
 
-	magneticTrigger = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComponent"));
+	magneticTrigger = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("CollisionTrigger"));
 	magneticTrigger->bGenerateOverlapEvents = false;
 	magneticTrigger->SetSimulatePhysics(false);
-	magneticTrigger->SetCollisionProfileName("ObjectMagnetTrigger");
+	magneticTrigger->SetCollisionProfileName("ObjectMagnet");
 	magneticTrigger->AttachTo(SceneComponent);
+
+	UnrealFickDich = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("CollisionTrigger2"));
+	UnrealFickDich->bGenerateOverlapEvents = false;
+	UnrealFickDich->SetSimulatePhysics(false);
+	UnrealFickDich->SetCollisionProfileName("ObjectMagnet");
+	UnrealFickDich->AttachTo(SceneComponent);
 
 	magneticWave = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("WaveParticle"));
 	magneticWave->AttachTo(magneticTrigger);
 
 	PullingVelocity = 500.0f;
-
+	Radius = 200.0f;
 }
 
 // Called when the game starts or when spawned
 void AObjectMagnet::BeginPlay()
 {
 	Super::BeginPlay();
-
-	Radius = magneticTrigger->GetUnscaledSphereRadius() + 55.0f;
 	
 }
 

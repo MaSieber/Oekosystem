@@ -115,6 +115,7 @@ public:
 	bool IsDestroyed();
 
 	int32 Type;
+	bool bForceShit;
 
 protected:
 	void Accelerate(float DeltaTime);
@@ -149,8 +150,9 @@ protected:
 	FRotator OriginRotation;
 
 	bool bStop;
-
 	int counter;
+
+	
 
 private:
 	FVector OldTarget;

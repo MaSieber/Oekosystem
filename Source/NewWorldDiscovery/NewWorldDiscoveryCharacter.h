@@ -154,6 +154,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Reset)
 	void Reset();
 
+	UFUNCTION(BlueprintCallable, Category = Reset)
+	void CheatEnableAllAbilitys();
+
 	UFUNCTION()
 	void DoDamage();
 

@@ -21,10 +21,10 @@ ABaseMagnetic::ABaseMagnetic()
 	MagneticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MagneticMesh"));
 	MagneticMesh->bGenerateOverlapEvents = false;
 	MagneticMesh->bMultiBodyOverlap = true;
-	MagneticMesh->SetCollisionProfileName("MagneticBox");
+	MagneticMesh->SetCollisionProfileName("NoCollision");
 	MagneticMesh->OnComponentBeginOverlap.AddDynamic(this, &ABaseMagnetic::OnOverlapBegin);
 	MagneticMesh->OnComponentEndOverlap.AddDynamic(this, &ABaseMagnetic::OnOverlapEnd);
-	MagneticMesh->SetSimulatePhysics(true);
+	MagneticMesh->SetSimulatePhysics(false);
 
 	RootComponent = MagneticMesh;
 
@@ -64,16 +64,63 @@ ABaseMagnetic::ABaseMagnetic()
 	bUpdating = false;
 	Type = 0;
 
+	bForceShit = true;
+
+	UE_LOG(LogTemp, Warning, TEXT("Construct - BaseMagnetic"));
+
+	if (MagneticMesh->IsSimulatingPhysics())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Physic Enabled"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Physic Disabled"));
+	}
+
+	if (MagneticMesh->IsGravityEnabled())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Gravity Enabled"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Gravity Disabled"));
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("%s"), *MagneticMesh->GetCollisionProfileName().ToString());
+
 }
 
 void ABaseMagnetic::BeginPlay()
 {
 	Super::BeginPlay();
 
+	UE_LOG(LogTemp, Warning, TEXT("BeginPlay - BaseMagnetic"));
+
 	StaticXPos = GetActorLocation().X;
 
 	OriginLocation = GetActorLocation();
 	OriginRotation = GetActorRotation();
+
+
+	if (MagneticMesh->IsSimulatingPhysics())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Physic Enabled"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Physic Disabled"));
+	}
+
+	if (MagneticMesh->IsGravityEnabled())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Gravity Enabled"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Gravity Disabled"));
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("%s"), *MagneticMesh->GetCollisionProfileName().ToString());
 }
 
 void ABaseMagnetic::SetRotationRate(float Value)
@@ -292,7 +339,7 @@ void ABaseMagnetic::OnOverlap(class AActor* actor,bool bState)
 			if (magnet && Type == 1)
 			{
 				UE_LOG(LogTemp,Warning,TEXT("ObjectMagnet"));
-				TargetLocation = magnet->magneticTrigger->GetComponentLocation();
+				TargetLocation = magnet->UnrealFickDich->GetComponentLocation();
 				UE_LOG(LogTemp, Warning, TEXT("ObjectMagnet Actor z:%f,target x: %f y: %f z: %f"), GetActorLocation().Z,TargetLocation.X, TargetLocation.Y, TargetLocation.Z);
 				if (GetActorLocation().Z > TargetLocation.Z) //critical test
 				{
