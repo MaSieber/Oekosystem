@@ -17,6 +17,7 @@ AMagneticBox::AMagneticBox()
 void AMagneticBox::BeginPlay()
 {
 	Super::BeginPlay();
+
 }
 
 void AMagneticBox::Tick(float DeltaTime)

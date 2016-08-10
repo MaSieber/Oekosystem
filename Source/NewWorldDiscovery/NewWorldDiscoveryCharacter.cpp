@@ -2,6 +2,7 @@
 
 #include "NewWorldDiscovery.h"
 #include "NewWorldDiscoveryCharacter.h"
+#include "WorldDiscoveryPlayerController.h"
 #include "WorldDiscoveryPlayerState.h"
 #include "DrawDebugHelpers.h"
 #include "HelperClass.h"
@@ -88,8 +89,19 @@ void ANewWorldDiscoveryCharacter::SetupPlayerInputComponent(class UInputComponen
 
 	InputComponent->BindAction("Reset", IE_Pressed, this, &ANewWorldDiscoveryCharacter::Reset);
 
+	InputComponent->BindAction("EnableAbilitys", IE_Pressed, this, &ANewWorldDiscoveryCharacter::CheatEnableAllAbilitys);
+
 	InputComponent->BindTouch(IE_Pressed, this, &ANewWorldDiscoveryCharacter::TouchStarted);
 	InputComponent->BindTouch(IE_Released, this, &ANewWorldDiscoveryCharacter::TouchStopped);
+}
+
+void ANewWorldDiscoveryCharacter::CheatEnableAllAbilitys()
+{
+	AWorldDiscoveryPlayerState * playerState = (AWorldDiscoveryPlayerState*)this->PlayerState;
+	if (playerState != nullptr)
+	{
+		playerState->AddAbility(7);
+	}
 }
 
 void ANewWorldDiscoveryCharacter::Reset()
@@ -170,6 +182,13 @@ bool ANewWorldDiscoveryCharacter::RemoveEnergy()
 */
 void ANewWorldDiscoveryCharacter::CreateMagneticBox()
 {
+	AWorldDiscoveryPlayerState * playerState = (AWorldDiscoveryPlayerState*)this->PlayerState;
+	if (playerState != nullptr)
+	{
+		if (!playerState->HasBoxAbility())
+			return;
+	}
+
 	FVector SpawnLocation = GetSpawnLocation();
 	if (!IsSpawnPossible(GetActorLocation(), SpawnLocation))
 		return;
@@ -194,9 +213,15 @@ void ANewWorldDiscoveryCharacter::CreateMagneticBox()
 	ABaseMagnetic *box = GetWorld()->SpawnActor<ABaseMagnetic>(MagneticBox,SpawnLocation, Rotation, SpawnParameters);
 	if (box)
 	{ 
+		box->bIgnoreMagnetic = false;
 		box->MagneticMesh->SetSimulatePhysics(false);
+		box->MagneticMesh->SetEnableGravity(true);
 		box->MagneticMesh->bGenerateOverlapEvents = false;
+		box->MagneticMesh->bMultiBodyOverlap = true;
+		box->MagneticMesh->SetCollisionProfileName("MagneticBox");
+		box->bForceShit = false;
 		CreatedBoxes.Add(box);
+		OnCreate();
 		box->OnCreate();
 		
 		if (obstacle != nullptr)
@@ -210,6 +235,13 @@ void ANewWorldDiscoveryCharacter::CreateMagneticBox()
 }
 void ANewWorldDiscoveryCharacter::CreateMagneticBall()
 {
+	AWorldDiscoveryPlayerState * playerState = (AWorldDiscoveryPlayerState*)this->PlayerState;
+	if (playerState != nullptr)
+	{
+		if (!playerState->HasBallAbility())
+			return;
+	}
+
 	FVector SpawnLocation = GetSpawnLocation();
 	if (!IsSpawnPossible(GetActorLocation(), SpawnLocation))
 		return;
@@ -234,15 +266,28 @@ void ANewWorldDiscoveryCharacter::CreateMagneticBall()
 	ABaseMagnetic *ball = GetWorld()->SpawnActor<ABaseMagnetic>(MagneticBall, SpawnLocation, Rotation, SpawnParameters);
 	if (ball)
 	{
+		ball->bIgnoreMagnetic = false;
 		ball->MagneticMesh->SetSimulatePhysics(false);
+		ball->MagneticMesh->SetEnableGravity(true);
 		ball->MagneticMesh->bGenerateOverlapEvents = false;
+		ball->MagneticMesh->bMultiBodyOverlap = true;
+		ball->bForceShit = false;
+		ball->MagneticMesh->SetCollisionProfileName("MagneticBox");
 		CreatedBalls.Add(ball);
+		OnCreate();
 		ball->OnCreate();
 	}
 		
 }
 void ANewWorldDiscoveryCharacter::CreateMagneticShields()
 {
+	AWorldDiscoveryPlayerState * playerState = (AWorldDiscoveryPlayerState*)this->PlayerState;
+	if (playerState != nullptr)
+	{
+		if (!playerState->HasShieldAbility())
+			return;
+	}
+
 	FVector SpawnLocation = GetSpawnLocation();
 	if (!IsSpawnPossible(GetActorLocation(), SpawnLocation))
 		return;
@@ -266,9 +311,15 @@ void ANewWorldDiscoveryCharacter::CreateMagneticShields()
 	ABaseMagnetic *pyramide = GetWorld()->SpawnActor<ABaseMagnetic>(MagneticShields, SpawnLocation, Rotation, SpawnParameters);
 	if (pyramide)
 	{
+		pyramide->bIgnoreMagnetic = false;
 		pyramide->MagneticMesh->SetSimulatePhysics(false);
+		pyramide->MagneticMesh->SetEnableGravity(true);
 		pyramide->MagneticMesh->bGenerateOverlapEvents = false;
+		pyramide->MagneticMesh->bMultiBodyOverlap = true;
+		pyramide->MagneticMesh->SetCollisionProfileName("MagneticBox");
+		pyramide->bForceShit = false;
 		CreatedShields.Add(pyramide);
+		OnCreate();
 		pyramide->OnCreate();
 	}
 }
@@ -309,10 +360,20 @@ bool ANewWorldDiscoveryCharacter::IsSpawnPossible(FVector startLocation,FVector 
 
 void ANewWorldDiscoveryCharacter::RotateAround(float Value)
 {
-	if (Value > 0.0f)	//Always same speed
-		Value = 1.0f;
-	else if (Value < 0.0f)
-		Value = -1.0f;
+	//if (Value > 0.0f)	//Always same speed
+	//	Value = 1.0f;
+	//else if (Value < 0.0f)
+	//	Value = -1.0f;
+
+	AWorldDiscoveryPlayerController *controller = Cast<AWorldDiscoveryPlayerController>(GetWorld()->GetFirstPlayerController());
+	float MaxSensitivity = controller->InputYawScale;
+
+	if (MaxSensitivity <= 0.0f)
+		MaxSensitivity = 1.0f;
+
+	UE_LOG(LogTemp,Warning,TEXT("%f"), MaxSensitivity);
+
+	Value = FMath::Clamp(Value,-MaxSensitivity, MaxSensitivity);
 
 	OnRotateAround(Value);
 
@@ -352,8 +413,13 @@ void ANewWorldDiscoveryCharacter::EnableMagnetic()
 		FActorSpawnParameters SpawnParameters = FActorSpawnParameters();
 		SpawnParameters.bNoFail = true;
 		SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+		float direction = 1.0f;
+		FVector forward = this->GetActorForwardVector();
+		direction = forward.Y <= 0 ? -1.0f : 1.0f;
+
 		FRotator Rotation = FRotator(0.0f, 0.0f, 0.0f);
-		
+		Rotation.Roll = 90.0f + 70.0f * direction;
 		FVector ActorPos = GetActorLocation();
 		ActorPos.Z += 20.0f;
 
@@ -374,7 +440,6 @@ void ANewWorldDiscoveryCharacter::EnableMagnetic()
 					degree->magneticWaveSingle->Activate();
 				}
 			}
-				
 				
 			TargetLocation = FVector::ZeroVector;
 			playerDegree->parentCharacter = this;

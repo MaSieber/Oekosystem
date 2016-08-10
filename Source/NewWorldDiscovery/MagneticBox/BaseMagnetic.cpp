@@ -21,10 +21,10 @@ ABaseMagnetic::ABaseMagnetic()
 	MagneticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MagneticMesh"));
 	MagneticMesh->bGenerateOverlapEvents = false;
 	MagneticMesh->bMultiBodyOverlap = true;
-	MagneticMesh->SetCollisionProfileName("MagneticBox");
+	MagneticMesh->SetCollisionProfileName("NoCollision");
 	MagneticMesh->OnComponentBeginOverlap.AddDynamic(this, &ABaseMagnetic::OnOverlapBegin);
 	MagneticMesh->OnComponentEndOverlap.AddDynamic(this, &ABaseMagnetic::OnOverlapEnd);
-	MagneticMesh->SetSimulatePhysics(true);
+	MagneticMesh->SetSimulatePhysics(false);
 
 	RootComponent = MagneticMesh;
 
@@ -64,6 +64,9 @@ ABaseMagnetic::ABaseMagnetic()
 	bUpdating = false;
 	Type = 0;
 
+	bForceShit = true;
+
+
 }
 
 void ABaseMagnetic::BeginPlay()
@@ -74,6 +77,7 @@ void ABaseMagnetic::BeginPlay()
 
 	OriginLocation = GetActorLocation();
 	OriginRotation = GetActorRotation();
+
 }
 
 void ABaseMagnetic::SetRotationRate(float Value)
@@ -81,7 +85,7 @@ void ABaseMagnetic::SetRotationRate(float Value)
 	RotationRate = Value;
 
 	RotationCurrent = RotationRate * RotationAroundVelocity;
-	FMath::Clamp(RotationCurrent,-1.0f,1.0f);
+	FMath::Clamp(RotationCurrent,-RotationRate, RotationRate);
 }
 
 void ABaseMagnetic::UpdateTargetLocation(FVector Location)
@@ -158,9 +162,8 @@ void ABaseMagnetic::Tick(float DeltaTime)
 			FVector PlayerPos = playerChar->GetActorLocation();
 
 			FVector PushDirection = -1.0f * (PlayerPos - ActorPos).GetSafeNormal();
-
+			PushDirection.X = 0.0f;
 			MagneticMesh->AddImpulseAtLocation(PushDirection * PushAmount, GetActorLocation());
-
 			PullingType = ePulling::NONE;
 
 			break;
@@ -183,6 +186,24 @@ void ABaseMagnetic::Tick(float DeltaTime)
 		SetActorRotation(rot);
 	}
 
+
+
+	FVector velocity = magneticMovement->Velocity;
+	if (ActorPos.X != OriginLocation.X)
+	{
+		float absDist = FMath::Abs(ActorPos.X - OriginLocation.X);
+		if (absDist <= 0.1f)
+			velocity.X = 0.0f;
+		else
+		{
+			velocity.X = OriginLocation.X - ActorPos.X;
+		}
+	}
+	else
+	{
+		velocity.X = 0.0f;
+	}
+	magneticMovement->Velocity = velocity;
 
 }
 
@@ -292,7 +313,7 @@ void ABaseMagnetic::OnOverlap(class AActor* actor,bool bState)
 			if (magnet && Type == 1)
 			{
 				UE_LOG(LogTemp,Warning,TEXT("ObjectMagnet"));
-				TargetLocation = magnet->magneticTrigger->GetComponentLocation();
+				TargetLocation = magnet->UnrealFickDich->GetComponentLocation();
 				UE_LOG(LogTemp, Warning, TEXT("ObjectMagnet Actor z:%f,target x: %f y: %f z: %f"), GetActorLocation().Z,TargetLocation.X, TargetLocation.Y, TargetLocation.Z);
 				if (GetActorLocation().Z > TargetLocation.Z) //critical test
 				{
@@ -332,7 +353,11 @@ void ABaseMagnetic::OnOverlap(class AActor* actor,bool bState)
 	}
 	else
 	{
-		TriggerMagneticStop();
+		AObjectMagnet *magnet = Cast<AObjectMagnet>(actor);
+		if (magnet && parentCharacter == nullptr)
+		{
+			TriggerMagneticStop();
+		}
 	}
 }
 

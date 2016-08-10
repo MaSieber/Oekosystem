@@ -11,10 +11,14 @@ ABaseObstacle::ABaseObstacle()
 	PrimaryActorTick.bCanEverTick = true;
 
 	objectMagnet = nullptr;
+	objectMagnet2 = nullptr;
 	bStatic = false;
 	MagneticObject = nullptr;
 	IsDestroyed = true;
 	bBeginDestroy = false;
+
+	bRightActive = true;
+	bLeftActive = true;
 }
 
 // Called when the game starts or when spawned
@@ -23,6 +27,7 @@ void ABaseObstacle::BeginPlay()
 	Super::BeginPlay();
 
 	SpawnMagnet();
+	SpawnMagnet2();
 	
 }
 
@@ -36,10 +41,7 @@ void ABaseObstacle::Tick( float DeltaTime )
 	{
 		state = 1;
 		UE_LOG(LogTemp, Warning, TEXT("%d"), state);
-	}
-		
-
-	
+	}	
 
 	if (bBeginDestroy && MagneticObject != nullptr && MagneticObject->IsBeingDestroyed())
 	{
@@ -54,7 +56,7 @@ void ABaseObstacle::Tick( float DeltaTime )
 
 void ABaseObstacle::SpawnMagnet()
 {
-	if (MagnetAbility)
+	if (bLeftActive && MagnetAbility)
 	{
 		FActorSpawnParameters SpawnParameters = FActorSpawnParameters();
 		SpawnParameters.bNoFail = true;
@@ -66,9 +68,31 @@ void ABaseObstacle::SpawnMagnet()
 		objectMagnet = GetWorld()->SpawnActor<AObjectMagnet>(MagnetAbility, ActorPos, Rotation, SpawnParameters);
 		if (objectMagnet)
 		{
-			objectMagnet->magneticTrigger->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-			objectMagnet->magneticTrigger->bGenerateOverlapEvents = true;
+			objectMagnet->UnrealFickDich->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+			objectMagnet->UnrealFickDich->bGenerateOverlapEvents = true;
 			objectMagnet->magneticWave->Activate();
+			bMagneticEffect = true;
+		}
+	}
+}
+
+void ABaseObstacle::SpawnMagnet2()
+{
+	if (bRightActive && MagnetAbility)
+	{
+		FActorSpawnParameters SpawnParameters = FActorSpawnParameters();
+		SpawnParameters.bNoFail = true;
+		SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		FRotator Rotation = FRotator(0.0f, 0.0f, 0.0f);
+
+		FVector ActorPos = GetActorLocation();
+
+		objectMagnet2 = GetWorld()->SpawnActor<AObjectMagnet>(MagnetAbility, ActorPos, Rotation, SpawnParameters);
+		if (objectMagnet2)
+		{
+			objectMagnet2->UnrealFickDich->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+			objectMagnet2->UnrealFickDich->bGenerateOverlapEvents = true;
+			objectMagnet2->magneticWave->Activate();
 			bMagneticEffect = true;
 		}
 	}

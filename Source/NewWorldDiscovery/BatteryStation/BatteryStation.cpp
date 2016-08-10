@@ -101,7 +101,7 @@ void ABatteryStation::Reset()
 
 			if (AMovingPlatform* platform = Cast<AMovingPlatform>(actor))
 			{
-				platform->ResetPlatform();
+				platform->ResetPlatform(false);
 			}
 			else if (ABaseMagnetic* magnetic = Cast<ABaseMagnetic>(actor))
 			{

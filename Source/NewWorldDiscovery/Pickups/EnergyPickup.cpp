@@ -2,8 +2,9 @@
 
 #include "NewWorldDiscovery.h"
 #include "EnergyPickup.h"
-#include "WorldDiscoveryPlayerState.h"
-#include "NewWorldDiscoveryCharacter.h"
+
+#include "../WorldDiscoveryPlayerState.h"
+#include "../NewWorldDiscoveryCharacter.h"
 
 
 // Sets default values

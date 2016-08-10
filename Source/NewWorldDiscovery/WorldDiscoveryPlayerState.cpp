@@ -8,6 +8,7 @@
 AWorldDiscoveryPlayerState::AWorldDiscoveryPlayerState()
 {
 	CurrentEnergy = 0;
+	Abilitys = 0;
 }
 
 
@@ -78,10 +79,43 @@ void AWorldDiscoveryPlayerState::RemoveRessource(int32 ressource)
 	}
 }
 
+
+void AWorldDiscoveryPlayerState::AddAbility(int32 ability)
+{
+	Abilitys = Abilitys | ability;
+}
 void AWorldDiscoveryPlayerState::AddRoboPart(int32 part)
 {
 	CollectedParts = CollectedParts | part;
 }
+
+bool AWorldDiscoveryPlayerState::HasBallAbility()
+{
+	if ((Abilitys & 2) == 2)
+	{
+		return true;
+	}
+	return false;
+}
+
+bool AWorldDiscoveryPlayerState::HasBoxAbility()
+{
+	if ((Abilitys & 1) == 1)
+	{
+		return true;
+	}
+	return false;
+}
+
+bool AWorldDiscoveryPlayerState::HasShieldAbility()
+{
+	if ((Abilitys & 4) == 4)
+	{
+		return true;
+	}
+	return false;
+}
+
 
 int32 AWorldDiscoveryPlayerState::GetRoboParts()
 {
