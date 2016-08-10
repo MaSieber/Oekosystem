@@ -11,6 +11,21 @@ ARobopartBody::ARobopartBody()
 	PrimaryActorTick.bCanEverTick = true;
 
 
+	HeadPoint = CreateDefaultSubobject<USceneComponent>(TEXT("HeadPoint"));
+	HeadPoint->AttachTo(RoboMesh);
+
+	RightArmPoint = CreateDefaultSubobject<USceneComponent>(TEXT("RightArmPoint"));
+	RightArmPoint->AttachTo(RoboMesh);
+
+	LeftArmPoint = CreateDefaultSubobject<USceneComponent>(TEXT("LeftArmPoint"));
+	LeftArmPoint->AttachTo(RoboMesh);
+
+	LeftLegPoint = CreateDefaultSubobject<USceneComponent>(TEXT("LeftLegPoint"));
+	LeftLegPoint->AttachTo(RoboMesh);
+
+	RightLegPoint = CreateDefaultSubobject<USceneComponent>(TEXT("RightLegPoint"));
+	RightLegPoint->AttachTo(RoboMesh);
+
 }
 
 // Called when the game starts or when spawned

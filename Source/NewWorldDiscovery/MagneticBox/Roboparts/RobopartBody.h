@@ -22,6 +22,20 @@ public:
 	// Called every frame
 	virtual void Tick( float DeltaSeconds ) override;
 
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = RobopartBody)
+	USceneComponent* HeadPoint;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = RobopartBody)
+	USceneComponent* LeftArmPoint;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = RobopartBody)
+	USceneComponent* RightArmPoint;
 	
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = RobopartBody)
+	USceneComponent* LeftLegPoint;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = RobopartBody)
+	USceneComponent* RightLegPoint;
+
 	
 };

@@ -22,4 +22,10 @@ public:
 	// Called every frame
 	virtual void Tick( float DeltaSeconds ) override;
 
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = BaseRoboPart)
+	UStaticMeshComponent* FixPointMesh;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = BaseRoboPart)
+	UStaticMeshComponent* RoboMesh;
+
 };
