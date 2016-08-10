@@ -54,6 +54,7 @@ void AMagnetBlueprintPickup::OnOverlapBegin(class AActor* OtherActor, class UPri
 		if (playerState != nullptr)
 		{
 			playerState->AddAbility((int32)AbilityType);
+			K2_DestroyActor();
 		}
 	}
 }
