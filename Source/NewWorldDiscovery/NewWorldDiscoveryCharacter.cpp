@@ -2,6 +2,7 @@
 
 #include "NewWorldDiscovery.h"
 #include "NewWorldDiscoveryCharacter.h"
+#include "WorldDiscoveryPlayerController.h"
 #include "WorldDiscoveryPlayerState.h"
 #include "DrawDebugHelpers.h"
 #include "HelperClass.h"
@@ -364,7 +365,15 @@ void ANewWorldDiscoveryCharacter::RotateAround(float Value)
 	//else if (Value < 0.0f)
 	//	Value = -1.0f;
 
-	Value = FMath::Clamp(Value,-1.0f,1.0f);
+	AWorldDiscoveryPlayerController *controller = Cast<AWorldDiscoveryPlayerController>(GetWorld()->GetFirstPlayerController());
+	float MaxSensitivity = controller->InputYawScale;
+
+	if (MaxSensitivity <= 0.0f)
+		MaxSensitivity = 1.0f;
+
+	UE_LOG(LogTemp,Warning,TEXT("%f"), MaxSensitivity);
+
+	Value = FMath::Clamp(Value,-MaxSensitivity, MaxSensitivity);
 
 	OnRotateAround(Value);
 

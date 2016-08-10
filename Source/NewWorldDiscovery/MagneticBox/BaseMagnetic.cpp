@@ -66,27 +66,6 @@ ABaseMagnetic::ABaseMagnetic()
 
 	bForceShit = true;
 
-	UE_LOG(LogTemp, Warning, TEXT("Construct - BaseMagnetic"));
-
-	if (MagneticMesh->IsSimulatingPhysics())
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Physic Enabled"));
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Physic Disabled"));
-	}
-
-	if (MagneticMesh->IsGravityEnabled())
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Gravity Enabled"));
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Gravity Disabled"));
-	}
-
-	UE_LOG(LogTemp, Warning, TEXT("%s"), *MagneticMesh->GetCollisionProfileName().ToString());
 
 }
 
@@ -94,33 +73,11 @@ void ABaseMagnetic::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UE_LOG(LogTemp, Warning, TEXT("BeginPlay - BaseMagnetic"));
-
 	StaticXPos = GetActorLocation().X;
 
 	OriginLocation = GetActorLocation();
 	OriginRotation = GetActorRotation();
 
-
-	if (MagneticMesh->IsSimulatingPhysics())
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Physic Enabled"));
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Physic Disabled"));
-	}
-
-	if (MagneticMesh->IsGravityEnabled())
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Gravity Enabled"));
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Gravity Disabled"));
-	}
-
-	UE_LOG(LogTemp, Warning, TEXT("%s"), *MagneticMesh->GetCollisionProfileName().ToString());
 }
 
 void ABaseMagnetic::SetRotationRate(float Value)
@@ -128,7 +85,7 @@ void ABaseMagnetic::SetRotationRate(float Value)
 	RotationRate = Value;
 
 	RotationCurrent = RotationRate * RotationAroundVelocity;
-	FMath::Clamp(RotationCurrent,-1.0f,1.0f);
+	FMath::Clamp(RotationCurrent,-RotationRate, RotationRate);
 }
 
 void ABaseMagnetic::UpdateTargetLocation(FVector Location)
