@@ -101,6 +101,7 @@ void ANewWorldDiscoveryCharacter::CheatEnableAllAbilitys()
 	if (playerState != nullptr)
 	{
 		playerState->AddAbility(7);
+		playerState->AddRoboPart(31);
 	}
 }
 
