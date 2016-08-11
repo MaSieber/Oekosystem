@@ -36,7 +36,7 @@ public:
 	void triggerMagnetic(FVector Location, bool bUpdating);
 
 	UFUNCTION(BlueprintCallable, Category = BaseMagnetic)
-	void TriggerMagneticStop();
+	virtual void TriggerMagneticStop();
 
 	UFUNCTION(BlueprintCallable, Category = BaseMagnetic)
 	void TriggerMagneticPush();
