@@ -31,6 +31,11 @@ ABaseRoboPart::ABaseRoboPart()
 	MagneticMesh->bMultiBodyOverlap = true;
 	MagneticMesh->SetCollisionProfileName("RoboPart");
 
+	RotationVelocity = 0.0f;
+	PullVelocity = 500;
+	PullAcceleration = 50;
+	PushAmount = 150000.0f;
+
 	Type = 999;
 }
 
@@ -45,6 +50,13 @@ void ABaseRoboPart::BeginPlay()
 void ABaseRoboPart::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
+
+}
+
+void ABaseRoboPart::TriggerMagneticStop()
+{
+	Super::TriggerMagneticStop();
+	MagneticMesh->SetEnableGravity(false);
 
 }
 
