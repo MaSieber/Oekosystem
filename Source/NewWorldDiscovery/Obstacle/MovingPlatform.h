@@ -59,6 +59,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MovingPlatform)
 	float Acceleration;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MovingPlatform)
+	bool bRestAnim;
+
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = MovingPlatform)
 	USceneComponent* BaseComponent;
 
@@ -95,6 +98,8 @@ public:
 	UFUNCTION()
 	virtual void DestroyMagneticObject() override;
 
+
+
 private:
 	uint32 StoringEnergy;
 	float CurrentVelocity;
@@ -115,8 +120,7 @@ private:
 	AActor *actor;
 	AActor *CollisionActor;
 	int32 ColliderType;
-
-	bool bRestAnim;
+	
 	bool bStarted;
 	
 };
