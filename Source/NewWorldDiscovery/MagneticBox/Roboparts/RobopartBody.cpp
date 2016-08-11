@@ -26,6 +26,42 @@ ARobopartBody::ARobopartBody()
 	RightLegPoint = CreateDefaultSubobject<USceneComponent>(TEXT("RightLegPoint"));
 	RightLegPoint->AttachTo(RoboMesh);
 
+	HeadPointCollider = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("HeadPointCollider"));
+	HeadPointCollider->bGenerateOverlapEvents = true;
+	HeadPointCollider->bMultiBodyOverlap = true;
+	HeadPointCollider->SetSimulatePhysics(false);
+	HeadPointCollider->SetCollisionProfileName("ObjectMagnet");
+	HeadPointCollider->AttachTo(HeadPoint);
+
+	RightArmPointCollider = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("RightArmPointCollider"));
+	RightArmPointCollider->bGenerateOverlapEvents = true;
+	RightArmPointCollider->bMultiBodyOverlap = true;
+	RightArmPointCollider->SetSimulatePhysics(false);
+	RightArmPointCollider->SetCollisionProfileName("ObjectMagnet");
+	RightArmPointCollider->AttachTo(RightArmPoint);
+
+	LeftArmPointCollider = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("LeftArmPointCollider"));
+	LeftArmPointCollider->bGenerateOverlapEvents = true;
+	LeftArmPointCollider->bMultiBodyOverlap = true;
+	LeftArmPointCollider->SetSimulatePhysics(false);
+	LeftArmPointCollider->SetCollisionProfileName("ObjectMagnet");
+	LeftArmPointCollider->AttachTo(LeftArmPoint);
+
+	LeftLegPointCollider = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("LeftLegPointCollider"));
+	LeftLegPointCollider->bGenerateOverlapEvents = true;
+	LeftLegPointCollider->bMultiBodyOverlap = true;
+	LeftLegPointCollider->SetSimulatePhysics(false);
+	LeftLegPointCollider->SetCollisionProfileName("ObjectMagnet");
+	LeftLegPointCollider->AttachTo(LeftLegPoint);
+
+	RightLegPointCollider = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("RightLegPointCollider"));
+	RightLegPointCollider->bGenerateOverlapEvents = true;
+	RightLegPointCollider->bMultiBodyOverlap = true;
+	RightLegPointCollider->SetSimulatePhysics(false);
+	RightLegPointCollider->SetCollisionProfileName("ObjectMagnet");
+	RightLegPointCollider->AttachTo(RightLegPoint);
+
+
 }
 
 // Called when the game starts or when spawned

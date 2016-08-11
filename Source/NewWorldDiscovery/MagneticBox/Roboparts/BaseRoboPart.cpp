@@ -29,7 +29,14 @@ ABaseRoboPart::ABaseRoboPart()
 	MagneticMesh->SetEnableGravity(true);
 	MagneticMesh->bGenerateOverlapEvents = true;
 	MagneticMesh->bMultiBodyOverlap = true;
-	MagneticMesh->SetCollisionProfileName("MagneticBox");
+	MagneticMesh->SetCollisionProfileName("RoboPart");
+
+	RotationVelocity = 0.0f;
+	PullVelocity = 500;
+	PullAcceleration = 50;
+	PushAmount = 150000.0f;
+
+	Type = 999;
 }
 
 // Called when the game starts or when spawned
@@ -43,6 +50,13 @@ void ABaseRoboPart::BeginPlay()
 void ABaseRoboPart::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
+
+}
+
+void ABaseRoboPart::TriggerMagneticStop()
+{
+	Super::TriggerMagneticStop();
+	MagneticMesh->SetEnableGravity(false);
 
 }
 

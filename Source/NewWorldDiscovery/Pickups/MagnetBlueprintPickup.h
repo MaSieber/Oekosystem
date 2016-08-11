@@ -44,5 +44,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AbilityPickup)
 	EAbility AbilityType;
 
+	UFUNCTION(BlueprintImplementableEvent, Category = BaseMagneticEvent)
+	void OnDestroying();
 
 };

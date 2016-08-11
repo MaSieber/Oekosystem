@@ -45,6 +45,7 @@ void APickupRoboterPart::Tick( float DeltaTime )
 void APickupRoboterPart::OnOverlapBegin(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	PickupEventCollider->bGenerateOverlapEvents = false;
+	PickupEventCollider->SetCollisionProfileName("NoCollision");
 	ANewWorldDiscoveryCharacter *playerChar = Cast<ANewWorldDiscoveryCharacter>(OtherActor);
 	if (playerChar)
 	{
@@ -52,7 +53,7 @@ void APickupRoboterPart::OnOverlapBegin(class AActor* OtherActor, class UPrimiti
 		if (playerState != nullptr)
 		{
 			playerState->AddRoboPart((int32)RoboPartType);
-			K2_DestroyActor();
+			OnDestroying();
 
 		}
 	}

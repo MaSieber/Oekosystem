@@ -28,4 +28,7 @@ public:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = BaseRoboPart)
 	UStaticMeshComponent* RoboMesh;
 
+	UFUNCTION(BlueprintCallable, Category = BaseRoboPart)
+	virtual void TriggerMagneticStop() override;
+
 };
