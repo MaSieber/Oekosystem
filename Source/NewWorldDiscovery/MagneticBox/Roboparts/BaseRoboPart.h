@@ -31,4 +31,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = BaseRoboPart)
 	virtual void TriggerMagneticStop() override;
 
+	UFUNCTION(BlueprintCallable, Category = BaseRoboPart)
+	virtual void TriggerMagneticPush() override;
+
+	bool IsPushed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = BaseRoboPart)
+	bool ReadyForDestroy;
+
 };

@@ -20,7 +20,7 @@ ABaseRoboPart::ABaseRoboPart()
 	RoboMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("RoboMesh"));
 	RoboMesh->bGenerateOverlapEvents = false;
 	RoboMesh->bMultiBodyOverlap = true;
-	RoboMesh->SetCollisionProfileName("NoCollision");
+	RoboMesh->SetCollisionProfileName("BlockAllDynamic");
 	RoboMesh->SetSimulatePhysics(false);
 	RoboMesh->AttachTo(FixPointMesh);
 
@@ -37,12 +37,17 @@ ABaseRoboPart::ABaseRoboPart()
 	PushAmount = 150000.0f;
 
 	Type = 999;
+
+	IsPushed = false;
+	ReadyForDestroy = false;
 }
 
 // Called when the game starts or when spawned
 void ABaseRoboPart::BeginPlay()
 {
 	Super::BeginPlay();
+
+	RoboMesh->SetCollisionProfileName("NoCollision");
 	
 }
 
@@ -57,6 +62,13 @@ void ABaseRoboPart::TriggerMagneticStop()
 {
 	Super::TriggerMagneticStop();
 	MagneticMesh->SetEnableGravity(false);
+	MagneticMesh->SetSimulatePhysics(false);
+	magneticMovement->StopMovementImmediately();
+}
 
+void ABaseRoboPart::TriggerMagneticPush()
+{
+	Super::TriggerMagneticPush();
+	IsPushed = true;
 }
 

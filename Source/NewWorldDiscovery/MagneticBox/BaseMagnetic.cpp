@@ -412,3 +412,8 @@ bool ABaseMagnetic::IsDestroyed()
 {
 	return bIsDestroyed || bDestroying;
 }
+
+bool ABaseMagnetic::IsGrabbed()
+{
+	return (PullingType != ePulling::NONE);
+}
