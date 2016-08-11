@@ -29,7 +29,9 @@ ABaseRoboPart::ABaseRoboPart()
 	MagneticMesh->SetEnableGravity(true);
 	MagneticMesh->bGenerateOverlapEvents = true;
 	MagneticMesh->bMultiBodyOverlap = true;
-	MagneticMesh->SetCollisionProfileName("MagneticBox");
+	MagneticMesh->SetCollisionProfileName("RoboPart");
+
+	Type = 999;
 }
 
 // Called when the game starts or when spawned

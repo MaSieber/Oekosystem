@@ -45,5 +45,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PickupRoboterPart)
 	ERoboterPart RoboPartType;
+
+	UFUNCTION(BlueprintImplementableEvent, Category = BaseMagneticEvent)
+	void OnDestroying();
 	
 };

@@ -37,5 +37,19 @@ public:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = RobopartBody)
 	USceneComponent* RightLegPoint;
 
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = ObjectMagnet)
+	UStaticMeshComponent* HeadPointCollider;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = ObjectMagnet)
+	UStaticMeshComponent* LeftArmPointCollider;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = ObjectMagnet)
+	UStaticMeshComponent* RightArmPointCollider;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = ObjectMagnet)
+	UStaticMeshComponent* LeftLegPointCollider;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = ObjectMagnet)
+	UStaticMeshComponent* RightLegPointCollider;
 	
 };
