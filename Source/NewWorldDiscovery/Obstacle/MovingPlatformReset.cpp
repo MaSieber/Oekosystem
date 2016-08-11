@@ -45,7 +45,6 @@ void AMovingPlatformReset::Tick( float DeltaTime )
 
 void AMovingPlatformReset::Reset()
 {
-	
 	for (AMovingPlatform* platform : Platforms)
 	{
 		platform->ResetPlatform(false);
@@ -58,5 +57,6 @@ void AMovingPlatformReset::OnOverlapBegin(class AActor* OtherActor, class UPrimi
 	if (playerCharacter)
 	{
 		Reset();
+		OnReset();
 	}
 }
