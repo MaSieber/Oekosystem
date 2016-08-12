@@ -34,11 +34,26 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Ability)
 	TSubclassOf<class ABaseRoboPart> SpawnRoboPart;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Ability)
+	bool IsSpawned;
+
 	UFUNCTION()
 	void OnOverlapBegin(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = RobopartSpawn)
+	UStaticMeshComponent* SpawnMesh;
+
+	UFUNCTION(BlueprintImplementableEvent, Category = RobopartSpawn)
+	void OnSpawn();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = RobopartSpawn)
+	void OnDespawn();
+
 private:
 	ABaseRoboPart* RoboPart;
+	bool bIsDestroying;
+
+	bool bDespawnEventTriggered;
 
 	
 };

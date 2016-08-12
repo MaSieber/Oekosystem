@@ -65,6 +65,7 @@ ABaseMagnetic::ABaseMagnetic()
 	Type = 0;
 
 	bForceShit = true;
+	
 
 
 }
@@ -230,7 +231,10 @@ void ABaseMagnetic::triggerMagnetic(FVector Location, bool bUpdating)
 void ABaseMagnetic::TriggerMagneticStop()
 {
 	PullingType = ePulling::NONE;
-	MagneticMesh->SetCollisionProfileName("MagneticBox");
+	if (Type == 999)
+		MagneticMesh->SetCollisionProfileName("RoboPart");
+	else
+		MagneticMesh->SetCollisionProfileName("MagneticBox");
 	MagneticMesh->SetEnableGravity(true);
 	MagneticMesh->SetSimulatePhysics(true);
 	MagneticMesh->bGenerateOverlapEvents = true;
@@ -254,7 +258,10 @@ void ABaseMagnetic::TriggerMagneticPush()
 		UE_LOG(LogTemp, Warning, TEXT("Push"));
 
 		PullingType = ePulling::PUSHING;
-		MagneticMesh->SetCollisionProfileName("MagneticBox");
+		if (Type == 999)
+			MagneticMesh->SetCollisionProfileName("RoboPart");
+		else 
+			MagneticMesh->SetCollisionProfileName("MagneticBox");
 		MagneticMesh->SetEnableGravity(true);
 		MagneticMesh->SetSimulatePhysics(true);
 		MagneticMesh->bGenerateOverlapEvents = true;
@@ -307,30 +314,43 @@ void ABaseMagnetic::OnOverlap(class AActor* actor,bool bState)
 		if (bIgnoreMagnetic)
 			return;
 
-		if (PullingType == ePulling::NONE)
-		{
-			AObjectMagnet *magnet = Cast<AObjectMagnet>(actor);
-			if (magnet && Type == 1)
-			{
-				UE_LOG(LogTemp,Warning,TEXT("ObjectMagnet"));
-				TargetLocation = magnet->UnrealFickDich->GetComponentLocation();
-				UE_LOG(LogTemp, Warning, TEXT("ObjectMagnet Actor z:%f,target x: %f y: %f z: %f"), GetActorLocation().Z,TargetLocation.X, TargetLocation.Y, TargetLocation.Z);
-				if (GetActorLocation().Z > TargetLocation.Z) //critical test
-				{
-					ANewWorldDiscoveryCharacter *playerChar = Cast<ANewWorldDiscoveryCharacter>(parentCharacter);
-					if (playerChar)
-					{
-						playerChar->RemovePulledObject(this);
-					}
+		UE_LOG(LogTemp, Warning, TEXT("OnOverlap"));
 
-					parentCharacter = nullptr;
-					Radius = magnet->Radius;
-					CurrentVelocity = magnet->PullingVelocity;
-					triggerMagnetic(TargetLocation, false);
+		AObjectMagnet *magnet = Cast<AObjectMagnet>(actor);
+		if (magnet)
+		{
+			switch (Type)
+			{
+			case 1:
+				if (PullingType != ePulling::PULLING)
+				{ 
+					UE_LOG(LogTemp, Warning, TEXT("ObjectMagnet - Type 1"));
+					TargetLocation = magnet->UnrealFickDich->GetComponentLocation();
+					if (GetActorLocation().Z > TargetLocation.Z) //critical test
+					{
+						ANewWorldDiscoveryCharacter *playerChar = Cast<ANewWorldDiscoveryCharacter>(parentCharacter);
+						if (playerChar)
+						{
+							playerChar->RemovePulledObject(this);
+						}
+
+						parentCharacter = nullptr;
+						Radius = magnet->Radius;
+						CurrentVelocity = magnet->PullingVelocity;
+						triggerMagnetic(TargetLocation, false);
+					}
 				}
-				return;
+				break;
+			case 999:
+				UE_LOG(LogTemp, Warning, TEXT("ObjectMagnet - Type 999"));
+				break;
+
 			}
-			
+			return;
+		}
+
+		if (PullingType == ePulling::NONE)
+		{			
 			APlayerDegree *playerDegree = Cast<APlayerDegree>(actor);
 			if (playerDegree)
 			{
@@ -392,4 +412,9 @@ void ABaseMagnetic::SetNewMassScale(const float& NewScale)
 bool ABaseMagnetic::IsDestroyed()
 {
 	return bIsDestroyed || bDestroying;
+}
+
+bool ABaseMagnetic::IsGrabbed()
+{
+	return (PullingType != ePulling::NONE);
 }

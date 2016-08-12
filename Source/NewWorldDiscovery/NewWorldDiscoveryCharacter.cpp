@@ -101,6 +101,7 @@ void ANewWorldDiscoveryCharacter::CheatEnableAllAbilitys()
 	if (playerState != nullptr)
 	{
 		playerState->AddAbility(7);
+		playerState->AddRoboPart(31);
 	}
 }
 
@@ -370,8 +371,6 @@ void ANewWorldDiscoveryCharacter::RotateAround(float Value)
 
 	if (MaxSensitivity <= 0.0f)
 		MaxSensitivity = 1.0f;
-
-	UE_LOG(LogTemp,Warning,TEXT("%f"), MaxSensitivity);
 
 	Value = FMath::Clamp(Value,-MaxSensitivity, MaxSensitivity);
 

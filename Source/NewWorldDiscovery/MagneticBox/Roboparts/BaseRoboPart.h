@@ -22,4 +22,30 @@ public:
 	// Called every frame
 	virtual void Tick( float DeltaSeconds ) override;
 
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = BaseRoboPart)
+	UStaticMeshComponent* ScalingMesh;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = BaseRoboPart)
+	UStaticMeshComponent* FixPointMesh;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = BaseRoboPart)
+	UStaticMeshComponent* RoboMesh;
+
+	UFUNCTION(BlueprintCallable, Category = BaseRoboPart)
+	virtual void TriggerMagneticStop() override;
+
+	UFUNCTION(BlueprintCallable, Category = BaseRoboPart)
+	virtual void TriggerMagneticPush() override;
+
+	bool IsPushed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = BaseRoboPart)
+	bool ReadyForDestroy;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = BaseRoboPart)
+	bool bIsSnaped;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = BaseRoboPart)
+	bool bEmissveEvent;
+
 };

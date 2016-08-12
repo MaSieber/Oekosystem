@@ -36,10 +36,10 @@ public:
 	void triggerMagnetic(FVector Location, bool bUpdating);
 
 	UFUNCTION(BlueprintCallable, Category = BaseMagnetic)
-	void TriggerMagneticStop();
+	virtual void TriggerMagneticStop();
 
 	UFUNCTION(BlueprintCallable, Category = BaseMagnetic)
-	void TriggerMagneticPush();
+	virtual void TriggerMagneticPush();
 
 	UFUNCTION(BlueprintImplementableEvent, Category = BaseMagneticEvent)
 	void OnCreate();
@@ -116,6 +116,9 @@ public:
 
 	int32 Type;
 	bool bForceShit;
+
+	UFUNCTION()
+	bool IsGrabbed();
 
 protected:
 	void Accelerate(float DeltaTime);

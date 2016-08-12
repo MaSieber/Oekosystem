@@ -24,5 +24,11 @@ void ARobopartHead::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
 
+	if (bEmissveEvent)
+	{
+		OnEmissve();
+		bEmissveEvent = false;
+	}
+
 }
 
