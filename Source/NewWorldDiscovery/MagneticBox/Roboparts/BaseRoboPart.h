@@ -45,4 +45,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = BaseRoboPart)
 	bool bIsSnaped;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = BaseRoboPart)
+	bool bEmissveEvent;
+
 };

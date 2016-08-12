@@ -22,6 +22,7 @@ public:
 	// Called every frame
 	virtual void Tick( float DeltaSeconds ) override;
 
-	
+	UFUNCTION(BlueprintImplementableEvent, Category = BaseMagneticEvent)
+	void OnEmissve();
 	
 };

@@ -48,6 +48,7 @@ ABaseRoboPart::ABaseRoboPart()
 	IsPushed = false;
 	ReadyForDestroy = false;
 	bIsSnaped = false;
+	bEmissveEvent = false;
 
 }
 
