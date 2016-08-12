@@ -10,26 +10,33 @@ ABaseRoboPart::ABaseRoboPart()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	FixPointMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("FixPointMesh"));
-	FixPointMesh->bGenerateOverlapEvents = false;
-	FixPointMesh->bMultiBodyOverlap = true;
-	FixPointMesh->SetCollisionProfileName("NoCollision");
-	FixPointMesh->SetSimulatePhysics(false);
-	FixPointMesh->AttachTo(MagneticMesh);
-
-	RoboMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("RoboMesh"));
-	RoboMesh->bGenerateOverlapEvents = false;
-	RoboMesh->bMultiBodyOverlap = true;
-	RoboMesh->SetCollisionProfileName("BlockAllDynamic");
-	RoboMesh->SetSimulatePhysics(false);
-	RoboMesh->AttachTo(FixPointMesh);
-
 	bIgnoreMagnetic = false;
 	MagneticMesh->SetSimulatePhysics(false);
 	MagneticMesh->SetEnableGravity(true);
 	MagneticMesh->bGenerateOverlapEvents = true;
 	MagneticMesh->bMultiBodyOverlap = true;
 	MagneticMesh->SetCollisionProfileName("RoboPart");
+
+	ScalingMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ScalingMesh"));
+	ScalingMesh->bGenerateOverlapEvents = false;
+	ScalingMesh->bMultiBodyOverlap = false;
+	ScalingMesh->SetCollisionProfileName("NoCollision");
+	ScalingMesh->SetSimulatePhysics(false);
+	ScalingMesh->AttachTo(MagneticMesh);
+
+	FixPointMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("FixPointMesh"));
+	FixPointMesh->bGenerateOverlapEvents = false;
+	FixPointMesh->bMultiBodyOverlap = false;
+	FixPointMesh->SetCollisionProfileName("NoCollision");
+	FixPointMesh->SetSimulatePhysics(false);
+	FixPointMesh->AttachTo(ScalingMesh);
+
+	RoboMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("RoboMesh"));
+	RoboMesh->bGenerateOverlapEvents = false;
+	RoboMesh->bMultiBodyOverlap = false;
+	RoboMesh->SetCollisionProfileName("NoCollision");
+	RoboMesh->SetSimulatePhysics(false);
+	RoboMesh->AttachTo(FixPointMesh);
 
 	RotationVelocity = 0.0f;
 	PullVelocity = 500;
@@ -40,6 +47,8 @@ ABaseRoboPart::ABaseRoboPart()
 
 	IsPushed = false;
 	ReadyForDestroy = false;
+	bIsSnaped = false;
+
 }
 
 // Called when the game starts or when spawned
@@ -47,7 +56,7 @@ void ABaseRoboPart::BeginPlay()
 {
 	Super::BeginPlay();
 
-	RoboMesh->SetCollisionProfileName("NoCollision");
+	//RoboMesh->SetCollisionProfileName("NoCollision");
 	
 }
 
@@ -61,9 +70,11 @@ void ABaseRoboPart::Tick( float DeltaTime )
 void ABaseRoboPart::TriggerMagneticStop()
 {
 	Super::TriggerMagneticStop();
-	MagneticMesh->SetEnableGravity(false);
-	MagneticMesh->SetSimulatePhysics(false);
+
+	MagneticMesh->SetEnableGravity(!bIsSnaped);
+	MagneticMesh->SetSimulatePhysics(!bIsSnaped);
 	magneticMovement->StopMovementImmediately();
+	
 }
 
 void ABaseRoboPart::TriggerMagneticPush()

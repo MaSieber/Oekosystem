@@ -65,6 +65,7 @@ ABaseMagnetic::ABaseMagnetic()
 	Type = 0;
 
 	bForceShit = true;
+	
 
 
 }

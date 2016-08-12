@@ -23,6 +23,9 @@ public:
 	virtual void Tick( float DeltaSeconds ) override;
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = BaseRoboPart)
+	UStaticMeshComponent* ScalingMesh;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = BaseRoboPart)
 	UStaticMeshComponent* FixPointMesh;
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = BaseRoboPart)
@@ -38,5 +41,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = BaseRoboPart)
 	bool ReadyForDestroy;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = BaseRoboPart)
+	bool bIsSnaped;
 
 };

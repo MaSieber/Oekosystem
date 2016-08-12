@@ -81,6 +81,11 @@ void ARobopartSpawn::OnOverlapBegin(class AActor* OtherActor, class UPrimitiveCo
 	ANewWorldDiscoveryCharacter *character = Cast<ANewWorldDiscoveryCharacter>(OtherActor);
 	if (character)
 	{
+		AWorldDiscoveryPlayerState *state = Cast<AWorldDiscoveryPlayerState>(character->PlayerState);
+
+		if (state->GetRoboParts() < 31)
+			return;
+
 		if (SpawnRoboPart)
 		{
 			character->GetMovementComponent()->StopMovementImmediately();
@@ -96,8 +101,8 @@ void ARobopartSpawn::OnOverlapBegin(class AActor* OtherActor, class UPrimitiveCo
 			if (RoboPart)
 			{
 				RoboPart->MagneticMesh->bGenerateOverlapEvents = true;
-				RoboPart->MagneticMesh->SetSimulatePhysics(true);
-				RoboPart->MagneticMesh->SetEnableGravity(false);
+				RoboPart->MagneticMesh->SetSimulatePhysics(false);
+				RoboPart->MagneticMesh->SetEnableGravity(true);
 				IsSpawned = true;
 				bIsDestroying = false;
 				bDespawnEventTriggered = false;
